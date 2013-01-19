@@ -81,7 +81,7 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 
 	if( _pf.GetInt(TEXT("DtViewEnable"), &_bDtViewEnable) == FALSE )
 	{
-		SetDtViewEnable(TRUE);
+		SetDtViewEnable(FALSE);
 	}
 
 	if( _pf.GetInt(TEXT("DtViewMaxSpace"), &_iDtViewMaxSpace) == FALSE )
