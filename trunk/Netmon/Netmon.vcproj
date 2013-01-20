@@ -325,6 +325,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\utils\ProcessCache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessCache.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utils\Profile.cpp"
 				>
 			</File>

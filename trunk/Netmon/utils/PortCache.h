@@ -5,7 +5,7 @@ class PortCache
 {
 protected:
 	// The port cache that makes looking up tcp / udp table much more faster.
-	// The table is initialized to all zero when in constructor, which means that
+	// The table is initialized to all zero in constructor, which means that
 	// no map from port to pid is logged.
 	//
 	// PortCache class has a GetTcpPortPid() / GetUdpPortPid interface, which is used to replace
