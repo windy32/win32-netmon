@@ -22,7 +22,7 @@ TCHAR *ProcessCache::GetName(int pid)
 	{
 		rebuildTable();
 	}
-	return _nameTable[pid];
+	return _nameTable[pid][0] == TEXT('\0') ? TEXT("Unknown") : _nameTable[pid];
 }
 
 TCHAR *ProcessCache::GetFullPath(int pid)
@@ -31,7 +31,7 @@ TCHAR *ProcessCache::GetFullPath(int pid)
 	{
 		rebuildTable();
 	}
-	return _pathTable[pid];
+	return _pathTable[pid][0] == TEXT('\0') ? TEXT("-") : _pathTable[pid];
 }
 
 BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name)
