@@ -183,7 +183,7 @@ void Process::OnTimer()
 	{
 		ProcessItem &item = _processes[i];
 		
-		if( item.active )
+		if( item.active && item.pid != -1 ) // Skip the "Unknown" process
 		{
 			if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name))
 			{
