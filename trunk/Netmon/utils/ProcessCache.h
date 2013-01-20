@@ -26,11 +26,15 @@ protected:
 
 	void rebuildTable();
 
-public:
+	static ProcessCache *_instance;
 	ProcessCache();
+
+public:
+	static ProcessCache *instance();
 
 	TCHAR *GetName(int pid);
 	TCHAR *GetFullPath(int pid);
+	BOOL IsProcessAlive(int pid, const TCHAR *name);
 };
 
 #endif

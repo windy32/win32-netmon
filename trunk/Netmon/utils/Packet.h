@@ -46,9 +46,9 @@ typedef struct tagPacketInfoEx
 	int     time_us; // Time in Microseconds
 
 	// Part 2 -----------------------------------
-	HANDLE  handle;
-	int     pauid;   // Process Activity UID
+	int     pid;
 	int     puid;    // Process UID
+	int     pauid;   // Process Activity UID
 	TCHAR   name[MAX_PATH];
 	TCHAR   fullPath[MAX_PATH];
 } PacketInfoEx;

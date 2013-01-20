@@ -8,6 +8,7 @@
 #include "utils/Process.h"
 #include "utils/PcapNetFilter.h"
 #include "utils/PortCache.h"
+#include "utils/ProcessCache.h"
 #include "utils/Language.h"
 #include "utils/Profile.h"
 
@@ -329,11 +330,10 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 	// Capture Packets --------------------------------------------------------
 	while( g_bCapture )
 	{
-		int processId = -1;
-		int processUid = -1;
+		int pid = -1;
+		int processUID = -1;
 		TCHAR processName[MAX_PATH] = TEXT("Unknown");
 		TCHAR processFullPath[MAX_PATH] = TEXT("-");
-		HANDLE processHandle = 0;
 
 		// - Get a Packet (Process UID or PID is not Provided Here)
 		filter.Capture(&pi, &g_bCapture);
@@ -347,48 +347,36 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		// - Get PID
 		if( pi.trasportProtocol == TRA_TCP )
 		{
-			processId = pc.GetTcpPortPid(pi.local_port);
-			processId = ( processId == 0 ) ? -1 : processId;
+			pid = pc.GetTcpPortPid(pi.local_port);
+			pid = ( pid == 0 ) ? -1 : pid;
 		}
 		else if( pi.trasportProtocol == TRA_UDP )
 		{
-			processId = pc.GetUdpPortPid(pi.local_port);
-			processId = ( processId == 0 ) ? -1 : processId;
+			pid = pc.GetUdpPortPid(pi.local_port);
+			pid = ( pid == 0 ) ? -1 : pid;
 		}
 
 		// - Get Process Name & Full Path
-		if( processId != -1 )
+		if( pid != -1 )
 		{
-			processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
-
-			if( processHandle != 0 )
-			{
-				int iBytes1 = GetModuleBaseName(processHandle, 0, processName, MAX_PATH) ;
-				int iBytes2 = GetModuleFileNameEx(processHandle, 0, processFullPath, MAX_PATH);
-
-				// If One Call Fails, the First Byte of processName will change
-				if( iBytes1 == 0 || iBytes2 == 0)
-				{
-					processHandle = 0;
-					_tcscpy_s(processName, MAX_PATH, TEXT("Unknown"));
-				}
-			}
+			_tcscpy_s(processName, MAX_PATH, ProcessCache::instance()->GetName(pid));
+			_tcscpy_s(processFullPath, MAX_PATH, ProcessCache::instance()->GetFullPath(pid));
 		}
 
 		// - Get Process UID
-		processUid = Process::GetProcessUid(processName);
+		processUID = Process::GetProcessUid(processName);
 
 		// - Insert Into Process Table
-		if( processUid == -1 )
+		if( processUID == -1 )
 		{
-			processUid = Utils::InsertProcess(processName);
+			processUID = Utils::InsertProcess(processName);
 		}
 
-		// - Complete Structure PacketInfoEx
+		// - Fill PacketInfoEx
 		memcpy(&pie, &pi, sizeof(pi));
 
-		pie.handle = processHandle;
-		pie.puid = processUid;
+		pie.pid = pid;
+		pie.puid = processUID;
 
 		_tcscpy_s(pie.name, MAX_PATH, processName);
 		_tcscpy_s(pie.fullPath, MAX_PATH, processFullPath);
