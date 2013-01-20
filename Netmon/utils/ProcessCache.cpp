@@ -1,15 +1,24 @@
 #include "stdafx.h"
 #include "ProcessCache.h"
 
+ProcessCache *ProcessCache::_instance = NULL;
+
 ProcessCache::ProcessCache()
 {
 	RtlZeroMemory(_nameTable, sizeof(_nameTable));
 	RtlZeroMemory(_pathTable, sizeof(_pathTable));
 }
 
+ProcessCache *ProcessCache::instance()
+{
+	if (_instance == NULL)
+		_instance = new ProcessCache();
+	return _instance;
+}
+
 TCHAR *ProcessCache::GetName(int pid)
 {
-	if (_nameTable[pid] == NULL)
+	if (_nameTable[pid][0] == TEXT('\0'))
 	{
 		rebuildTable();
 	}
@@ -18,11 +27,17 @@ TCHAR *ProcessCache::GetName(int pid)
 
 TCHAR *ProcessCache::GetFullPath(int pid)
 {
-	if (_pathTable[pid] == NULL)
+	if (_pathTable[pid][0] == TEXT('\0'))
 	{
 		rebuildTable();
 	}
 	return _pathTable[pid];
+}
+
+BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name)
+{
+	rebuildTable();
+	return _tcscmp(_nameTable[pid], name) == 0;
 }
 
 void ProcessCache::rebuildTable()

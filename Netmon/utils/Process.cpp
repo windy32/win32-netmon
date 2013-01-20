@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Process.h"
-
+#include "ProcessCache.h"
 #include "Utils.h"
 
 #pragma region Members of Process
@@ -118,8 +118,8 @@ void Process::OnPacket(PacketInfoEx *pi)
 
 		item.active = true;
 		item.dirty = false;
+		item.pid = pi->pid;
 		item.puid = pi->puid;
-		item.handle = pi->handle;
 
 		_tcscpy_s(item.name, MAX_PATH, pi->name);
 		_tcscpy_s(item.fullPath, MAX_PATH, pi->fullPath);
@@ -148,7 +148,7 @@ void Process::OnPacket(PacketInfoEx *pi)
 		if( !item.active )
 		{
 			item.active = true;
-			item.handle = pi->handle;
+			item.pid = pi->pid;
 
 			item.txRate = 0;
 			item.rxRate = 0;
@@ -161,10 +161,6 @@ void Process::OnPacket(PacketInfoEx *pi)
 			pi->pauid = item.pauid;
 
 			_tcscpy_s(item.fullPath, MAX_PATH, pi->fullPath);
-		}
-		else
-		{
-			CloseHandle(pi->handle);
 		}
 
 		if( pi->dir == DIR_UP )
@@ -187,33 +183,14 @@ void Process::OnTimer()
 	{
 		ProcessItem &item = _processes[i];
 		
-		if( item.active && item.handle != 0) // Ordinary Process, not the "Unknown Process"
+		if( item.active )
 		{
-			DWORD dwExitCode = STILL_ACTIVE;
-
-			if( GetExitCodeProcess(item.handle, &dwExitCode))
+			if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name))
 			{
-				if( dwExitCode != STILL_ACTIVE )
-				{
-					Utils::UpdateProcessActivity(item.pauid, (int)time(0));
-
-					CloseHandle(item.handle);
-					item.handle = 0;
-					item.active = false;
-					ListViewUpdate(i);
-				}
-			}
-			else
-			{
-				CloseHandle(item.handle);
-				item.handle = 0;
+				Utils::UpdateProcessActivity(item.pauid, (int)time(0));
 				item.active = false;
 				ListViewUpdate(i);
 			}
-
-			//char msg[256];
-			//sprintf_s(msg, sizeof(msg), "Index = %d, Handle = %d, ExitCode = %d\n", i, item.handle, dwExitCode);
-			//OutputDebugString(msg);
 		}
 	}
 

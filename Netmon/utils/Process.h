@@ -18,8 +18,6 @@ protected:
 		TCHAR fullPath[MAX_PATH];
 
 		// Valid Only When Active
-		HANDLE handle;
-
 		bool dirty;
 
 		int txRate;
@@ -27,6 +25,7 @@ protected:
 		int prevTxRate;
 		int prevRxRate;
 
+		int pid;
 		int pauid;
 		int startTime;
 		int endTime;
