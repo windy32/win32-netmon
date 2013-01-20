@@ -14,6 +14,7 @@
 #include <commctrl.h>
 #include <shellapi.h>
 #include <iphlpapi.h>
+#include <tlhelp32.h>
 #include <psapi.h>
 #include <uxtheme.h>
 
