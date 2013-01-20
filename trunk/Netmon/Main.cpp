@@ -361,6 +361,10 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		{
 			_tcscpy_s(processName, MAX_PATH, ProcessCache::instance()->GetName(pid));
 			_tcscpy_s(processFullPath, MAX_PATH, ProcessCache::instance()->GetFullPath(pid));
+			if (processName[0] == TEXT('\0'))
+			{
+				pid = -1;
+			}
 		}
 
 		// - Get Process UID
