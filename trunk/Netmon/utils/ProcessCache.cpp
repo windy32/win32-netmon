@@ -5,6 +5,7 @@ ProcessCache *ProcessCache::_instance = NULL;
 
 ProcessCache::ProcessCache()
 {
+	InitializeCriticalSection(&_cs);
 	RtlZeroMemory(_nameTable, sizeof(_nameTable));
 	RtlZeroMemory(_pathTable, sizeof(_pathTable));
 }
@@ -18,30 +19,50 @@ ProcessCache *ProcessCache::instance()
 
 TCHAR *ProcessCache::GetName(int pid)
 {
+	TCHAR *result;
+	EnterCriticalSection(&_cs);
+
 	if (_nameTable[pid][0] == TEXT('\0'))
 	{
 		rebuildTable();
 	}
-	return _nameTable[pid][0] == TEXT('\0') ? TEXT("Unknown") : _nameTable[pid];
+	result = _nameTable[pid][0] == TEXT('\0') ? TEXT("Unknown") : _nameTable[pid];
+
+	LeaveCriticalSection(&_cs);
+	return result;
 }
 
 TCHAR *ProcessCache::GetFullPath(int pid)
 {
+	TCHAR *result;
+	EnterCriticalSection(&_cs);
+
 	if (_pathTable[pid][0] == TEXT('\0'))
 	{
 		rebuildTable();
 	}
-	return _pathTable[pid][0] == TEXT('\0') ? TEXT("-") : _pathTable[pid];
+	result = _pathTable[pid][0] == TEXT('\0') ? TEXT("-") : _pathTable[pid];
+
+	LeaveCriticalSection(&_cs);
+	return result;
 }
 
 BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name)
 {
+	BOOL result;
+	EnterCriticalSection(&_cs);
+
 	rebuildTable();
-	return _tcscmp(_nameTable[pid], name) == 0;
+	result =  (_tcscmp(_nameTable[pid], name) == 0) ? TRUE : FALSE;
+
+	LeaveCriticalSection(&_cs);
+	return result;
 }
 
 void ProcessCache::rebuildTable()
 {
+	EnterCriticalSection(&_cs);
+
 	// Clear Tables
 	RtlZeroMemory(_nameTable, sizeof(_nameTable));
 	RtlZeroMemory(_pathTable, sizeof(_pathTable));
@@ -75,4 +96,6 @@ void ProcessCache::rebuildTable()
 		CloseHandle(hProcess);
 	}
 	CloseHandle(hSnapShot);
+
+	LeaveCriticalSection(&_cs);
 }

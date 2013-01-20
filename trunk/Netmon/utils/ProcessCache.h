@@ -24,6 +24,8 @@ protected:
 	TCHAR _nameTable[32768][MAX_PATH];
 	TCHAR _pathTable[32768][MAX_PATH];
 
+	CRITICAL_SECTION _cs;
+
 	void rebuildTable();
 
 	static ProcessCache *_instance;
