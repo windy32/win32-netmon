@@ -10,21 +10,21 @@ protected:
 	//
 	// ProcessCache class has a GetName() / GetFullPath() interface, which is used to replace
 	// CreateToolhelp32Snapshot / Process32First / Process32Next / OpenProcess / GetModuleFileNameEx
-    // for better performance.
+	// for better performance.
 	// 
 	// If the map from pid to name and full path is loged in the table, ProcessCache will return quickly.
 	// 
 	// If not, ProcessCache calls CreateToolhelp32Snapshot / Process32First / Process32Next / 
-    // OpenProcess / GetModuleFileNameEx to update the pid table, and then return the result.
+	// OpenProcess / GetModuleFileNameEx to update the pid table, and then return the result.
 	//
 	// Return Value
 	//
 	//     GetName / GetFullPath returns the name / full path for the corresponding pid.
 	//     If the name or full path cannot be found, return value is NULL.
 	TCHAR _nameTable[32768][MAX_PATH];
-    TCHAR _pathTable[32768][MAX_PATH];
+	TCHAR _pathTable[32768][MAX_PATH];
 
-    void rebuildTable();
+	void rebuildTable();
 
 public:
 	ProcessCache();
