@@ -1224,7 +1224,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 	HANDLE hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), PIPE_ACCESS_DUPLEX, 0, 32, 1024, 1024, 1000, NULL);
 	if( hPipe == NULL )
 	{
-		MessageBox(0, TEXT("Netmon is still running.\nOnly one instance is allowed for Netmon"), 
+		MessageBox(0, TEXT("Netmon is still running.\nOnly one instance is allowed for Netmon!"), 
 			TEXT("Error"), MB_OK | MB_ICONWARNING);
 		return 1;
 	}
@@ -1234,6 +1234,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 	if( g_nLanguage == 0 )
 	{
 		MessageBox(0, TEXT("Failed to load languages."), TEXT("Error"), MB_OK | MB_ICONWARNING);
+		CloseHandle(hPipe);
 		return 1;
 	}
 	else
