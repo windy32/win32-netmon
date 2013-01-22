@@ -187,6 +187,11 @@ static void InitDatabase()
 		             TEXT("    ")
 		             TEXT("    Primary Key (UID)")
 		             TEXT(");"), true);
+
+		// Add some init data
+		Utils::InsertProcess(TEXT("Unknown"));
+		Utils::InsertProcess(TEXT("System"));
+		Utils::InsertProcess(TEXT("svchost.exe"));
 	}
 
 	if( !SQLite::TableExist(TEXT("PActivity")))
@@ -292,14 +297,6 @@ static void InitDatabase()
 		             TEXT("    Primary Key (ProcessUid, Date),")
 		             TEXT("    Foreign Key (ProcessUid) References Process(UID)")
 		             TEXT(");"), true);
-	}
-
-	// Add some init data
-	if (Process::GetProcessUid(TEXT("Unknown")) == -1)
-	{
-		Utils::InsertProcess(TEXT("Unknown"));
-		Utils::InsertProcess(TEXT("System"));
-		Utils::InsertProcess(TEXT("svchost.exe"));
 	}
 
 	// Flush
