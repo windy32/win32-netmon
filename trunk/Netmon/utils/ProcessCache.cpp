@@ -61,8 +61,6 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name)
 
 void ProcessCache::rebuildTable()
 {
-	EnterCriticalSection(&_cs);
-
 	// Clear Tables
 	RtlZeroMemory(_nameTable, sizeof(_nameTable));
 	RtlZeroMemory(_pathTable, sizeof(_pathTable));
@@ -96,6 +94,4 @@ void ProcessCache::rebuildTable()
 		CloseHandle(hProcess);
 	}
 	CloseHandle(hSnapShot);
-
-	LeaveCriticalSection(&_cs);
 }
