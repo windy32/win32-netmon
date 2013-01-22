@@ -361,11 +361,17 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		{
 			_tcscpy_s(processName, MAX_PATH, ProcessCache::instance()->GetName(pid));
 			_tcscpy_s(processFullPath, MAX_PATH, ProcessCache::instance()->GetFullPath(pid));
-			if (processName[0] == TEXT('\0'))
+
+			if (processName[0] == TEXT('\0')) // Cannot get process name from the table
 			{
 				pid = -1;
+				_tcscpy_s(processName, MAX_PATH, TEXT("Unknown"));
+				_tcscpy_s(processFullPath, MAX_PATH, TEXT("-"));
 			}
 		}
+		// else
+		//    it's likely to be an ICMP packet or something else, 
+		//    processName is still "Unknown" and processFullPath is still "-"
 
 		// - Get Process UID
 		processUID = Process::GetProcessUid(processName);
