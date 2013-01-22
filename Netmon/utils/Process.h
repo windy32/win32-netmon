@@ -25,7 +25,7 @@ protected:
 		int prevTxRate;
 		int prevRxRate;
 
-		int pid;
+		int pid; // Note: A "Process" item may corresponds to multiple pids
 		int pauid;
 		int startTime;
 		int endTime;

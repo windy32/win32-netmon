@@ -65,7 +65,6 @@ void Process::ListViewInsert(int index, HWND hList)
 	{
 		_stprintf_s(szColumn[2], MAX_PATH, TEXT("%d"), item.prevTxRate);
 		_stprintf_s(szColumn[3], MAX_PATH, TEXT("%d"), item.prevRxRate);
-
 		_tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
 	}
 	else
