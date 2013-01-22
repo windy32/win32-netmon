@@ -117,7 +117,7 @@ void Process::OnPacket(PacketInfoEx *pi)
 
 		item.active = true;
 		item.dirty = false;
-		item.pid = pi->pid;
+		item.pid = pi->pid; // The first pid is logged
 		item.puid = pi->puid;
 
 		_tcscpy_s(item.name, MAX_PATH, pi->name);
@@ -134,6 +134,7 @@ void Process::OnPacket(PacketInfoEx *pi)
 		item.pauid = Utils::InsertProcessActivity(item.puid, item.startTime, item.endTime);
 		pi->pauid = item.pauid;
 
+		// Add to process list
 		_processes.push_back(item);
 
 		// Add to ListView
@@ -147,19 +148,20 @@ void Process::OnPacket(PacketInfoEx *pi)
 		if( !item.active )
 		{
 			item.active = true;
-			item.pid = pi->pid;
+			item.pid = pi->pid; // The first pid is logged
+
+			_tcscpy_s(item.fullPath, MAX_PATH, pi->fullPath);
 
 			item.txRate = 0;
 			item.rxRate = 0;
 			item.prevTxRate = 0;
 			item.prevRxRate = 0;
 
+			// Process Activity
 			item.startTime = (int) time(0);
 			item.endTime = -1;
 			item.pauid = Utils::InsertProcessActivity(item.puid, item.startTime, item.endTime);
 			pi->pauid = item.pauid;
-
-			_tcscpy_s(item.fullPath, MAX_PATH, pi->fullPath);
 		}
 
 		if( pi->dir == DIR_UP )
