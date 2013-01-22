@@ -30,6 +30,7 @@ protected:
 
 	static ProcessCache *_instance;
 	ProcessCache();
+	~ProcessCache();
 
 public:
 	static ProcessCache *instance();
