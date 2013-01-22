@@ -467,19 +467,37 @@ void MonthView::DrawGraph()
 
 	TCHAR szText[256];
 	TCHAR szYearMonth[256];
-	const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
-
 	Language::GetYearMonthString(szYearMonth, 256, _curMonth / 12 + 1970, _curMonth % 12);
 
 	if( _process == -1 )
 	{
-		_stprintf_s(szText, _countof(szText), szFormat, 
-			Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(mItem.sumRx >> 20), (int)(mItem.sumTx >> 20));
+		if ((int)mItem.sumRx < 1024 * 1024 && (int)mItem.sumTx < 1024 * 1024)
+		{
+			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
+			_stprintf_s(szText, _countof(szText), szFormat, 
+				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(mItem.sumRx >> 10), (int)(mItem.sumTx >> 10));
+		}
+		else
+		{
+			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
+			_stprintf_s(szText, _countof(szText), szFormat, 
+				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(mItem.sumRx >> 20), (int)(mItem.sumTx >> 20));
+		}
 	}
 	else
 	{
-		_stprintf_s(szText, _countof(szText), szFormat, 
-			item.processName, szYearMonth, (int)(mItem.sumRx >> 20), (int)(mItem.sumTx >> 20));
+		if((int)mItem.sumRx < 1024 * 1024 && (int)mItem.sumTx < 1024 * 1024)
+		{
+			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
+			_stprintf_s(szText, _countof(szText), szFormat, 
+				item.processName, szYearMonth, (int)(mItem.sumRx >> 10), (int)(mItem.sumTx >> 10));
+		}
+		else
+		{
+			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
+			_stprintf_s(szText, _countof(szText), szFormat, 
+				item.processName, szYearMonth, (int)(mItem.sumRx >> 20), (int)(mItem.sumTx >> 20));
+		}
 	}
 	TextOut(_hdcBuf, x1 + 1, y2 + 2, szText, _tcslen(szText));
 
