@@ -10,6 +10,11 @@ ProcessCache::ProcessCache()
 	RtlZeroMemory(_pathTable, sizeof(_pathTable));
 }
 
+ProcessCache::~ProcessCache()
+{
+	DeleteCriticalSection(&_cs);
+}
+
 ProcessCache *ProcessCache::instance()
 {
 	if (_instance == NULL)
