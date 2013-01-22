@@ -1221,7 +1221,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 	g_hInstance = hInstance;
 
 	// Single Instance (Create a Named-Pipe)
-	HANDLE hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), PIPE_ACCESS_DUPLEX, 0, 32, 1024, 1024, 1000, NULL);
+	HANDLE hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), 
+		PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, 0, 4, 1024, 1024, 1000, NULL);
 	if( hPipe == INVALID_HANDLE_VALUE )
 	{
 		MessageBox(0, TEXT("Netmon is still running.\nOnly one instance is allowed for Netmon!"), 
