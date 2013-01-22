@@ -40,7 +40,9 @@
 #define IDS_ABOUT_CLOSE                         40035
 #define IDS_RTVIEW_TXRATE                       40036
 #define IDS_RTVIEW_RXRATE                       40037
-#define IDS_MTVIEW_TEXT                         40038
+
+#define IDS_MTVIEW_TEXT_MB                      40038
+
 #define IDS_STVIEW_PROTOCOL                     40039
 #define IDS_STVIEW_TX_TCP                       40040
 #define IDS_STVIEW_TX_UDP                       40041
@@ -77,5 +79,7 @@
 #define IDS_PREF_DTVIEW_DELETE_ALL              40072
 #define IDS_PREF_OK                             40073
 #define IDS_PREF_CANCEL                         40074
+
+#define IDS_MTVIEW_TEXT_KB                      40075
 
 // Remember to update "Language.h"
