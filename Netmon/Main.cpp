@@ -295,9 +295,12 @@ static void InitDatabase()
 	}
 
 	// Add some init data
-	Utils::InsertProcess(TEXT("Unknown"));
-	Utils::InsertProcess(TEXT("System"));
-	Utils::InsertProcess(TEXT("svchost.exe"));
+	if (Process::GetProcessUid(TEXT("Unknown")) == -1)
+	{
+		Utils::InsertProcess(TEXT("Unknown"));
+		Utils::InsertProcess(TEXT("System"));
+		Utils::InsertProcess(TEXT("svchost.exe"));
+	}
 
 	// Flush
 	SQLite::Flush();
