@@ -83,7 +83,7 @@ void ProcessCache::rebuildTable()
 		TCHAR *processName = p.szExeFile;
 
 		// Get full path (if possible)
-		HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 		if (hProcess == 0)
 		{
 			_tcscpy_s(_nameTable[pid], MAX_PATH, processName);
