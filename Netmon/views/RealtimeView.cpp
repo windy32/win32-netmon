@@ -177,6 +177,11 @@ void RealtimeView::DrawGraph()
 	int x2 = _width - 10;
 	int y2 = _height - 26;
 
+	if (x2 % 2 == 1)
+	{
+		x2 -= 1;
+	}
+
 	// Clear Background
 	Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
 
@@ -200,7 +205,7 @@ void RealtimeView::DrawGraph()
 		(_zoomFactor == ZOOM_1S)  ? 1 :
 		(_zoomFactor == ZOOM_10S) ? 10 : 60;
 
-	int startIndex = (graphWidth > (int) rxRate.size() * 2) ? 0 : rxRate.size() - graphWidth / 2;
+	int startIndex = (graphWidth > (int) rxRate.size() * 2 - 2) ? 0 : rxRate.size() - graphWidth / 2 - 1;
 	int endIndex = rxRate.size();
 
 	// - Calc the Max Rate
