@@ -471,7 +471,7 @@ void MonthView::DrawGraph()
 
 	if( _process == -1 )
 	{
-		if ((int)mItem.sumRx < 1024 * 1024 && (int)mItem.sumTx < 1024 * 1024)
+		if (mItem.sumRx < 1024 * 1024 && mItem.sumTx < 1024 * 1024)
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
 			_stprintf_s(szText, _countof(szText), szFormat, 
@@ -486,7 +486,7 @@ void MonthView::DrawGraph()
 	}
 	else
 	{
-		if((int)mItem.sumRx < 1024 * 1024 && (int)mItem.sumTx < 1024 * 1024)
+		if(mItem.sumRx < 1024 * 1024 && mItem.sumTx < 1024 * 1024)
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
 			_stprintf_s(szText, _countof(szText), szFormat, 
