@@ -27,11 +27,11 @@ TCHAR *ProcessCache::GetName(int pid)
 	TCHAR *result;
 	EnterCriticalSection(&_cs);
 
-	if (_nameTable[pid][0] == TEXT('\0'))
+	if (_nameTable[pid / 4][0] == TEXT('\0'))
 	{
 		rebuildTable();
 	}
-	result = _nameTable[pid][0] == TEXT('\0') ? TEXT("Unknown") : _nameTable[pid];
+	result = _nameTable[pid / 4][0] == TEXT('\0') ? TEXT("Unknown") : _nameTable[pid / 4];
 
 	LeaveCriticalSection(&_cs);
 	return result;
@@ -42,11 +42,11 @@ TCHAR *ProcessCache::GetFullPath(int pid)
 	TCHAR *result;
 	EnterCriticalSection(&_cs);
 
-	if (_pathTable[pid][0] == TEXT('\0'))
+	if (_pathTable[pid / 4][0] == TEXT('\0'))
 	{
 		rebuildTable();
 	}
-	result = _pathTable[pid][0] == TEXT('\0') ? TEXT("-") : _pathTable[pid];
+	result = _pathTable[pid / 4][0] == TEXT('\0') ? TEXT("-") : _pathTable[pid / 4];
 
 	LeaveCriticalSection(&_cs);
 	return result;
@@ -58,7 +58,7 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name)
 	EnterCriticalSection(&_cs);
 
 	rebuildTable();
-	result =  (_tcscmp(_nameTable[pid], name) == 0) ? TRUE : FALSE;
+	result =  (_tcscmp(_nameTable[pid / 4], name) == 0) ? TRUE : FALSE;
 
 	LeaveCriticalSection(&_cs);
 	return result;
@@ -86,15 +86,15 @@ void ProcessCache::rebuildTable()
 		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 		if (hProcess == 0)
 		{
-			_tcscpy_s(_nameTable[pid], MAX_PATH, processName);
-			_tcscpy_s(_pathTable[pid], MAX_PATH, TEXT("-"));
+			_tcscpy_s(_nameTable[pid / 4], MAX_PATH, processName);
+			_tcscpy_s(_pathTable[pid / 4], MAX_PATH, TEXT("-"));
 		}
 		else
 		{
 			TCHAR fullPath[260];
 			GetModuleFileNameEx(hProcess, 0, fullPath, 260);
-			_tcscpy_s(_nameTable[pid], MAX_PATH, processName);
-			_tcscpy_s(_pathTable[pid], MAX_PATH, fullPath);
+			_tcscpy_s(_nameTable[pid / 4], MAX_PATH, processName);
+			_tcscpy_s(_pathTable[pid / 4], MAX_PATH, fullPath);
 		}
 		CloseHandle(hProcess);
 	}
