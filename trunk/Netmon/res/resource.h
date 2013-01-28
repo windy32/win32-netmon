@@ -10,6 +10,10 @@
 #define IDB_PAGEUP_LT                           112
 #define IDB_PAGEDN_DK                           114
 #define IDB_PAGEDN_LT                           116
+#define IDB_START                               118
+#define IDB_START_HOVER                         120
+#define IDB_STOP                                122
+#define IDB_STOP_HOVER                          124
 #define IDP_SIDEBAR                             1000
 #define IDS_SIDEBAR                             1001
 #define IDE_THIRD_PARTY                         1002
