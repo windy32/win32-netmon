@@ -39,6 +39,24 @@ static HDC       g_hDcSidebarBuf;
 static HBITMAP   g_hBmpSidebarBg;
 static HBITMAP   g_hBmpSidebarBuf;
 
+static HDC       g_hDcStart;
+static HDC       g_hDcStartHover;
+static HDC       g_hDcStop;
+static HDC       g_hDcStopHover;
+
+static HBITMAP   g_hBmpStart;
+static HBITMAP   g_hBmpStartHover;
+static HBITMAP   g_hBmpStop;
+static HBITMAP   g_hBmpStopHover;
+
+static enum enumHoverState
+{
+	Start, Stop, Neither
+}g_enumHoverState = Neither;
+
+static int g_iSidebarWidth;
+static int g_iSidebarHeight;
+
 // Capture thread
 HANDLE    g_hCaptureThread;
 bool      g_bCapture = false;
@@ -598,14 +616,30 @@ static void CreateLanguageMenuItems()
 
 static void DrawSidebar()
 {
-	RECT stRect;
-	HDC hDcSidebar = GetDC(GetDlgItem(g_hDlgMain, IDP_SIDEBAR));
+	HDC hDcSidebar = GetDC(g_hDlgMain);
 
-	// Paint Sidebar
-	GetClientRect(GetDlgItem(g_hDlgMain, IDP_SIDEBAR), &stRect);
-	Rectangle(g_hDcSidebarBuf, 0, 0, stRect.right, stRect.bottom + 1);
-	BitBlt(g_hDcSidebarBuf, 0, stRect.bottom - 446, 50, 446, g_hDcSidebarBg, 0, 0, SRCCOPY);
-	BitBlt(hDcSidebar, 0, 0, stRect.right, stRect.bottom + 1, g_hDcSidebarBuf, 0, 0, SRCCOPY);
+	// Paint to buffer
+	Rectangle(g_hDcSidebarBuf, 0, 0, g_iSidebarWidth, g_iSidebarHeight + 1);
+	BitBlt(g_hDcSidebarBuf, 0, g_iSidebarHeight - 446, 50, 446, g_hDcSidebarBg, 0, 0, SRCCOPY);
+
+	if (g_enumHoverState == Neither)
+	{
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 60, 18, 18, g_hDcStart, 0, 0, SRCCOPY);
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 33, 18, 18, g_hDcStop, 0, 0, SRCCOPY);
+	}
+	else if (g_enumHoverState == Start)
+	{
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 60, 18, 18, g_hDcStartHover, 0, 0, SRCCOPY);
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 33, 18, 18, g_hDcStop, 0, 0, SRCCOPY);
+	}
+	else // Stop
+	{
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 60, 18, 18, g_hDcStart, 0, 0, SRCCOPY);
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 33, 18, 18, g_hDcStopHover, 0, 0, SRCCOPY);
+	}
+
+	// Write to screen
+	BitBlt(hDcSidebar, 0, 0, g_iSidebarWidth, g_iSidebarHeight + 1, g_hDcSidebarBuf, 0, 0, SRCCOPY);
 
 	ReleaseDC(GetDlgItem(g_hDlgMain, IDP_SIDEBAR), hDcSidebar);
 }
@@ -932,6 +966,16 @@ static void OnExit(HWND hWnd)
 	DeleteObject(g_hBmpSidebarBg);
 	DeleteObject(g_hBmpSidebarBuf);
 
+	DeleteDC(g_hDcStart);
+	DeleteDC(g_hDcStartHover);
+	DeleteDC(g_hDcStop);
+	DeleteDC(g_hDcStopHover);
+
+	DeleteObject(g_hBmpStart);
+	DeleteObject(g_hBmpStartHover);
+	DeleteObject(g_hBmpStop);
+	DeleteObject(g_hBmpStopHover);
+
 	// End Views
 	g_rtView.End();
 	g_mtView.End();
@@ -1014,6 +1058,21 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	SelectObject(g_hDcSidebarBg, g_hBmpSidebarBg);
 	SelectObject(g_hDcSidebarBuf, g_hBmpSidebarBuf);
+
+	g_hDcStart = CreateCompatibleDC(hDc);
+	g_hDcStartHover = CreateCompatibleDC(hDc);
+	g_hDcStop = CreateCompatibleDC(hDc);
+	g_hDcStopHover = CreateCompatibleDC(hDc);
+
+	g_hBmpStart = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_START));
+	g_hBmpStartHover = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_START_HOVER));
+	g_hBmpStop = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_STOP));
+	g_hBmpStopHover = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_STOP_HOVER));
+
+	SelectObject(g_hDcStart, g_hBmpStart);
+	SelectObject(g_hDcStartHover, g_hBmpStartHover);
+	SelectObject(g_hDcStop, g_hBmpStop);
+	SelectObject(g_hDcStopHover, g_hBmpStopHover);
 
 	SelectObject(g_hDcSidebarBuf, GetStockObject(NULL_PEN));
 
@@ -1142,7 +1201,8 @@ static void OnSize(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	
 	MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 50 - 1, 0, clientWidth - 50 + 2, 140 + (clientHeight - 440) / 3, TRUE);
 	MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 50 + 6, 140 + 6 + (clientHeight - 440) / 3, clientWidth - 50 - 12, clientHeight - 140 - 12 - (clientHeight - 440) / 3, TRUE);
-	MoveWindow(GetDlgItem(hWnd, IDP_SIDEBAR), 0, 0, 50, clientHeight, TRUE);
+	g_iSidebarWidth = 50;
+	g_iSidebarHeight = clientHeight;
 
 	// Resize the Child Window in Tab Control
 	RECT stRect;
@@ -1190,6 +1250,69 @@ static void OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 }
 
+static void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	// Get Mouse Position
+	int x = GET_X_LPARAM(lParam); 
+	int y = GET_Y_LPARAM(lParam); 
+
+	enum enumHoverState newState = Neither;
+	if (x >= 15 && x < 33)
+	{
+		if (y >= g_iSidebarHeight - 60 && y < g_iSidebarHeight - 42)
+		{
+			newState = Start;
+		}
+		else if (y >= g_iSidebarHeight - 33 && y < g_iSidebarHeight - 15)
+		{
+			newState = Stop;
+		}
+	}
+
+	// Update Sidebar when necessary
+	if (g_enumHoverState != newState)
+	{
+		g_enumHoverState = newState;
+		DrawSidebar();
+	}
+}
+
+static void OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	// Get Mouse Position
+	int x = GET_X_LPARAM(lParam); 
+	int y = GET_Y_LPARAM(lParam); 
+
+	enum enumHoverState newState = Neither;
+	if (x >= 15 && x < 33)
+	{
+		if (y >= g_iSidebarHeight - 60 && y < g_iSidebarHeight - 42)
+		{
+			newState = Start;
+		}
+		else if (y >= g_iSidebarHeight - 33 && y < g_iSidebarHeight - 15)
+		{
+			newState = Stop;
+		}
+	}
+
+	// Start / Stop when necessary
+	if (newState == Start)
+	{
+		if (g_bCapture == false)
+		{
+			OnCapture(hWnd);
+		}
+	}
+	else if(newState == Stop)
+	{
+		if (g_bCapture == true)
+		{
+			OnStop(hWnd);
+		}
+	}
+}
+
 ///----------------------------------------------------------------------------------------------//
 ///                                    Main Dialog Proc                                          //
 ///----------------------------------------------------------------------------------------------//
@@ -1197,6 +1320,8 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 {
 	#define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
 
+	PROCESS_MSG(WM_MOUSEMOVE,     OnMouseMove)
+	PROCESS_MSG(WM_LBUTTONDOWN,   OnLButtonDown)
 	PROCESS_MSG(WM_INITDIALOG,    OnInitDialog)    // Init
 	PROCESS_MSG(WM_CLOSE,         OnClose)
 	PROCESS_MSG(WM_COMMAND,       OnCommand)
