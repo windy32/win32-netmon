@@ -25,6 +25,7 @@ protected:
 	TCHAR _pathTable[32768 / 4][MAX_PATH];
 
 	CRITICAL_SECTION _cs;
+	int _csCounter; // For debugging
 
 	void rebuildTable();
 
