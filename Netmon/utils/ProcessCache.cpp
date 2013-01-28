@@ -127,9 +127,15 @@ void ProcessCache::rebuildTable()
 		else
 		{
 			TCHAR fullPath[260];
-			GetModuleFileNameEx(hProcess, 0, fullPath, 260);
 			_tcscpy_s(_nameTable[pid / 4], MAX_PATH, processName);
-			_tcscpy_s(_pathTable[pid / 4], MAX_PATH, fullPath);
+			if (GetModuleFileNameEx(hProcess, 0, fullPath, 260) > 0) // Success
+			{
+				_tcscpy_s(_pathTable[pid / 4], MAX_PATH, fullPath);
+			}
+			else
+			{
+				_tcscpy_s(_pathTable[pid / 4], MAX_PATH, TEXT('\0'));
+			}
 			Utils::DbgPrint(TEXT("   PID = %d, Name = \"%s\", FullPath = \"%s\""), pid, processName, fullPath);
 		}
 		CloseHandle(hProcess);
