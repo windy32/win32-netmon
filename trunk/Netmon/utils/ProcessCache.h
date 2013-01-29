@@ -27,7 +27,7 @@ protected:
 	CRITICAL_SECTION _cs;
 	int _csCounter; // For debugging
 
-	void rebuildTable();
+	void rebuildTable(bool dump = true);
 
 	static ProcessCache *_instance;
 	ProcessCache();
