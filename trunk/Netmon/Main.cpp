@@ -622,20 +622,20 @@ static void DrawSidebar()
 	Rectangle(g_hDcSidebarBuf, 0, 0, g_iSidebarWidth, g_iSidebarHeight + 1);
 	BitBlt(g_hDcSidebarBuf, 0, g_iSidebarHeight - 446, 50, 446, g_hDcSidebarBg, 0, 0, SRCCOPY);
 
-	if (g_enumHoverState == Neither)
-	{
-		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 60, 18, 18, g_hDcStart, 0, 0, SRCCOPY);
-		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 33, 18, 18, g_hDcStop, 0, 0, SRCCOPY);
-	}
-	else if (g_enumHoverState == Start)
+	if (!g_bCapture && g_enumHoverState == Start)
 	{
 		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 60, 18, 18, g_hDcStartHover, 0, 0, SRCCOPY);
 		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 33, 18, 18, g_hDcStop, 0, 0, SRCCOPY);
 	}
-	else // Stop
+	else if (g_bCapture && g_enumHoverState == Stop)
 	{
 		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 60, 18, 18, g_hDcStart, 0, 0, SRCCOPY);
 		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 33, 18, 18, g_hDcStopHover, 0, 0, SRCCOPY);
+	}
+	else
+	{
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 60, 18, 18, g_hDcStart, 0, 0, SRCCOPY);
+		BitBlt(g_hDcSidebarBuf, 15, g_iSidebarHeight - 33, 18, 18, g_hDcStop, 0, 0, SRCCOPY);
 	}
 
 	// Write to screen
@@ -1302,6 +1302,7 @@ static void OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if (g_bCapture == false)
 		{
 			OnCapture(hWnd);
+			DrawSidebar();
 		}
 	}
 	else if(newState == Stop)
@@ -1309,6 +1310,7 @@ static void OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if (g_bCapture == true)
 		{
 			OnStop(hWnd);
+			DrawSidebar();
 		}
 	}
 }
