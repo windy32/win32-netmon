@@ -74,17 +74,20 @@ TCHAR *ProcessCache::GetFullPath(int pid)
 	return result;
 }
 
-BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name)
+BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
 {
 	BOOL result;
 	EnterCriticalSection(&_cs);
 
-	rebuildTable(false);
+	if (rebuild)
+	{
+		rebuildTable(false);
+	}
 	result =  (_tcscmp(_nameTable[pid / 4], name) == 0) ? TRUE : FALSE;
 
 	if (result == TRUE) // For debugging
 	{
-		Utils::DbgPrint(TEXT("PID %d, \"%s\" is alive\n"), pid, name);
+		// Utils::DbgPrint(TEXT("PID %d, \"%s\" is alive\n"), pid, name);
 	}
 	else
 	{

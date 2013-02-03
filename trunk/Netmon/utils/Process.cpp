@@ -180,13 +180,15 @@ void Process::OnPacket(PacketInfoEx *pi)
 void Process::OnTimer()
 {
 	// See if a Process Ends
+	bool rebuilt = false;
 	for(unsigned int i = 0; i < _processes.size(); i++)
 	{
 		ProcessItem &item = _processes[i];
 		if( item.active && item.pid != -1 ) // Skip the "Unknown" process
 		{
-			if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name))
+			if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name, rebuilt))
 			{
+				rebuilt = true;
 				Utils::UpdateProcessActivity(item.pauid, (int)time(0));
 				item.active = false;
 				ListViewUpdate(i);

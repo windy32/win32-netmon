@@ -38,7 +38,7 @@ public:
 
 	TCHAR *GetName(int pid);
 	TCHAR *GetFullPath(int pid);
-	BOOL IsProcessAlive(int pid, const TCHAR *name);
+	BOOL IsProcessAlive(int pid, const TCHAR *name, bool rebuild);
 };
 
 #endif
