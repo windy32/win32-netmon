@@ -31,7 +31,7 @@ TCHAR *ProcessCache::GetName(int pid)
 	
 	if (_nameTable[pid / 4][0] == TEXT('\0'))
 	{
-		Utils::DbgPrint(TEXT("Rebuild Table...")); // For debugging
+		Utils::DbgPrint(TEXT("Rebuild Table...\n")); // For debugging
 		rebuildTable();
 		result = _nameTable[pid / 4];
 		if (result[0] == TEXT('\0'))
