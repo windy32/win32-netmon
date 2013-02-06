@@ -54,8 +54,6 @@ void RealtimeView::End()
 
 void RealtimeView::Fill()
 {
-	EnterCriticalSection(&_stCS);
-
 	// Calc the desired length of each vectors
 	// 
 	// e.g.: When _startTime = 500
@@ -98,12 +96,12 @@ void RealtimeView::Fill()
 			it->second.rate_rx_60s.push_back(0);
 		}
 	}
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void RealtimeView::InsertPacket(PacketInfoEx *pi)
 {
+	EnterCriticalSection(&_stCS);
+
 	// One day is 86400 seconds, each second 4 bytes, which sums up to be 337.5KB.
 	// 10 processed with tx/rx rate: 6.75MB
 
@@ -142,10 +140,13 @@ void RealtimeView::InsertPacket(PacketInfoEx *pi)
 		itemAll.rate_rx_10s.back() += pi->size;
 		itemAll.rate_rx_60s.back() += pi->size;
 	}
+	LeaveCriticalSection(&_stCS);
 }
 
 void RealtimeView::SetProcessUid(int puid, TCHAR *processName)
 {
+	EnterCriticalSection(&_stCS);
+
 	// Insert a RtViewItem if PUID not Exist
 	if( _items.count(puid) == 0 )
 	{
@@ -159,14 +160,19 @@ void RealtimeView::SetProcessUid(int puid, TCHAR *processName)
 	_process = puid;
 
 	DrawGraph();
+	LeaveCriticalSection(&_stCS);
 }
 void RealtimeView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
+	EnterCriticalSection(&_stCS);
+
 	// Fill Vectors
 	Fill();
 
 	// Start Painting
 	DrawGraph();
+
+	LeaveCriticalSection(&_stCS);
 }
 
 void RealtimeView::DrawGraph()

@@ -71,6 +71,7 @@ protected:
 	static HBITMAP _hbmpBuf;
 
 	static StatisticsView * _this;
+	static CRITICAL_SECTION _stCS;
 
 protected:
 	static void DrawGraph();

@@ -26,12 +26,15 @@ ProcessCache *ProcessCache::instance()
 
 TCHAR *ProcessCache::GetName(int pid)
 {
+	bool rebuild = false;
 	TCHAR *result;
 	EnterCriticalSection(&_cs);
 	
 	if (_nameTable[pid / 4][0] == TEXT('\0'))
 	{
+		rebuild = true; // For debugging
 		Utils::DbgPrint(TEXT("Rebuild Table...\n")); // For debugging
+
 		rebuildTable();
 		result = _nameTable[pid / 4];
 		if (result[0] == TEXT('\0'))
@@ -91,7 +94,7 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
 	}
 	else
 	{
-		Utils::DbgPrint(TEXT("PID %d, \"%s\" is dead, new name is %s\n"), pid, name, _nameTable[pid / 4]);
+		Utils::DbgPrint(TEXT("PID %d, \"%s\" is dead\n"), pid, name);
 	}
 
 	LeaveCriticalSection(&_cs);

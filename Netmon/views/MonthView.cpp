@@ -187,6 +187,8 @@ void MonthView::InitDatabaseCallback(SQLiteRow *row)
 
 void MonthView::InsertPacket(PacketInfoEx *pi)
 {
+	EnterCriticalSection(&_stCS);
+
 	// Insert an MtViewItem if PUID not Exist
 	if( _items.count(pi->puid) == 0 )
 	{
@@ -219,10 +221,14 @@ void MonthView::InsertPacket(PacketInfoEx *pi)
 		mItemAll.dayRx[mDay - 1] += pi->size;
 		mItemAll.sumRx += pi->size;
 	}
+
+	LeaveCriticalSection(&_stCS);
 }
 
 void MonthView::SetProcessUid(int puid, TCHAR *processName)
 {
+	EnterCriticalSection(&_stCS);
+
 	// Insert an MtViewItem if PUID not Exist
 	if( _items.count(puid) == 0 )
 	{
@@ -239,17 +245,21 @@ void MonthView::SetProcessUid(int puid, TCHAR *processName)
 	}
 
 	DrawGraph();
+
+	LeaveCriticalSection(&_stCS);
 }
 void MonthView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
+	EnterCriticalSection(&_stCS);
+
 	// Start Painting
 	DrawGraph();
+
+	LeaveCriticalSection(&_stCS);
 }
 
 void MonthView::Fill()
 {
-	EnterCriticalSection(&_stCS);
-
 	// Calc the desired length of the vectors
 	int exMonth = Utils::GetExMonth();
 	int length = exMonth - MtViewItem::firstMonth + 1;
@@ -262,8 +272,6 @@ void MonthView::Fill()
 			it->second.months.push_back(MonthItem());
 		}
 	}
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void MonthView::DrawGraph()
