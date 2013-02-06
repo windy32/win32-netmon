@@ -17,6 +17,7 @@ HDC     StatisticsView::_hdcBuf;
 HBITMAP StatisticsView::_hbmpBuf;
 
 StatisticsView *StatisticsView::_this;
+CRITICAL_SECTION StatisticsView::_stCS;
 
 #pragma endregion
 
@@ -32,6 +33,8 @@ void StatisticsView::Init()
 
 	_this = this;
 
+	InitializeCriticalSection(&_stCS);
+
 	InitDatabase();
 }
 
@@ -39,6 +42,8 @@ void StatisticsView::End()
 {
 	DeleteDC(_hdcBuf);
 	DeleteObject(_hbmpBuf);
+
+	DeleteCriticalSection(&_stCS);
 
 	SaveDatabase();
 }
@@ -369,6 +374,8 @@ void StatisticsView::InitDatabaseRateCallback(SQLiteRow *row)
 
 void StatisticsView::InsertPacket(PacketInfoEx *pi)
 {
+	EnterCriticalSection(&_stCS);
+
 	// Insert a StViewItem if PUID not Exist
 	if( _items.count(pi->puid) == 0 )
 	{
@@ -466,17 +473,25 @@ void StatisticsView::InsertPacket(PacketInfoEx *pi)
 		item.rxPacketSize[size - 1] += 1;
 		itemAll.rxPacketSize[size - 1] += 1;
 	}
+
+	LeaveCriticalSection(&_stCS);
 }
 
 void StatisticsView::SetProcessUid(int puid, TCHAR *processName)
 {
+	EnterCriticalSection(&_stCS);
+
 	_process = puid;
 
 	DrawGraph();
+
+	LeaveCriticalSection(&_stCS);
 }
 
 void StatisticsView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
+	EnterCriticalSection(&_stCS);
+
 	// Update statistics for rate
 	for(std::map<int, StViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
 	{
@@ -512,6 +527,8 @@ void StatisticsView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 
 	// Start Painting
 	DrawGraph();
+
+	LeaveCriticalSection(&_stCS);
 }
 
 void StatisticsView::DrawGraph()
