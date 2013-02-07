@@ -33,6 +33,8 @@ protected:
 
 	static std::vector<ProcessItem> _processes;
 
+	static CRITICAL_SECTION _stCS;
+
 	// It's associated with a ListView control
 	static HWND _hList;
 

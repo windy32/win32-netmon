@@ -374,7 +374,6 @@ void StatisticsView::InitDatabaseRateCallback(SQLiteRow *row)
 
 void StatisticsView::InsertPacket(PacketInfoEx *pi)
 {
-	EnterCriticalSection(&_stCS);
 
 	// Insert a StViewItem if PUID not Exist
 	if( _items.count(pi->puid) == 0 )
@@ -383,6 +382,8 @@ void StatisticsView::InsertPacket(PacketInfoEx *pi)
 		_items[pi->puid].newItem = true;
 		_tcscpy_s(_items[pi->puid].processName, MAX_PATH, pi->name);
 	}
+
+	EnterCriticalSection(&_stCS);
 
 	// Create a Reference for Short
 	StViewItem &item = _items[pi->puid];
@@ -479,13 +480,8 @@ void StatisticsView::InsertPacket(PacketInfoEx *pi)
 
 void StatisticsView::SetProcessUid(int puid, TCHAR *processName)
 {
-	EnterCriticalSection(&_stCS);
-
 	_process = puid;
-
 	DrawGraph();
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void StatisticsView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
@@ -524,11 +520,10 @@ void StatisticsView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 			itemAll.rxRate[rxRate] += 1;
 		}
 	}
+	LeaveCriticalSection(&_stCS);
 
 	// Start Painting
 	DrawGraph();
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void StatisticsView::DrawGraph()
@@ -579,7 +574,11 @@ void StatisticsView::DrawGraph()
 	int rtect_width  = 0;
 	int rtect_height = 0;
 
-	StViewItem &item = _items[_process];
+	EnterCriticalSection(&_stCS);
+
+	StViewItem item = _items[_process];
+
+	LeaveCriticalSection(&_stCS);
 
 	// Clear Background
 	Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
