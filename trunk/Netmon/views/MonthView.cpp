@@ -187,8 +187,6 @@ void MonthView::InitDatabaseCallback(SQLiteRow *row)
 
 void MonthView::InsertPacket(PacketInfoEx *pi)
 {
-	EnterCriticalSection(&_stCS);
-
 	// Insert an MtViewItem if PUID not Exist
 	if( _items.count(pi->puid) == 0 )
 	{
@@ -201,6 +199,8 @@ void MonthView::InsertPacket(PacketInfoEx *pi)
 
 	// Update Traffic
 	int mDay = Utils::GetDay((time_t)pi->time_s);
+
+	EnterCriticalSection(&_stCS);
 
 	MonthItem &mItem = _items[pi->puid].months[Utils::GetExMonth() - MtViewItem::firstMonth];
 	MonthItem &mItemAll = _items[PROCESS_ALL].months[Utils::GetExMonth() - MtViewItem::firstMonth];
@@ -227,35 +227,24 @@ void MonthView::InsertPacket(PacketInfoEx *pi)
 
 void MonthView::SetProcessUid(int puid, TCHAR *processName)
 {
-	EnterCriticalSection(&_stCS);
-
-	// Insert an MtViewItem if PUID not Exist
-	if( _items.count(puid) == 0 )
-	{
-		_items[puid] = MtViewItem();
-		_tcscpy_s(_items[puid].processName, MAX_PATH, processName);
-	}
-
 	_process = puid;
 	Fill();
+
+	EnterCriticalSection(&_stCS);
 
 	if( _curMonth > _items[puid].firstMonth + (int)_items[puid].months.size() - 1 )
 	{
 		_curMonth = _items[puid].firstMonth;
 	}
 
-	DrawGraph();
-
 	LeaveCriticalSection(&_stCS);
+
+	DrawGraph();
 }
 void MonthView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	EnterCriticalSection(&_stCS);
-
 	// Start Painting
 	DrawGraph();
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void MonthView::Fill()
@@ -263,6 +252,8 @@ void MonthView::Fill()
 	// Calc the desired length of the vectors
 	int exMonth = Utils::GetExMonth();
 	int length = exMonth - MtViewItem::firstMonth + 1;
+
+	EnterCriticalSection(&_stCS);
 
 	// Fill vectors
 	for(std::map<int, MtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
@@ -272,6 +263,8 @@ void MonthView::Fill()
 			it->second.months.push_back(MonthItem());
 		}
 	}
+
+	LeaveCriticalSection(&_stCS);
 }
 
 void MonthView::DrawGraph()
@@ -279,8 +272,12 @@ void MonthView::DrawGraph()
 	// Fill Vectors
 	Fill();
 
-	MtViewItem &item = _items[_process];
-	MonthItem &mItem = item.months[_curMonth - MtViewItem::firstMonth];
+	EnterCriticalSection(&_stCS);
+
+	MtViewItem item = _items[_process];
+	MonthItem mItem = item.months[_curMonth - MtViewItem::firstMonth];
+
+	LeaveCriticalSection(&_stCS);
 
 	int numDays = Utils::GetNumDays(_curMonth);
 

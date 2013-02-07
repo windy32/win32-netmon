@@ -6,6 +6,7 @@
 #pragma region Members of Process
 
 std::vector<Process::ProcessItem> Process::_processes;
+CRITICAL_SECTION Process::_stCS;
 HWND Process::_hList;
 
 #pragma endregion
@@ -26,6 +27,8 @@ void Process::Init(HWND hList)
 	row.InsertType(SQLiteRow::TYPE_STRING);
 
 	SQLite::Select(command, &row, InitCallback);
+
+	InitializeCriticalSection(&_stCS);
 }
 
 void Process::InitCallback(SQLiteRow *row)
@@ -135,13 +138,20 @@ void Process::OnPacket(PacketInfoEx *pi)
 		pi->pauid = item.pauid;
 
 		// Add to process list
+		EnterCriticalSection(&_stCS);
+
 		_processes.push_back(item);
+
+		LeaveCriticalSection(&_stCS);
 
 		// Add to ListView
 		ListViewInsert(_processes.size() - 1, _hList);
+
 	}
 	else
 	{
+		EnterCriticalSection(&_stCS);
+
 		// Update the ProcessItem that already Exists
 		ProcessItem &item = _processes[index];
 
@@ -174,11 +184,15 @@ void Process::OnPacket(PacketInfoEx *pi)
 		}
 
 		item.dirty = true;
+
+		LeaveCriticalSection(&_stCS);
 	}
 }
 
 void Process::OnTimer()
 {
+	EnterCriticalSection(&_stCS);
+
 	// See if a Process Ends
 	bool rebuilt = false;
 	for(unsigned int i = 0; i < _processes.size(); i++)
@@ -217,6 +231,7 @@ void Process::OnTimer()
 			item.dirty = false;
 		}
 	}
+	LeaveCriticalSection(&_stCS);
 }
 
 void Process::OnExit()
@@ -228,54 +243,73 @@ void Process::OnExit()
 			Utils::UpdateProcessActivity(_processes[i].pauid, (int)time(0));
 		}
 	}
+	DeleteCriticalSection(&_stCS);
 }
 
 // Utils
 int Process::GetProcessUid(int index)
 {
-	return _processes[index].puid;
+	EnterCriticalSection(&_stCS);
+	int puid = _processes[index].puid;
+	LeaveCriticalSection(&_stCS);
+	return puid;
 }
 
 int Process::GetProcessCount()
 {
-	return _processes.size();
+	EnterCriticalSection(&_stCS);
+	int size = _processes.size();
+	LeaveCriticalSection(&_stCS);
+	return size;
 }
 
 int Process::GetProcessUid(const TCHAR *name)
 {
+	int puid = -1;
+	EnterCriticalSection(&_stCS);
 	for(unsigned int i = 0; i < _processes.size(); i++)
 	{
 		if( _tcscmp(_processes[i].name, name) == 0 )
 		{
-			return _processes[i].puid;
+			puid = _processes[i].puid;
+			break;
 		}
 	}
-	return -1;
+	LeaveCriticalSection(&_stCS);
+	return puid;
 }
 
 bool Process::GetProcessName(int puid, TCHAR *buf, int len)
 {
+	bool result = false;
+	EnterCriticalSection(&_stCS);
 	for(unsigned int i = 0; i < _processes.size(); i++)
 	{
 		if( _processes[i].puid == puid )
 		{
 			_tcscpy_s(buf, len, _processes[i].name);
-			return true;
+			result = true;
+			break;
 		}
 	}
-	return false;
+	LeaveCriticalSection(&_stCS);
+	return result;
 }
 
-int  Process::GetProcessIndex(int puid)
+int Process::GetProcessIndex(int puid)
 {
+	int index = -1;
+	EnterCriticalSection(&_stCS);
 	for(unsigned int i = 0; i < _processes.size(); i++)
 	{
 		if( _processes[i].puid == puid )
 		{
-			return i;
+			index = i;
+			break;
 		}
 	}
-	return -1;
+	LeaveCriticalSection(&_stCS);
+	return index;
 }
 
 bool Process::GetProcessRate(int puid, int *txRate, int *rxRate)
@@ -288,20 +322,26 @@ bool Process::GetProcessRate(int puid, int *txRate, int *rxRate)
 	}
 	else
 	{
+		EnterCriticalSection(&_stCS);
 		*txRate = _processes[index].prevTxRate;
 		*rxRate = _processes[index].prevRxRate;
+		LeaveCriticalSection(&_stCS);
 		return true;
 	}
 }
 
 bool Process::IsProcessActive(int puid)
 {
+	bool active = false;
+	EnterCriticalSection(&_stCS);
 	for(unsigned int i = 0; i < _processes.size(); i++)
 	{
 		if( _processes[i].puid == puid )
 		{
-			return _processes[i].active;
+			active = _processes[i].active;
+			break;
 		}
 	}
-	return false;
+	LeaveCriticalSection(&_stCS);
+	return active;
 }

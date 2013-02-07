@@ -26,6 +26,14 @@ CRITICAL_SECTION RealtimeView::_stCS;
 
 #pragma endregion
 
+// Call Graph (targets with an asterisk have stl operations)
+//
+// DrawGraph* <-+---- SetProcessUid
+//              |
+// Fill* <------+---- InsertPacket*
+//              |
+//              +---- TimerProc
+//
 void RealtimeView::Init()
 {
 	_process = PROCESS_ALL;
@@ -76,6 +84,8 @@ void RealtimeView::Fill()
 	unsigned int size_60s = (unsigned int)(timeOffset / 60 + 1);
 
 	// Fill vectors
+	EnterCriticalSection(&_stCS);
+
 	for(std::map<int, RtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
 	{
 		while( it->second.rate_tx_1s.size() < size_1s )
@@ -96,12 +106,11 @@ void RealtimeView::Fill()
 			it->second.rate_rx_60s.push_back(0);
 		}
 	}
+	LeaveCriticalSection(&_stCS);
 }
 
 void RealtimeView::InsertPacket(PacketInfoEx *pi)
 {
-	EnterCriticalSection(&_stCS);
-
 	// One day is 86400 seconds, each second 4 bytes, which sums up to be 337.5KB.
 	// 10 processed with tx/rx rate: 6.75MB
 
@@ -120,6 +129,8 @@ void RealtimeView::InsertPacket(PacketInfoEx *pi)
 	RtViewItem &itemAll = _items[PROCESS_ALL];
 
 	// Add the Packet's Size to Vectors
+	EnterCriticalSection(&_stCS);
+
 	if( pi->dir == DIR_UP )
 	{
 		item.rate_tx_1s.back()  += pi->size;
@@ -145,34 +156,21 @@ void RealtimeView::InsertPacket(PacketInfoEx *pi)
 
 void RealtimeView::SetProcessUid(int puid, TCHAR *processName)
 {
-	EnterCriticalSection(&_stCS);
-
-	// Insert a RtViewItem if PUID not Exist
-	if( _items.count(puid) == 0 )
-	{
-		_items[puid] = RtViewItem();
-		_tcscpy_s(_items[puid].processName, MAX_PATH, processName);
-	}
-
 	// Fill Vectors
 	Fill();
 
+	// Update
 	_process = puid;
-
 	DrawGraph();
-	LeaveCriticalSection(&_stCS);
 }
+
 void RealtimeView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	EnterCriticalSection(&_stCS);
-
 	// Fill Vectors
 	Fill();
 
 	// Start Painting
 	DrawGraph();
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void RealtimeView::DrawGraph()
@@ -195,15 +193,18 @@ void RealtimeView::DrawGraph()
 	Rectangle(_hdcBuf, x1, y1, x2, y2);
 
 	// Scan the Vector
+	// - Create a copy for safety
+	EnterCriticalSection(&_stCS);
 
-	// - Create a Reference for Short
-	std::vector<int> &txRate = 
+	std::vector<int> txRate = 
 		(_zoomFactor == ZOOM_1S)  ? _items[_process].rate_tx_1s  : 
 		(_zoomFactor == ZOOM_10S) ? _items[_process].rate_tx_10s : _items[_process].rate_tx_60s;
 
-	std::vector<int> &rxRate = 
+	std::vector<int> rxRate = 
 		(_zoomFactor == ZOOM_1S)  ? _items[_process].rate_rx_1s  : 
 		(_zoomFactor == ZOOM_10S) ? _items[_process].rate_rx_10s : _items[_process].rate_rx_60s;
+
+	LeaveCriticalSection(&_stCS);
 
 	// - Calc some Parameters of the Graph
 	int graphWidth = x2 - x1;
