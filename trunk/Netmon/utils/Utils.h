@@ -14,8 +14,8 @@ public:
 	// Database operations
 	static int GetProcessUid(const TCHAR *name);
 	static int InsertProcess(const TCHAR *name);
-	static int InsertProcessActivity(int puid, int startTime, int endTime);
-	static void UpdateProcessActivity(int pauid, int endTime);
+	//static int InsertProcessActivity(int puid, int startTime, int endTime);
+	//static void UpdateProcessActivity(int pauid, int endTime);
 	static bool GetProcessName(int puid, TCHAR *buf, int len);
 	static void InsertPacket(PacketInfoEx *pi);
 	static void DeleteAllPackets();
