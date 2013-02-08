@@ -73,6 +73,7 @@ int Utils::InsertProcess(const TCHAR *name)
 	return (int)SQLite::GetLastInsertRowId();
 }
 
+/*
 int Utils::InsertProcessActivity(int puid, int startTime, int endTime)
 {
 	TCHAR command[256];
@@ -98,6 +99,7 @@ void Utils::UpdateProcessActivity(int pauid, int endTime)
 
 	SQLite::Exec(command, false);
 }
+*/
 
 bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
 {

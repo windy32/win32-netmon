@@ -132,10 +132,10 @@ void Process::OnPacket(PacketInfoEx *pi)
 		item.prevRxRate = 0;
 
 		// Process Activity
-		item.startTime = (int) time(0);
-		item.endTime = -1;
-		item.pauid = Utils::InsertProcessActivity(item.puid, item.startTime, item.endTime);
-		pi->pauid = item.pauid;
+		//item.startTime = (int) time(0);
+		//item.endTime = -1;
+		//item.pauid = Utils::InsertProcessActivity(item.puid, item.startTime, item.endTime);
+		//pi->pauid = item.pauid;
 
 		// Add to process list
 		EnterCriticalSection(&_stCS);
@@ -168,10 +168,10 @@ void Process::OnPacket(PacketInfoEx *pi)
 			item.prevRxRate = 0;
 
 			// Process Activity
-			item.startTime = (int) time(0);
-			item.endTime = -1;
-			item.pauid = Utils::InsertProcessActivity(item.puid, item.startTime, item.endTime);
-			pi->pauid = item.pauid;
+			//item.startTime = (int) time(0);
+			//item.endTime = -1;
+			//item.pauid = Utils::InsertProcessActivity(item.puid, item.startTime, item.endTime);
+			//pi->pauid = item.pauid;
 		}
 
 		if( pi->dir == DIR_UP )
@@ -203,7 +203,7 @@ void Process::OnTimer()
 			if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name, !rebuilt))
 			{
 				rebuilt = true;
-				Utils::UpdateProcessActivity(item.pauid, (int)time(0));
+				//Utils::UpdateProcessActivity(item.pauid, (int)time(0));
 				item.active = false;
 				ListViewUpdate(i);
 			}
@@ -236,13 +236,13 @@ void Process::OnTimer()
 
 void Process::OnExit()
 {
-	for(unsigned int i = 0; i < _processes.size(); i++)
-	{
-		if( _processes[i].active == true )
-		{
-			Utils::UpdateProcessActivity(_processes[i].pauid, (int)time(0));
-		}
-	}
+	//for(unsigned int i = 0; i < _processes.size(); i++)
+	//{
+	//	if( _processes[i].active == true )
+	//	{
+	//		Utils::UpdateProcessActivity(_processes[i].pauid, (int)time(0));
+	//	}
+	//}
 	DeleteCriticalSection(&_stCS);
 }
 
