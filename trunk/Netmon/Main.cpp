@@ -641,7 +641,7 @@ static void DrawSidebar()
 	// Write to screen
 	BitBlt(hDcSidebar, 0, 0, g_iSidebarWidth, g_iSidebarHeight + 1, g_hDcSidebarBuf, 0, 0, SRCCOPY);
 
-	ReleaseDC(GetDlgItem(g_hDlgMain, IDP_SIDEBAR), hDcSidebar);
+	ReleaseDC(g_hDlgMain, hDcSidebar);
 }
 
 static void EnumDevices()
@@ -1199,8 +1199,8 @@ static void OnSize(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int clientWidth = lParam & 0xFFFF;
 	int clientHeight = lParam >> 16;
 	
-	MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 50 - 1, 0, clientWidth - 50 + 2, 140 + (clientHeight - 440) / 3, TRUE);
-	MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 50 + 6, 140 + 6 + (clientHeight - 440) / 3, clientWidth - 50 - 12, clientHeight - 140 - 12 - (clientHeight - 440) / 3, TRUE);
+	MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 50 - 1, 0, clientWidth - 50 + 2, 60 + (clientHeight - 240) / 2, TRUE);
+	MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 50 + 6, 60 + 6 + (clientHeight - 240) / 2, clientWidth - 50 - 12, clientHeight - 60 - 12 - (clientHeight - 240) / 2, TRUE);
 	g_iSidebarWidth = 50;
 	g_iSidebarHeight = clientHeight;
 
