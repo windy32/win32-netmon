@@ -18,22 +18,6 @@ IDB_ABOUT_SIDEBAR  BITMAP         ".\\res\\AboutSidebar.bmp"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_STOP_HOVER     BITMAP         ".\\stop-hover.bmp"
-
-
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_STOP           BITMAP         ".\\stop.bmp"
-
-
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_START_HOVER    BITMAP         ".\\start-hover.bmp"
-
-
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_START          BITMAP         ".\\start.bmp"
-
-
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDB_PAGEDN_DK      BITMAP         ".\\res\\PageDownDark.bmp"
 
 
@@ -51,6 +35,22 @@ IDB_PAGEUP_LT      BITMAP         ".\\res\\PageUpLight.bmp"
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDB_SIDEBAR        BITMAP         ".\\res\\Sidebar.bmp"
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDB_START          BITMAP         ".\\start.bmp"
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDB_START_HOVER    BITMAP         ".\\start-hover.bmp"
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDB_STOP           BITMAP         ".\\stop.bmp"
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDB_STOP_HOVER     BITMAP         ".\\stop-hover.bmp"
 
 
 
@@ -200,6 +200,14 @@ STYLE DS_SETFONT | WS_VISIBLE | WS_CHILDWINDOW
 FONT 9, "MS Shell Dlg 2", 0, 0, 0
 {
 }
+
+
+
+//
+// Cursor resources
+//
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+CUR_VSPLIT         CURSOR         ".\\vsplit.cur"
 
 
 
