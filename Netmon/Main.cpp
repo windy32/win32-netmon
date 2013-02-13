@@ -1010,7 +1010,9 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	HDC hDc;
 
 	// Init SQLite
-	SQLite::Open(TEXT("Netmon.db"));
+	TCHAR dbPath[MAX_PATH];
+	Utils::GetSomeFilePathNameInCurrentDir(dbPath, MAX_PATH, TEXT("Netmon.db"));
+	SQLite::Open(dbPath);
 	InitDatabase();
 
 	// Load Icon
