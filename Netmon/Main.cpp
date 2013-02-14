@@ -1119,6 +1119,11 @@ static void OnClose(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	ShowWindow(hWnd, SW_HIDE); 
 }
 
+static void OnQueryEndSession(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	OnExit(hWnd);
+}
+
 static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	if( wParam == IDM_FILE_EXIT || wParam == IDM_TRAY_EXIT)
@@ -1324,16 +1329,17 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 {
 	#define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
 
-	PROCESS_MSG(WM_MOUSEMOVE,     OnMouseMove)
-	PROCESS_MSG(WM_LBUTTONDOWN,   OnLButtonDown)
-	PROCESS_MSG(WM_INITDIALOG,    OnInitDialog)    // Init
-	PROCESS_MSG(WM_CLOSE,         OnClose)
-	PROCESS_MSG(WM_COMMAND,       OnCommand)
-	PROCESS_MSG(WM_USER_TRAY,     OnUserTray)      // Tray icon messages
-	PROCESS_MSG(WM_PAINT,         OnPaint)
-	PROCESS_MSG(WM_SIZE,          OnSize)          // Resize Sidebar, ListView and Tab Control
-	PROCESS_MSG(WM_GETMINMAXINFO, OnGetMinMaxInfo) // Set Window's minimun size
-	PROCESS_MSG(WM_NOTIFY,        OnNotify)
+	PROCESS_MSG(WM_MOUSEMOVE,       OnMouseMove)
+	PROCESS_MSG(WM_LBUTTONDOWN,     OnLButtonDown)
+	PROCESS_MSG(WM_INITDIALOG,      OnInitDialog)    // Init
+	PROCESS_MSG(WM_CLOSE,           OnClose)
+	PROCESS_MSG(WM_QUERYENDSESSION, OnQueryEndSession)
+	PROCESS_MSG(WM_COMMAND,         OnCommand)
+	PROCESS_MSG(WM_USER_TRAY,       OnUserTray)      // Tray icon messages
+	PROCESS_MSG(WM_PAINT,           OnPaint)
+	PROCESS_MSG(WM_SIZE,            OnSize)          // Resize Sidebar, ListView and Tab Control
+	PROCESS_MSG(WM_GETMINMAXINFO,   OnGetMinMaxInfo) // Set Window's minimun size
+	PROCESS_MSG(WM_NOTIFY,          OnNotify)
 
 	#undef PROCESS_MSG
 
