@@ -660,7 +660,7 @@ static void EnumDevices()
 			TEXT("Please make sure WinPcap version 4.1.2 is correctly installed."), TEXT("Error"), MB_OK | MB_ICONWARNING);
 
 		EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
-		DeleteMenu(hMenuView, 5, MF_BYPOSITION);
+		DeleteMenu(hMenuAdapter, 0, MF_BYPOSITION);
 		return;
 	}
 
@@ -1277,10 +1277,13 @@ static void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	// Update Sidebar when necessary
-	if (g_enumHoverState != newState)
+	if (g_nAdapters > 0)
 	{
-		g_enumHoverState = newState;
-		DrawSidebar();
+		if (g_enumHoverState != newState)
+		{
+			g_enumHoverState = newState;
+			DrawSidebar();
+		}
 	}
 }
 
@@ -1302,6 +1305,9 @@ static void OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			newState = Stop;
 		}
 	}
+
+	if (g_nAdapters == 0)
+		return;
 
 	// Start / Stop when necessary
 	if (newState == Start)
