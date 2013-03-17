@@ -7,9 +7,16 @@ ProcessCache *ProcessCache::_instance = NULL;
 ProcessCache::ProcessCache()
 {
 	InitializeCriticalSection(&_cs);
-	RtlZeroMemory(_nameTable, sizeof(_nameTable));
-	RtlZeroMemory(_pathTable, sizeof(_pathTable));
-	_csCounter = 0; // For debugging
+
+	//RtlZeroMemory(_nameTable, sizeof(_nameTable));
+	//RtlZeroMemory(_pathTable, sizeof(_pathTable));
+	for (int i = 0; i < 32768 / 4; i++)
+	{
+		_nameTable[i] = new TCHAR[MAX_PATH];
+		_pathTable[i] = new TCHAR[MAX_PATH];
+		RtlZeroMemory(_nameTable[i], MAX_PATH * 2);
+		RtlZeroMemory(_pathTable[i], MAX_PATH * 2);
+	}
 }
 
 ProcessCache::~ProcessCache()
@@ -30,14 +37,14 @@ TCHAR *ProcessCache::GetName(int pid)
 	TCHAR *result;
 	EnterCriticalSection(&_cs);
 	
-	if (_nameTable[pid / 4][0] == TEXT('\0'))
+	if (_tcslen(_nameTable[pid / 4]) == 0)
 	{
 		rebuild = true; // For debugging
 		Utils::DbgPrint(TEXT("Rebuild Table...\n")); // For debugging
 
 		rebuildTable();
 		result = _nameTable[pid / 4];
-		if (result[0] == TEXT('\0'))
+		if (_tcslen(result) == 0)
 		{
 			Utils::DbgPrint(TEXT("PID %d Not Found\n"), pid);
 		}
@@ -57,12 +64,12 @@ TCHAR *ProcessCache::GetFullPath(int pid)
 	TCHAR *result;
 	EnterCriticalSection(&_cs);
 
-	if (_pathTable[pid / 4][0] == TEXT('\0'))
+	if (_tcslen(_pathTable[pid / 4]) == 0)
 	{
 		Utils::DbgPrint(TEXT("Rebuild Table...\n")); // For debugging
 		rebuildTable();
 		result = _pathTable[pid / 4];
-		if (result[0] == TEXT('\0'))
+		if (_tcslen(result) == 0)
 		{
 			Utils::DbgPrint(TEXT("PID %d Not Found\n"), pid);
 		}
@@ -71,7 +78,7 @@ TCHAR *ProcessCache::GetFullPath(int pid)
 			Utils::DbgPrint(TEXT("PID %d : \"%s\"\n"), pid, _pathTable[pid / 4]);
 		}
 	}
-	result = _pathTable[pid / 4][0] == TEXT('\0') ? TEXT("-") : _pathTable[pid / 4];
+	result = _tcslen(_pathTable[pid / 4]) == 0 ? TEXT("-") : _pathTable[pid / 4];
 
 	LeaveCriticalSection(&_cs);
 	return result;
@@ -104,8 +111,11 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
 void ProcessCache::rebuildTable(bool dump)
 {
 	// Clear Tables
-	RtlZeroMemory(_nameTable, sizeof(_nameTable));
-	RtlZeroMemory(_pathTable, sizeof(_pathTable));
+	for (int i = 0; i < 32768 / 4; i++)
+	{
+		RtlZeroMemory(_nameTable[i], MAX_PATH * 2);
+		RtlZeroMemory(_pathTable[i], MAX_PATH * 2);
+	}
 
 	// Take a snapshot
 	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
