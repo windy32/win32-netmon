@@ -457,6 +457,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		}
 
 		// - Update Views
+#if 1
 		g_rtView.InsertPacket(&pie);
 		g_mtView.InsertPacket(&pie);
 		g_stView.InsertPacket(&pie);
@@ -464,7 +465,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		{
 			g_dtView.InsertPacket(&pie);
 		}
-
+#endif
 		if( g_bCapture ) // If the user hasn't clicked Stop
 		{
 			// DebugPrint
