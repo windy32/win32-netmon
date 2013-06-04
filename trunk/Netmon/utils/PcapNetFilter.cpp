@@ -167,6 +167,27 @@ bool PcapNetFilter::Select(int i)
 
 bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 {
+#ifdef DEBUG
+	if (*capture)
+	{
+		pi->size = 1460;
+		pi->time_s = (int)time(0);
+		pi->time_us = 0;
+		pi->networkProtocol = NET_IPv4;
+		pi->trasportProtocol = TRA_TCP;
+		pi->dir = DIR_DOWN;
+		pi->local_port = 0;
+		pi->remote_port = 0;
+
+		Sleep(1);
+		return true;
+	}
+	else
+	{
+		return true;
+	}
+#endif
+
 	int res;
 	struct pcap_pkthdr *header;
 	const unsigned char *pkt_data;
