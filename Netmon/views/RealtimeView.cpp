@@ -42,7 +42,7 @@ void RealtimeView::End()
 	DeleteObject(_hbmpBuf);
 }
 
-void RealtimeView::SetProcessUid(int puid, TCHAR *processName)
+void RealtimeView::SetProcessUid(int puid)
 {
 	_process = puid;
 	DrawGraph();

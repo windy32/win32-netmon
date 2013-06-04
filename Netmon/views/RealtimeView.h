@@ -37,7 +37,7 @@ protected:
 public:
 	virtual void Init(RealtimeModel *model);
 	virtual void End();
-	virtual void SetProcessUid(int puid, TCHAR *processName);
+	virtual void SetProcessUid(int puid);
 
 	virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };

@@ -478,7 +478,7 @@ void StatisticsView::InsertPacket(PacketInfoEx *pi)
 	LeaveCriticalSection(&_stCS);
 }
 
-void StatisticsView::SetProcessUid(int puid, TCHAR *processName)
+void StatisticsView::SetProcessUid(int puid)
 {
 	_process = puid;
 	DrawGraph();
