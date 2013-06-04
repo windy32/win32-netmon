@@ -17,11 +17,7 @@ protected:
 	static const int PROCESS_ALL;
 
 public:
-	virtual void Init() = 0;
-	virtual void End() = 0;
 	virtual void SetProcessUid(int puid, TCHAR *processName) = 0;
-	virtual void InsertPacket(PacketInfoEx *pi) = 0;
-
 	virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 };
 
