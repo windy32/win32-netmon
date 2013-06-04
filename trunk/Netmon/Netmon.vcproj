@@ -198,7 +198,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="View"
+			Name="Model &amp; View"
 			>
 			<File
 				RelativePath=".\views\DetailView.cpp"
@@ -217,11 +217,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\views\NetModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\NetModel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\views\NetView.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\views\NetView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\views\RealtimeModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\RealtimeModel.h"
 				>
 			</File>
 			<File

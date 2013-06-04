@@ -5,14 +5,11 @@
 
 #pragma region Members of RealtimeView
 
-enum RealtimeView::ZoomFactor RealtimeView::_zoomFactor;
+// Settings
+enum ZoomFactor RealtimeView::_zoomFactor;
 enum RealtimeView::SmoothFactor RealtimeView::_smoothFactor;
 
-std::map<int, RealtimeView::RtViewItem> RealtimeView::_items;
-
-int RealtimeView::_startTime; 
-int RealtimeView::_pos;
-
+// GDI Objects
 HDC     RealtimeView::_hdcTarget;
 HDC     RealtimeView::_hdcBuf;
 HBITMAP RealtimeView::_hbmpBuf;
@@ -22,154 +19,37 @@ HFONT   RealtimeView::_hEnglishFont;
 HFONT   RealtimeView::_hShellDlgFont;
 HFONT   RealtimeView::_hProcessFont;
 
-CRITICAL_SECTION RealtimeView::_stCS;
+// Model Object
+RealtimeModel *RealtimeView::_model;
 
 #pragma endregion
 
-// Call Graph (targets with an asterisk have stl operations)
-//
-// DrawGraph* <-+---- SetProcessUid
-//              |
-// Fill* <------+---- InsertPacket*
-//              |
-//              +---- TimerProc
-//
-void RealtimeView::Init()
+void RealtimeView::Init(RealtimeModel *model)
 {
 	_process = PROCESS_ALL;
-
-	_items[PROCESS_ALL] = RtViewItem();
+	_model = model;
 
 	_hdcBuf = 0;
 	_hbmpBuf = 0;
 
 	_zoomFactor = ZOOM_1S;
 	_smoothFactor = SMOOTH_1X;
-
-	_startTime = 0;
-	_pos = 0;
-
-	InitializeCriticalSection(&_stCS);
 }
 
 void RealtimeView::End()
 {
 	DeleteDC(_hdcBuf);
 	DeleteObject(_hbmpBuf);
-
-	DeleteCriticalSection(&_stCS);
-}
-
-void RealtimeView::Fill()
-{
-	// Calc the desired length of each vectors
-	// 
-	// e.g.: When _startTime = 500
-	//
-	// Packets with time ranging from 500 to 509 is added to rate_10s[0]
-	// Packets with time ranging form 510 to 519 is added to rate_10s[1]
-	// ...
-	// When time timeOffset < 10, there should be one element in rate_10s
-	// When time timeOffset < 20, there should be two element in rate_20s
-	// ...
-	if( _startTime == 0 )
-	{
-		_startTime = (int)time(0);
-	}
-
-	int timeOffset = (int)time(0) - _startTime;
-
-	unsigned int size_1s  = (unsigned int)(timeOffset + 1);
-	unsigned int size_10s = (unsigned int)(timeOffset / 10 + 1);
-	unsigned int size_60s = (unsigned int)(timeOffset / 60 + 1);
-
-	// Fill vectors
-	EnterCriticalSection(&_stCS);
-
-	for(std::map<int, RtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
-	{
-		while( it->second.rate_tx_1s.size() < size_1s )
-		{
-			it->second.rate_tx_1s.push_back(0);
-			it->second.rate_rx_1s.push_back(0);
-		}
-
-		while( it->second.rate_tx_10s.size() < size_10s )
-		{
-			it->second.rate_tx_10s.push_back(0);
-			it->second.rate_rx_10s.push_back(0);
-		}
-
-		while( it->second.rate_tx_60s.size() < size_60s )
-		{
-			it->second.rate_tx_60s.push_back(0);
-			it->second.rate_rx_60s.push_back(0);
-		}
-	}
-	LeaveCriticalSection(&_stCS);
-}
-
-void RealtimeView::InsertPacket(PacketInfoEx *pi)
-{
-	// One day is 86400 seconds, each second 4 bytes, which sums up to be 337.5KB.
-	// 10 processed with tx/rx rate: 6.75MB
-
-	// Insert a RtViewItem if PUID not Exist
-	if( _items.count(pi->puid) == 0 )
-	{
-		_items[pi->puid] = RtViewItem();
-		_tcscpy_s(_items[pi->puid].processName, MAX_PATH, pi->name);
-	}
-
-	// Fill Vectors
-	Fill();
-
-	// Create a Reference for Short
-	RtViewItem &item = _items[pi->puid];
-	RtViewItem &itemAll = _items[PROCESS_ALL];
-
-	// Add the Packet's Size to Vectors
-	EnterCriticalSection(&_stCS);
-
-	if( pi->dir == DIR_UP )
-	{
-		item.rate_tx_1s.back()  += pi->size;
-		item.rate_tx_10s.back() += pi->size;
-		item.rate_tx_60s.back() += pi->size;
-
-		itemAll.rate_tx_1s.back()  += pi->size;
-		itemAll.rate_tx_10s.back() += pi->size;
-		itemAll.rate_tx_60s.back() += pi->size;
-	}
-	else if( pi->dir == DIR_DOWN )
-	{
-		item.rate_rx_1s.back()  += pi->size;
-		item.rate_rx_10s.back() += pi->size;
-		item.rate_rx_60s.back() += pi->size;
-
-		itemAll.rate_rx_1s.back()  += pi->size;
-		itemAll.rate_rx_10s.back() += pi->size;
-		itemAll.rate_rx_60s.back() += pi->size;
-	}
-	LeaveCriticalSection(&_stCS);
 }
 
 void RealtimeView::SetProcessUid(int puid, TCHAR *processName)
 {
-	// Fill Vectors
-	Fill();
-
-	// Update
 	_process = puid;
 	DrawGraph();
 }
 
 void RealtimeView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	// Fill Vectors
-	Fill();
-
-	// Start Painting
 	DrawGraph();
 }
 
@@ -192,21 +72,12 @@ void RealtimeView::DrawGraph()
 	// Box for Graph
 	Rectangle(_hdcBuf, x1, y1, x2, y2);
 
-	// Scan the Vector
-	// - Create a copy for safety
-	EnterCriticalSection(&_stCS);
+	// Export Model Info
+	std::vector<int> txRate;
+	std::vector<int> rxRate;
+	_model->Export(_process, _zoomFactor, txRate, rxRate);
 
-	std::vector<int> txRate = 
-		(_zoomFactor == ZOOM_1S)  ? _items[_process].rate_tx_1s  : 
-		(_zoomFactor == ZOOM_10S) ? _items[_process].rate_tx_10s : _items[_process].rate_tx_60s;
-
-	std::vector<int> rxRate = 
-		(_zoomFactor == ZOOM_1S)  ? _items[_process].rate_rx_1s  : 
-		(_zoomFactor == ZOOM_10S) ? _items[_process].rate_rx_10s : _items[_process].rate_rx_60s;
-
-	LeaveCriticalSection(&_stCS);
-
-	// - Calc some Parameters of the Graph
+	// - Calculate some Parameters of the Graph
 	int graphWidth = x2 - x1;
 	int iFactor = 
 		(_zoomFactor == ZOOM_1S)  ? 1 :
@@ -215,7 +86,7 @@ void RealtimeView::DrawGraph()
 	int startIndex = (graphWidth > (int) rxRate.size() * 2 - 2) ? 0 : rxRate.size() - graphWidth / 2 - 1;
 	int endIndex = rxRate.size();
 
-	// - Calc the Max Rate
+	// - Calculate the Max Rate
 	int maxRate = 0;
 
 	for(int i = startIndex; i < endIndex; i++)
@@ -237,7 +108,7 @@ void RealtimeView::DrawGraph()
 
 	maxRate = maxRate / 1024 + 1; // Unit is now KB/s
 
-	// Deside Scale
+	// Decide Scale
 	//    1.  [    0 KB/s,     10 KB/s]     10,     8,     6,     4,     2,    0
 	//
 	//    2.  (   10 KB/s,     20 KB/s]     20,    15,    10,     5,     0
@@ -383,7 +254,7 @@ void RealtimeView::DrawGraph()
 				int yPos1_1 = (y2 - y1) * (__int64)rxRate[i - 1] / (1024 * scaleRate * iFactor);
 				int yPos2_1 = (y2 - y1) * (__int64)rxRate[i] / (1024 * scaleRate * iFactor);
 
-				// Calc Average
+				// Calculate Average
 				yPos1 = (yPos1 + yPos1_1) / 2;
 				yPos2 = (yPos2 + yPos2_1) / 2;
 			}
@@ -429,7 +300,7 @@ void RealtimeView::DrawGraph()
 				int yPos1_1 = (y2 - y1) * (__int64)txRate[i - 1] / (1024 * scaleRate * iFactor);
 				int yPos2_1 = (y2 - y1) * (__int64)txRate[i] / (1024 * scaleRate * iFactor);
 
-				// Calc Average
+				// Calculate Average
 				yPos1 = (yPos1 + yPos1_1) / 2;
 				yPos2 = (yPos2 + yPos2_1) / 2;
 			}
@@ -447,7 +318,7 @@ void RealtimeView::DrawGraph()
 				int yPos1_3 = (y2 - y1) * (__int64)txRate[i - 3] / (1024 * scaleRate * iFactor);
 				int yPos2_3 = (y2 - y1) * (__int64)txRate[i - 2] / (1024 * scaleRate * iFactor);
 
-				// Calc Average
+				// Calculate Average
 				yPos1 = (yPos1 + yPos1_1 + yPos1_2 + yPos1_3) / 4;
 				yPos2 = (yPos2 + yPos2_1 + yPos2_2 + yPos2_3) / 4;
 			}
@@ -588,11 +459,10 @@ void RealtimeView::DrawGraph()
 	}
 	else
 	{
-		TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, 
-			_items[_process].processName, _tcslen(_items[_process].processName));
+		TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, TEXT("TODO"), _tcslen(TEXT("TODO")));
 	}
 
-	// Wriet to Screen
+	// Write to Screen
 	BitBlt(_hdcTarget, 0, 0, _width, _height, _hdcBuf, 0, 0, SRCCOPY);
 }
 

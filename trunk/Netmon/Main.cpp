@@ -66,6 +66,9 @@ int       g_nAdapters = 0;
 int       g_iAdapter = 0;
 TCHAR     g_szAdapterNames[16][256];
 
+// Model
+static RealtimeModel *g_rtModel;
+
 // View
 static RealtimeView   g_rtView;
 static MonthView      g_mtView;
@@ -458,7 +461,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 
 		// - Update Views
 #if 1
-		g_rtView.InsertPacket(&pie);
+		g_rtModel->InsertPacket(&pie);
+		//g_rtView.InsertPacket(&pie);
 		g_mtView.InsertPacket(&pie);
 		g_stView.InsertPacket(&pie);
 		if( bUpdateDtView )
@@ -1096,8 +1100,11 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// Enum Devices
 	EnumDevices();
 
+	// Init Models
+	g_rtModel = new RealtimeModel();
+
 	// Init Views
-	g_rtView.Init();
+	g_rtView.Init(g_rtModel);
 	g_mtView.Init();
 	g_stView.Init();
 	g_dtView.Init();
