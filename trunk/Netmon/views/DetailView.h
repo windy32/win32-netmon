@@ -52,7 +52,7 @@ public:
 	virtual void Init();
 	virtual void End();
 	virtual void InsertPacket(PacketInfoEx *pi);
-	virtual void SetProcessUid(int puid, TCHAR *processName);
+	virtual void SetProcessUid(int puid);
 
 	virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

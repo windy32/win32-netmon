@@ -209,6 +209,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\views\MonthModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\MonthModel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\views\MonthView.cpp"
 				>
 			</File>

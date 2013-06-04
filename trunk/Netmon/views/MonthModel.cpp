@@ -1,0 +1,208 @@
+#include "stdafx.h"
+#include "MonthModel.h"
+
+int MonthModel::MtModelItem::firstMonth = -1;
+
+MonthModel::RealtimeModel()
+{
+	_items[PROCESS_ALL] = MtModelItem();
+	_tcscpy_s(_items[PROCESS_ALL].processName, MAX_PATH, TEXT("All Process"));
+
+	InitDatabase();
+}
+
+void MonthModel::Fill()
+{
+	// Calculate the desired length of the vectors
+	int exMonth = Utils::GetExMonth();
+	int length = exMonth - MtModelItem::firstMonth + 1;
+
+	// Fill vectors
+	Lock();
+	for(std::map<int, MtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
+	{
+		while( (int)it->second.months.size() < length)
+		{
+			it->second.months.push_back(MonthItem());
+		}
+	}
+	Unlock();
+}
+
+void MonthModel::InitDatabase()
+{
+	static TCHAR command[256];
+
+	// Build Command
+	_stprintf_s(command, _countof(command), TEXT("Select * From Traffic;"));
+
+	// Build SQLiteRow Object
+	SQLiteRow row;
+
+	row.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
+	row.InsertType(SQLiteRow::TYPE_INT32); // 1 Date
+	row.InsertType(SQLiteRow::TYPE_INT64); // 2 TxBytes
+	row.InsertType(SQLiteRow::TYPE_INT64); // 3 RxBytes
+	row.InsertType(SQLiteRow::TYPE_INT32); // 4 TxPackets
+	row.InsertType(SQLiteRow::TYPE_INT32); // 5 RxPackets
+
+	// Select
+	SQLite::Select(command, &row, InitDatabaseCallback);
+
+	// Set current month as first month when no data is available
+	if( MtModelItem::firstMonth == -1 )
+	{
+		MtModelItem::firstMonth = Utils::GetExMonth();
+	}
+
+	// Fill processName
+	for(std::map<int, MtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
+	{
+		Process::GetProcessName(it->first, it->second.processName, MAX_PATH);
+	}
+}
+
+void MonthModel::InitDatabaseCallback(SQLiteRow *row)
+{
+	int puid        = row->GetDataInt32(0);
+	int date        = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), lower 16 bit for mday
+	__int64 txBytes = row->GetDataInt64(2);
+	__int64 rxBytes = row->GetDataInt64(3);
+
+	int mDay = Utils::GetMdayByDate(date);
+	int exMonth = Utils::GetExMonthByDate(date);
+
+	// Insert an MtViewItem if PUID not Exist
+	if( _items.count(puid) == 0 )
+	{
+		_items[puid] = MtModelItem();
+		MtModelItem::firstMonth = Utils::GetExMonthByDate(date);
+	}
+
+	// Fill Vectors
+	Fill();
+
+	while( exMonth - MtModelItem::firstMonth > (int)_items[puid].months.size() - 1)
+	{
+		_items[puid].months.push_back(MonthItem());
+	}
+
+	while( exMonth - MtModelItem::firstMonth > (int)_items[PROCESS_ALL].months.size() - 1)
+	{
+		_items[PROCESS_ALL].months.push_back(MonthItem());
+	}
+
+	// Update Traffic
+	MonthItem &mItem = _items[puid].months[exMonth - MtModelItem::firstMonth];
+	MonthItem &mItemAll = _items[PROCESS_ALL].months[exMonth - MtModelItem::firstMonth];
+
+	mItem.dayTx[mDay - 1] = txBytes;
+	mItem.dayRx[mDay - 1] = rxBytes;
+	mItem.sumTx += txBytes;
+	mItem.sumRx += rxBytes;
+
+	mItemAll.dayTx[mDay - 1] += txBytes;
+	mItemAll.dayRx[mDay - 1] += rxBytes;
+	mItemAll.sumTx += txBytes;
+	mItemAll.sumRx += rxBytes;
+}
+
+void MonthModel::SaveDatabase()
+{
+	// Delete all records
+	SQLite::Exec(TEXT("Delete From Traffic;"), true);
+
+	// Insert records
+	for(std::map<int, MtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it) // Loop of Process
+	{
+		int puid = it->first;
+
+		if( puid == PROCESS_ALL )
+		{
+			continue;
+		}
+
+		for(int i = 0; i < (int)it->second.months.size(); i++) // Loop of Month Array
+		{
+			int exMonth = MtModelItem::firstMonth + i;
+			int numDays = Utils::GetNumDays(exMonth);
+
+			for(int j = 0; j < numDays; j++) // Loop of Month
+			{
+				int date = (exMonth << 16) + (j + 1); // j + 1: [1, 31]
+
+				// Build Command
+				TCHAR command[256];
+
+				_stprintf_s(command, _countof(command), TEXT("Insert Into Traffic Values(%d, %d, %I64d, %I64d, 0, 0);"), 
+					puid, date, it->second.months[i].dayTx[j], it->second.months[i].dayRx[j]);
+
+				// Insert
+				SQLite::Exec(command, true);
+			}
+		}
+	}
+
+	// Flush
+	SQLite::Flush();
+}
+
+void MonthModel::InsertPacket(PacketInfoEx *pi)
+{
+	// Insert an MtViewItem if PUID not Exist
+	if( _items.count(pi->puid) == 0 )
+	{
+		_items[pi->puid] = MtViewItem();
+		_tcscpy_s(_items[pi->puid].processName, MAX_PATH, pi->name);
+	}
+
+	// Fill
+	Fill();
+
+	// Update Traffic
+	int mDay = Utils::GetDay((time_t)pi->time_s);
+
+	Lock();
+
+	MonthItem &mItem = _items[pi->puid].months[Utils::GetExMonth() - MtModelItem::firstMonth];
+	MonthItem &mItemAll = _items[PROCESS_ALL].months[Utils::GetExMonth() - MtModelItem::firstMonth];
+
+	if( pi->dir == DIR_UP )
+	{
+		mItem.dayTx[mDay - 1] += pi->size;
+		mItem.sumTx += pi->size;
+
+		mItemAll.dayTx[mDay - 1] += pi->size;
+		mItemAll.sumTx += pi->size;
+	}
+	else if( pi->dir == DIR_DOWN )
+	{
+		mItem.dayRx[mDay - 1] += pi->size;
+		mItem.sumRx += pi->size;
+
+		mItemAll.dayRx[mDay - 1] += pi->size;
+		mItemAll.sumRx += pi->size;
+	}
+
+	Unlock();
+}
+
+void MonthModel::Export(int process, int curMonth, MonthItem &item)
+{
+	Lock();
+	if (_items.count(process) != 0)
+	{
+		item = _items[process].months[curMonth - MtModelItem::firstMonth];
+	}
+	Unlock();
+}
+
+int MonthModel::GetFirstMonth()
+{
+	return MtModelItem::firstMonth;
+}
+
+int MonthModel::GetLastMonth()
+{
+	return MtModelItem::firstMonth + _items[PROCESS_ALL].months.size() - 1;
+}

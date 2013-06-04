@@ -8,11 +8,10 @@
 
 #pragma region Members of MonthView
 
-int MonthView::MtViewItem::firstMonth = -1;
-
-std::map<int, MonthView::MtViewItem> MonthView::_items;
+// Settings
 int MonthView::_curMonth = -1;
 
+// GDI Objects
 HFONT MonthView::_hFontDays;
 HFONT MonthView::_hFontDesc;
 HPEN  MonthView::_hPenVertical;
@@ -27,18 +26,14 @@ HBITMAP MonthView::_hbmpPageUpDark;
 HBITMAP MonthView::_hbmpPageDownLight;
 HBITMAP MonthView::_hbmpPageDownDark;
 
-MonthView * MonthView::_this;
-
-CRITICAL_SECTION MonthView::_stCS;
+// Model Object
+MonthModel *MonthView::_model;
 
 #pragma endregion
 
 void MonthView::Init()
 {
 	_process = PROCESS_ALL;
-
-	_items[PROCESS_ALL] = MtViewItem();
-	_tcscpy_s(_items[PROCESS_ALL].processName, MAX_PATH, TEXT("All Process"));
 
 	_hdcBuf = 0;
 	_hbmpBuf = 0;
@@ -47,13 +42,6 @@ void MonthView::Init()
 	_hbmpPageUpDark    = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEUP_DK));
 	_hbmpPageDownLight = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEDN_LT));
 	_hbmpPageDownDark  = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEDN_DK));
-
-	_this = this;
-
-	InitializeCriticalSection(&_stCS);
-
-	// Read Database
-	InitDatabase();
 }
 
 void MonthView::End()
@@ -61,223 +49,30 @@ void MonthView::End()
 	DeleteDC(_hdcBuf);
 	DeleteObject(_hbmpBuf);
 
-	DeleteCriticalSection(&_stCS);
-
-	SaveDatabase();
+	_model->SaveDatabase();
 }
 
-void MonthView::SaveDatabase()
-{
-	// Delete all records
-	SQLite::Exec(TEXT("Delete From Traffic;"), true);
-
-	// Insert records
-	for(std::map<int, MtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it) // Loop of Process
-	{
-		int puid = it->first;
-
-		if( puid == PROCESS_ALL )
-		{
-			continue;
-		}
-
-		for(int i = 0; i < (int)it->second.months.size(); i++) // Loop of Month Array
-		{
-			int exMonth = MtViewItem::firstMonth + i;
-			int numDays = Utils::GetNumDays(exMonth);
-
-			for(int j = 0; j < numDays; j++) // Loop of Month
-			{
-				int date = (exMonth << 16) + (j + 1); // j + 1: [1, 31]
-
-				// Build Command
-				TCHAR command[256];
-
-				_stprintf_s(command, _countof(command), TEXT("Insert Into Traffic Values(%d, %d, %I64d, %I64d, 0, 0);"), 
-					puid, date, it->second.months[i].dayTx[j], it->second.months[i].dayRx[j]);
-
-				// Insert
-				SQLite::Exec(command, true);
-			}
-		}
-	}
-
-	// Flush
-	SQLite::Flush();
-}
-
-void MonthView::InitDatabase()
-{
-	static TCHAR command[256];
-
-	// Build Command
-	_stprintf_s(command, _countof(command), TEXT("Select * From Traffic;"));
-
-	// Build SQLiteRow Object
-	SQLiteRow row;
-
-	row.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
-	row.InsertType(SQLiteRow::TYPE_INT32); // 1 Date
-	row.InsertType(SQLiteRow::TYPE_INT64); // 2 TxBytes
-	row.InsertType(SQLiteRow::TYPE_INT64); // 3 RxBytes
-	row.InsertType(SQLiteRow::TYPE_INT32); // 4 TxPackets
-	row.InsertType(SQLiteRow::TYPE_INT32); // 5 RxPackets
-
-	// Select
-	SQLite::Select(command, &row, InitDatabaseCallback);
-
-	// Set current month as first month when no data is available
-	if( MtViewItem::firstMonth == -1 )
-	{
-		MtViewItem::firstMonth = Utils::GetExMonth();
-	}
-	_curMonth = MtViewItem::firstMonth;
-
-	// Fill processName
-	for(std::map<int, MtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
-	{
-		Process::GetProcessName(it->first, it->second.processName, MAX_PATH);
-	}
-}
-
-void MonthView::InitDatabaseCallback(SQLiteRow *row)
-{
-	int puid        = row->GetDataInt32(0);
-	int date        = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), lower 16 bit for mday
-	__int64 txBytes = row->GetDataInt64(2);
-	__int64 rxBytes = row->GetDataInt64(3);
-
-	int mDay = Utils::GetMdayByDate(date);
-	int exMonth = Utils::GetExMonthByDate(date);
-
-	// Insert an MtViewItem if PUID not Exist
-	if( _items.count(puid) == 0 )
-	{
-		_items[puid] = MtViewItem();
-		MtViewItem::firstMonth = Utils::GetExMonthByDate(date);
-	}
-
-	// Fill Vectors
-	Fill();
-
-	while( exMonth - MtViewItem::firstMonth > (int)_items[puid].months.size() - 1)
-	{
-		_items[puid].months.push_back(MonthItem());
-	}
-
-	while( exMonth - MtViewItem::firstMonth > (int)_items[PROCESS_ALL].months.size() - 1)
-	{
-		_items[PROCESS_ALL].months.push_back(MonthItem());
-	}
-
-	// Update Traffic
-	MonthItem &mItem = _items[puid].months[exMonth - MtViewItem::firstMonth];
-	MonthItem &mItemAll = _items[PROCESS_ALL].months[exMonth - MtViewItem::firstMonth];
-
-	mItem.dayTx[mDay - 1] = txBytes;
-	mItem.dayRx[mDay - 1] = rxBytes;
-	mItem.sumTx += txBytes;
-	mItem.sumRx += rxBytes;
-
-	mItemAll.dayTx[mDay - 1] += txBytes;
-	mItemAll.dayRx[mDay - 1] += rxBytes;
-	mItemAll.sumTx += txBytes;
-	mItemAll.sumRx += rxBytes;
-}
-
-void MonthView::InsertPacket(PacketInfoEx *pi)
-{
-	// Insert an MtViewItem if PUID not Exist
-	if( _items.count(pi->puid) == 0 )
-	{
-		_items[pi->puid] = MtViewItem();
-		_tcscpy_s(_items[pi->puid].processName, MAX_PATH, pi->name);
-	}
-
-	// Fill
-	Fill();
-
-	// Update Traffic
-	int mDay = Utils::GetDay((time_t)pi->time_s);
-
-	EnterCriticalSection(&_stCS);
-
-	MonthItem &mItem = _items[pi->puid].months[Utils::GetExMonth() - MtViewItem::firstMonth];
-	MonthItem &mItemAll = _items[PROCESS_ALL].months[Utils::GetExMonth() - MtViewItem::firstMonth];
-
-	if( pi->dir == DIR_UP )
-	{
-		mItem.dayTx[mDay - 1] += pi->size;
-		mItem.sumTx += pi->size;
-
-		mItemAll.dayTx[mDay - 1] += pi->size;
-		mItemAll.sumTx += pi->size;
-	}
-	else if( pi->dir == DIR_DOWN )
-	{
-		mItem.dayRx[mDay - 1] += pi->size;
-		mItem.sumRx += pi->size;
-
-		mItemAll.dayRx[mDay - 1] += pi->size;
-		mItemAll.sumRx += pi->size;
-	}
-
-	LeaveCriticalSection(&_stCS);
-}
-
-void MonthView::SetProcessUid(int puid, TCHAR *processName)
+void MonthView::SetProcessUid(int puid)
 {
 	_process = puid;
-	Fill();
 
-	EnterCriticalSection(&_stCS);
-
-	if( _curMonth > _items[puid].firstMonth + (int)_items[puid].months.size() - 1 )
+	if (_curMonth > _model->GetLastMonth())
 	{
-		_curMonth = _items[puid].firstMonth;
+		_curMonth = _model->GetLastMonth();
 	}
-
-	LeaveCriticalSection(&_stCS);
 
 	DrawGraph();
 }
 void MonthView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	// Start Painting
 	DrawGraph();
-}
-
-void MonthView::Fill()
-{
-	// Calc the desired length of the vectors
-	int exMonth = Utils::GetExMonth();
-	int length = exMonth - MtViewItem::firstMonth + 1;
-
-	EnterCriticalSection(&_stCS);
-
-	// Fill vectors
-	for(std::map<int, MtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
-	{
-		while( (int)it->second.months.size() < length)
-		{
-			it->second.months.push_back(MonthItem());
-		}
-	}
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void MonthView::DrawGraph()
 {
-	// Fill Vectors
-	Fill();
-
-	EnterCriticalSection(&_stCS);
-
-	MtViewItem item = _items[_process];
-	MonthItem mItem = item.months[_curMonth - MtViewItem::firstMonth];
-
-	LeaveCriticalSection(&_stCS);
+	// Export Model Info
+	MonthModel::MonthItem item;
+	_model->Export(_process, _curMonth, item);
 
 	int numDays = Utils::GetNumDays(_curMonth);
 
@@ -291,25 +86,25 @@ void MonthView::DrawGraph()
 
 	x2 = x1 + colWidth * numDays;
 
-	// Calc the Maximum Amount of Traffic in a Day
+	// Calculate the Maximum Amount of Traffic in a Day
 	__int64 maxTraffic = 0;
 
 	for(int i = 0; i < numDays; i++)
 	{
-		if( mItem.dayTx[i] > maxTraffic )
+		if( item.dayTx[i] > maxTraffic )
 		{
-			maxTraffic = mItem.dayTx[i];
+			maxTraffic = item.dayTx[i];
 		}
 
-		if( mItem.dayRx[i] > maxTraffic )
+		if( item.dayRx[i] > maxTraffic )
 		{
-			maxTraffic = mItem.dayRx[i];
+			maxTraffic = item.dayRx[i];
 		}
 	}
 
 	maxTraffic /= (1024 * 1024); // Unit is now MB
 
-	// Deside Scale
+	// Decide Scale
 	//    1. (    0 MB,   100 MB]   100,    80,    60,    40,    20,    0
 	//    2. (  100 MB,   200 MB]   200,   150,   100,    50,     0
 	//    3. (  200 MB,   500 MB]   500,   400,   300,   200,   100,    0
@@ -405,7 +200,7 @@ void MonthView::DrawGraph()
 		_stprintf_s(szDay, _countof(szDay), TEXT("%d"), i + 1);
 
 		// Set Color, Sundays are Red
-		if( Utils::GetWeekDay(item.firstMonth, i + 1) == 0 )
+		if( Utils::GetWeekDay(_curMonth, i + 1) == 0 )
 		{
 			SetTextColor(_hdcBuf, RGB(0xDF, 0x00, 0x24));
 		}
@@ -446,7 +241,7 @@ void MonthView::DrawGraph()
 
 	for(int i = 0; i < numDays; i++)
 	{
-		int rxTraffic = (int)(mItem.dayRx[i] >> 20);
+		int rxTraffic = (int)(item.dayRx[i] >> 20);
 		int yPos = (y2 - y1) * rxTraffic / scaleTraffic;
 
 		Rectangle(_hdcBuf, x1 + 4 + colWidth * i, y2 - yPos - 1, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2);
@@ -457,7 +252,7 @@ void MonthView::DrawGraph()
 
 	for(int i = 0; i < numDays; i++)
 	{
-		int txTraffic = (int)(mItem.dayTx[i] >> 20);
+		int txTraffic = (int)(item.dayTx[i] >> 20);
 		int yPos = (y2 - y1) * txTraffic / scaleTraffic;
 
 		Rectangle(_hdcBuf, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2 - yPos - 1, x1 + colWidth - 4 + colWidth * i, y2);
@@ -476,38 +271,38 @@ void MonthView::DrawGraph()
 
 	if( _process == -1 )
 	{
-		if (mItem.sumRx < 1024 * 1024 && mItem.sumTx < 1024 * 1024)
+		if (item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024)
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
 			_stprintf_s(szText, _countof(szText), szFormat, 
-				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(mItem.sumRx >> 10), (int)(mItem.sumTx >> 10));
+				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
 		}
 		else
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
 			_stprintf_s(szText, _countof(szText), szFormat, 
-				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(mItem.sumRx >> 20), (int)(mItem.sumTx >> 20));
+				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
 		}
 	}
 	else
 	{
-		if(mItem.sumRx < 1024 * 1024 && mItem.sumTx < 1024 * 1024)
+		if(item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024)
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
 			_stprintf_s(szText, _countof(szText), szFormat, 
-				item.processName, szYearMonth, (int)(mItem.sumRx >> 10), (int)(mItem.sumTx >> 10));
+				TEXT("TODO")/* item.processName */, szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
 		}
 		else
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
 			_stprintf_s(szText, _countof(szText), szFormat, 
-				item.processName, szYearMonth, (int)(mItem.sumRx >> 20), (int)(mItem.sumTx >> 20));
+				TEXT("TODO")/* item.processName */, szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
 		}
 	}
 	TextOut(_hdcBuf, x1 + 1, y2 + 2, szText, _tcslen(szText));
 
 	// Draw PageUp / PageDown Icon
-	if( _curMonth == _items[_process].firstMonth ) // No previous month
+	if( _curMonth == _model->GetFirstMonth() ) // No previous month
 	{
 		SelectObject(_hdcPage, _hbmpPageUpLight);
 	}
@@ -518,7 +313,7 @@ void MonthView::DrawGraph()
 
 	BitBlt(_hdcBuf, x2 - 21, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
-	if( _curMonth == _items[_process].firstMonth + _items[_process].months.size() - 1 ) // No next month
+	if( _curMonth == _model->GetLastMonth() ) // No next month
 	{
 		SelectObject(_hdcPage, _hbmpPageDownLight);
 	}
@@ -529,7 +324,7 @@ void MonthView::DrawGraph()
 
 	BitBlt(_hdcBuf, x2 - 9, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
-	// Wriet to Screen
+	// Write to Screen
 	BitBlt(_hdcTarget, 0, 0, _width, _height, _hdcBuf, 0, 0, SRCCOPY);
 }
 
@@ -610,7 +405,7 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if( xPos >= x2 - 21 && xPos <= x2 - 21 + 7 &&
 			yPos >= y2 + 4  && yPos <= y2 + 4  + 7 )
 		{
-			if( _curMonth > _items[_process].firstMonth ) // Previous month
+			if( _curMonth > _model->GetFirstMonth()) // Previous month
 			{
 				_curMonth -= 1;
 				DrawGraph();
@@ -619,7 +414,7 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		else if( xPos >= x2 - 9 && xPos <= x2 - 9 + 7 &&
 		         yPos >= y2 + 4 && yPos <= y2 + 4 + 7 )
 		{
-			if( _curMonth < _items[_process].firstMonth + (int)_items[_process].months.size() - 1 ) // Next month
+			if( _curMonth < _model->GetLastMonth()) // Next month
 			{
 				_curMonth += 1;
 				DrawGraph();

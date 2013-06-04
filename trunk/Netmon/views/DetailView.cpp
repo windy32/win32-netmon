@@ -138,7 +138,7 @@ void DetailView::InsertPacket(PacketInfoEx *pi)
 	_items[PROCESS_ALL].curPackets += 1;
 }
 
-void DetailView::SetProcessUid(int puid, TCHAR *processName)
+void DetailView::SetProcessUid(int puid)
 {
 	_process = puid;
 	_curPage = 0;

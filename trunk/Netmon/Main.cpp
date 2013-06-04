@@ -68,6 +68,7 @@ TCHAR     g_szAdapterNames[16][256];
 
 // Model
 static RealtimeModel *g_rtModel;
+static MonthModel    *g_mtModel;
 
 // View
 static RealtimeView   g_rtView;
@@ -463,7 +464,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 #if 1
 		g_rtModel->InsertPacket(&pie);
 		//g_rtView.InsertPacket(&pie);
-		g_mtView.InsertPacket(&pie);
+		g_mtModel->InsertPacket(&pie);
+		//g_mtView.InsertPacket(&pie);
 		g_stView.InsertPacket(&pie);
 		if( bUpdateDtView )
 		{
@@ -899,10 +901,10 @@ static void OnProcessChanged(LPARAM lParam)
 			int puid = Process::GetProcessUid(lpstListView->iItem);
 			Process::GetProcessName(puid, name, _countof(name));
 
-			g_rtView.SetProcessUid(puid, name);
-			g_mtView.SetProcessUid(puid, name);
-			g_stView.SetProcessUid(puid, name);
-			g_dtView.SetProcessUid(puid, name);
+			g_rtView.SetProcessUid(puid);
+			g_mtView.SetProcessUid(puid);
+			g_stView.SetProcessUid(puid);
+			g_dtView.SetProcessUid(puid);
 		}
 	}
 	else if(((NMHDR *)lParam)->code == NM_CLICK )
@@ -911,10 +913,10 @@ static void OnProcessChanged(LPARAM lParam)
 
 		if( index == -1 )
 		{
-			g_rtView.SetProcessUid(-1, TEXT("All Process"));
-			g_mtView.SetProcessUid(-1, TEXT("All Process"));
-			g_stView.SetProcessUid(-1, TEXT("All Process"));
-			g_dtView.SetProcessUid(-1, TEXT("All Process"));
+			g_rtView.SetProcessUid(-1);
+			g_mtView.SetProcessUid(-1);
+			g_stView.SetProcessUid(-1);
+			g_dtView.SetProcessUid(-1);
 		}
 	}
 }
