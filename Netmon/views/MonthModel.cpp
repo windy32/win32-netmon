@@ -203,6 +203,8 @@ int MonthModel::GetFirstMonth()
 
 int MonthModel::GetLastMonth()
 {
+	Fill();
+
 	Lock();
 	int size = _items[PROCESS_ALL].months.size();
 	Unlock();
