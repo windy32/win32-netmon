@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "RealtimeView.h"
 
-#include "../utils/Utils.h"
+#include "../Utils/Utils.h"
+#include "../Utils/Process.h"
 
 #pragma region Members of RealtimeView
 
@@ -459,7 +460,9 @@ void RealtimeView::DrawGraph()
 	}
 	else
 	{
-		TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, TEXT("TODO"), _tcslen(TEXT("TODO")));
+		TCHAR buf[MAX_PATH];
+		Process::GetProcessName(_process, buf, MAX_PATH);
+		TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, buf, _tcslen(buf));
 	}
 
 	// Write to Screen
