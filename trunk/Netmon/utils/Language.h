@@ -10,7 +10,7 @@ protected:
 	{ 
 		// Length of a string table (see "Netmon/Lang/resource.h")
 		STRING_TABLE_MIN  = 40000,
-		STRING_TABLE_MAX  = 40075,
+		STRING_TABLE_MAX  = 40077,
 		STRING_TABLE_SIZE = STRING_TABLE_MAX - STRING_TABLE_MIN + 1
 	};
 

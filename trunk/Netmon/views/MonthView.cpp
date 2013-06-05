@@ -271,40 +271,41 @@ void MonthView::DrawGraph()
 	TCHAR szYearMonth[256];
 	Language::GetYearMonthString(szYearMonth, 256, _curMonth / 12 + 1970, _curMonth % 12);
 
-	if( _process == -1 )
+	TCHAR processName[MAX_PATH];
+	if (_process == -1)
 	{
-		if (item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024)
-		{
-			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
-			_stprintf_s(szText, _countof(szText), szFormat, 
-				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
-		}
-		else
-		{
-			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
-			_stprintf_s(szText, _countof(szText), szFormat, 
-				Language::GetString(IDS_ALL_PROCESS), szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
-		}
+		_tcscpy_s(processName, MAX_PATH, Language::GetString(IDS_ALL_PROCESS));
 	}
 	else
 	{
-		if(item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024)
-		{
-			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
-			TCHAR buf[MAX_PATH];
-			Process::GetProcessName(_process, buf, MAX_PATH);
-			_stprintf_s(szText, _countof(szText), szFormat, 
-				buf, szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
-		}
-		else
-		{
-			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
-			TCHAR buf[MAX_PATH];
-			Process::GetProcessName(_process, buf, MAX_PATH);
-			_stprintf_s(szText, _countof(szText), szFormat, 
-				buf, szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
-		}
+		Process::GetProcessName(_process, processName, MAX_PATH);
 	}
+
+	if (item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024) // KB_KB
+	{
+		const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
+		_stprintf_s(szText, _countof(szText), szFormat, 
+			processName, szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
+	}
+	else if (item.sumRx < 1024 * 1024 && item.sumTx >= 1024 * 1024) // KB_MB
+	{
+		const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB_MB);
+		_stprintf_s(szText, _countof(szText), szFormat, 
+			processName, szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 20));
+	}
+	else if (item.sumRx >= 1024 * 1024 && item.sumTx < 1024 * 1024) // MB_KB
+	{
+		const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB_KB);
+		_stprintf_s(szText, _countof(szText), szFormat, 
+			processName, szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 10));
+	}
+	else // MB_MB
+	{
+		const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB_MB);
+		_stprintf_s(szText, _countof(szText), szFormat, 
+			processName, szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
+	}
+
 	TextOut(_hdcBuf, x1 + 1, y2 + 2, szText, _tcslen(szText));
 
 	// Draw PageUp / PageDown Icon
