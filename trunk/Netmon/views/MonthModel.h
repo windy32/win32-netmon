@@ -33,13 +33,6 @@ private:
 	{
 		static int firstMonth; // Jan 1970 = 0, Feb 1970 = 1 ...
 		std::vector<MonthItem> months;
-
-		TCHAR processName[MAX_PATH];
-
-		struct tagMtModelItem()
-		{
-			RtlZeroMemory(processName, sizeof(processName));
-		}
 	} MtModelItem;
 
 	// Items
