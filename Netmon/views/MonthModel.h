@@ -2,7 +2,7 @@
 #define MONTH_MODEL_H
 
 #include "NetModel.h"
-#include 
+#include "../Utils/SQLite.h"
 
 class MonthModel : public NetModel
 {
@@ -46,11 +46,12 @@ private:
 	std::map<int, MtModelItem> _items;
 
 	// Others
+	static MonthModel *_this;
 
 private:
 	void Fill();
 	void InitDatabase();
-	void InitDatabaseCallback(SQLiteRow *row);
+	static void InitDatabaseCallback(SQLiteRow *row);
 
 public:
 	MonthModel();

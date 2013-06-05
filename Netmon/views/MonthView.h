@@ -32,8 +32,8 @@ protected:
 	static void WINAPI TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 public:
-	virtual void Init();
-	virtual void End();
+	static void Init(MonthModel *model);
+	static void End();
 	virtual void SetProcessUid(int puid);
 
 	virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

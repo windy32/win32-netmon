@@ -1104,10 +1104,11 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// Init Models
 	g_rtModel = new RealtimeModel();
+	g_mtModel = new MonthModel();
 
 	// Init Views
 	g_rtView.Init(g_rtModel);
-	g_mtView.Init();
+	g_mtView.Init(g_mtModel);
 	g_stView.Init();
 	g_dtView.Init();
 

@@ -9,7 +9,7 @@
 #pragma region Members of MonthView
 
 // Settings
-int MonthView::_curMonth = -1;
+int MonthView::_curMonth;
 
 // GDI Objects
 HFONT MonthView::_hFontDays;
@@ -31,13 +31,14 @@ MonthModel *MonthView::_model;
 
 #pragma endregion
 
-void MonthView::Init()
+void MonthView::Init(MonthModel *model)
 {
 	_process = PROCESS_ALL;
+	_model = model;
+	_curMonth = model->GetLastMonth();
 
 	_hdcBuf = 0;
 	_hbmpBuf = 0;
-
 	_hbmpPageUpLight   = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEUP_LT));
 	_hbmpPageUpDark    = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEUP_DK));
 	_hbmpPageDownLight = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEDN_LT));
@@ -289,14 +290,18 @@ void MonthView::DrawGraph()
 		if(item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024)
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
+			TCHAR buf[MAX_PATH];
+			Process::GetProcessName(_process, buf, MAX_PATH);
 			_stprintf_s(szText, _countof(szText), szFormat, 
-				TEXT("TODO")/* item.processName */, szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
+				buf, szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
 		}
 		else
 		{
 			const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_MB); // Like "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
+			TCHAR buf[MAX_PATH];
+			Process::GetProcessName(_process, buf, MAX_PATH);
 			_stprintf_s(szText, _countof(szText), szFormat, 
-				TEXT("TODO")/* item.processName */, szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
+				buf, szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
 		}
 	}
 	TextOut(_hdcBuf, x1 + 1, y2 + 2, szText, _tcslen(szText));

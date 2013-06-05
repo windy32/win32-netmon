@@ -1,10 +1,14 @@
 #include "stdafx.h"
 #include "MonthModel.h"
+#include "../Utils/Utils.h"
+#include "../Utils/Process.h"
 
 int MonthModel::MtModelItem::firstMonth = -1;
+MonthModel *MonthModel::_this;
 
-MonthModel::RealtimeModel()
+MonthModel::MonthModel()
 {
+	_this = this;
 	_items[PROCESS_ALL] = MtModelItem();
 	_tcscpy_s(_items[PROCESS_ALL].processName, MAX_PATH, TEXT("All Process"));
 
@@ -73,28 +77,28 @@ void MonthModel::InitDatabaseCallback(SQLiteRow *row)
 	int exMonth = Utils::GetExMonthByDate(date);
 
 	// Insert an MtViewItem if PUID not Exist
-	if( _items.count(puid) == 0 )
+	if( _this->_items.count(puid) == 0 )
 	{
-		_items[puid] = MtModelItem();
+		_this->_items[puid] = MtModelItem();
 		MtModelItem::firstMonth = Utils::GetExMonthByDate(date);
 	}
 
 	// Fill Vectors
-	Fill();
+	_this->Fill();
 
-	while( exMonth - MtModelItem::firstMonth > (int)_items[puid].months.size() - 1)
+	while( exMonth - MtModelItem::firstMonth > (int)_this->_items[puid].months.size() - 1)
 	{
-		_items[puid].months.push_back(MonthItem());
+		_this->_items[puid].months.push_back(MonthItem());
 	}
 
-	while( exMonth - MtModelItem::firstMonth > (int)_items[PROCESS_ALL].months.size() - 1)
+	while( exMonth - MtModelItem::firstMonth > (int)_this->_items[PROCESS_ALL].months.size() - 1)
 	{
-		_items[PROCESS_ALL].months.push_back(MonthItem());
+		_this->_items[PROCESS_ALL].months.push_back(MonthItem());
 	}
 
 	// Update Traffic
-	MonthItem &mItem = _items[puid].months[exMonth - MtModelItem::firstMonth];
-	MonthItem &mItemAll = _items[PROCESS_ALL].months[exMonth - MtModelItem::firstMonth];
+	MonthItem &mItem = _this->_items[puid].months[exMonth - MtModelItem::firstMonth];
+	MonthItem &mItemAll = _this->_items[PROCESS_ALL].months[exMonth - MtModelItem::firstMonth];
 
 	mItem.dayTx[mDay - 1] = txBytes;
 	mItem.dayRx[mDay - 1] = rxBytes;
@@ -152,7 +156,7 @@ void MonthModel::InsertPacket(PacketInfoEx *pi)
 	// Insert an MtViewItem if PUID not Exist
 	if( _items.count(pi->puid) == 0 )
 	{
-		_items[pi->puid] = MtViewItem();
+		_items[pi->puid] = MtModelItem();
 		_tcscpy_s(_items[pi->puid].processName, MAX_PATH, pi->name);
 	}
 
