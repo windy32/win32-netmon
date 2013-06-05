@@ -70,6 +70,7 @@ TCHAR     g_szAdapterNames[16][256];
 static RealtimeModel *g_rtModel;
 static MonthModel    *g_mtModel;
 static StatisticsModel *g_stModel;
+static DetailModel   *g_dtModel;
 
 // View
 static RealtimeView   g_rtView;
@@ -469,7 +470,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 
 		if( bUpdateDtView )
 		{
-			g_dtView.InsertPacket(&pie);
+			g_dtModel->InsertPacket(&pie);
 		}
 #endif
 		if( g_bCapture ) // If the user hasn't clicked Stop
@@ -1106,12 +1107,13 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	g_rtModel = new RealtimeModel();
 	g_mtModel = new MonthModel();
 	g_stModel = new StatisticsModel();
+	g_dtModel = new DetailModel();
 
 	// Init Views
 	g_rtView.Init(g_rtModel);
 	g_mtView.Init(g_mtModel);
 	g_stView.Init(g_stModel);
-	g_dtView.Init();
+	g_dtView.Init(g_dtModel);
 
 	// Update language
 	UpdateLanguage();

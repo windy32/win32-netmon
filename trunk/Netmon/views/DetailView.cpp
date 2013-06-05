@@ -9,14 +9,15 @@
 
 #pragma region Members of DetailView
 
-std::map<int, DetailView::DtViewItem> DetailView::_items;
+// UI Elements & States
 HWND DetailView::_hWnd;
 HWND DetailView::_hList;
 int DetailView::_iLanguageId;
 __int64 DetailView::_curPage;
 WNDPROC DetailView::_lpOldProcEdit;
 
-CRITICAL_SECTION DetailView::_stCS;
+// Model Object
+DetailModel *DetailView::_model;
 
 #pragma endregion
 
@@ -25,7 +26,7 @@ LRESULT CALLBACK DetailView::MyProcEdit(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 {
 	if(uMsg == WM_KEYDOWN && wParam == VK_RETURN )
 	{
-		if( _items[_process].curPackets > 0 )
+		if( _model->GetCurPackets(_process) > 0 )
 		{
 			OnGoto();
 		}
@@ -39,103 +40,17 @@ LRESULT CALLBACK DetailView::MyProcEdit(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 }
 
 
-void DetailView::Init()
+void DetailView::Init(DetailModel *model)
 {
 	_process = PROCESS_ALL;
+	_model = model;
+
 	_curPage = 0;
-
-	_items[PROCESS_ALL] = DtViewItem();
-	_tcscpy_s(_items[PROCESS_ALL].processName, MAX_PATH, TEXT("All Process"));
-
-	InitializeCriticalSection(&_stCS);
-
-	// Read Database
-	InitDatabase();
 }
 
 void DetailView::End()
 {
-	DeleteCriticalSection(&_stCS);
-
-	SaveDatabase();
-}
-
-void DetailView::InitDatabase()
-{
-	int puid;
-	TCHAR name[256];
-	__int64 packetCount;
-	TCHAR command[256];
-
-	for(int i = 0; i < Process::GetProcessCount(); i++)
-	{
-		// Get puid, name and packetCount
-		puid = Process::GetProcessUid(i);
-		Process::GetProcessName(puid, name, _countof(name));
-
-		_stprintf_s(command, _countof(command), TEXT("Select Count From PacketCount Where ProcessUid = \'%d\';"), puid);
-
-		SQLiteRow row;
-		row.InsertType(SQLiteRow::TYPE_INT64); // 0 Count(*)
-		if( SQLite::Select(command, &row))
-		{
-			packetCount = row.GetDataInt64(0);
-		}
-		else
-		{
-			packetCount = 0;
-		}
-
-		// Insert DtViewItem
-		_items[puid] = DtViewItem();
-		_tcscpy_s(_items[puid].processName, MAX_PATH, name);
-		_items[puid].curPackets = packetCount;
-
-		// Update corresponding PROCESS_ALL item
-		_items[PROCESS_ALL].curPackets += packetCount;
-	}
-}
-
-void DetailView::SaveDatabase()
-{
-	// Delete all records
-	SQLite::Exec(TEXT("Delete From PacketCount;"), true);
-
-	// Insert records
-	for(std::map<int, DtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
-	{
-		int puid = it->first;
-		__int64 count = it->second.curPackets;
-
-		if( puid == PROCESS_ALL )
-		{
-			continue;
-		}
-
-		// Build Command
-		TCHAR command[256];
-		_stprintf_s(command, _countof(command), TEXT("Insert Into PacketCount Values(%d, %I64d);"), puid, count);
-
-		// Insert
-		SQLite::Exec(command, true);
-	}
-
-	// Flush
-	SQLite::Flush();
-}
-
-void DetailView::InsertPacket(PacketInfoEx *pi)
-{
-	// Insert an DtViewItem if PUID not Exist
-	if( _items.count(pi->puid) == 0 )
-	{
-		_items[pi->puid] = DtViewItem();
-		_tcscpy_s(_items[pi->puid].processName, MAX_PATH, pi->name);
-	}
-
-	// Update packet count
-	_items[pi->puid].curPackets += 1;
-	_items[PROCESS_ALL].curPackets += 1;
+	_model->SaveDatabase();
 }
 
 void DetailView::SetProcessUid(int puid)
@@ -205,13 +120,11 @@ void DetailView::UpdateSize(HWND hWnd)
 }
 
 void DetailView::UpdateContent(bool rebuildList)
-{
-	EnterCriticalSection(&_stCS);
-	
+{	
 	TCHAR status[256];
 
-	__int64 prevPackets = _items[_process].prevPackets;
-	__int64 curPackets  = _items[_process].curPackets;
+	__int64 prevPackets = _model->GetPrevPackets(_process);
+	__int64 curPackets  = _model->GetCurPackets(_process);
 
 	const TCHAR *szFormat = Language::GetString(IDS_DTVIEW_PAGE); // Like "%s Page %I64d / %I64d - %I64d"
 
@@ -227,14 +140,23 @@ void DetailView::UpdateContent(bool rebuildList)
 		if( prevPackets != 0 )
 		{
 			Utils::ListViewClear(_hList);
-			_items[_process].prevPackets = 0;
+			_model->SetPrevPackets(_process, 0);
 		}
 	}
 	else
 	{
+		TCHAR buf[MAX_PATH];
+		if (_process == -1)
+		{
+			_tcscpy_s(buf, MAX_PATH, Language::GetString(IDS_ALL_PROCESS));
+		}
+		else
+		{
+			Process::GetProcessName(_process, buf, MAX_PATH);
+		}
+
 		_stprintf_s(status, 256, szFormat, 
-			_items[_process].processName, 
-			_curPage + 1, (curPackets - 1) / 100 + 1, curPackets);
+			buf, _curPage + 1, (curPackets - 1) / 100 + 1, curPackets);
 		SetDlgItemText(_hWnd, IDL_STATUS, status);
 
 		// Button
@@ -280,11 +202,9 @@ void DetailView::UpdateContent(bool rebuildList)
 			SQLite::Select(command, &row, UpdateContentCallback);
 
 			// Update prevPackets
-			_items[_process].prevPackets = curPackets;
+			_model->SetPrevPackets(_process, curPackets);
 		}
 	}
-
-	LeaveCriticalSection(&_stCS);
 }
 
 void DetailView::UpdateContentCallback(SQLiteRow *row)
@@ -306,7 +226,7 @@ void DetailView::OnPageUp()
 	_curPage -= 1;
 	UpdateContent(true);
 
-	__int64 curPackets  = _items[_process].curPackets;
+	__int64 curPackets  = _model->GetCurPackets(_process);
 
 	EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
 	EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
@@ -317,7 +237,7 @@ void DetailView::OnPageDown()
 	_curPage += 1;
 	UpdateContent(true);
 
-	__int64 curPackets  = _items[_process].curPackets;
+	__int64 curPackets  = _model->GetCurPackets(_process);
 
 	EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
 	EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
@@ -327,7 +247,7 @@ void DetailView::OnGoto()
 {
 	BOOL translated;
 	int page = GetDlgItemInt(_hWnd, IDE_GOTO, &translated, TRUE);
-	__int64 curPackets  = _items[_process].curPackets;
+	__int64 curPackets  = _model->GetCurPackets(_process);
 
 	if( !translated ) 
 	{
@@ -458,15 +378,12 @@ LRESULT DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 __int64 DetailView::GetPacketCount()
 {
-	return _items[PROCESS_ALL].curPackets;
+	return _model->GetCurPackets(_process);
 }
 
 void DetailView::OnAllPacketsDeleted()
 {
-	for(std::map<int, DtViewItem>::iterator it = _items.begin(); it != _items.end(); ++it)
-	{
-		it->second.curPackets = 0;
-	}
+	_model->ClearPackets();
 	_curPage = 0;
 
 	if( _hWnd != 0 )

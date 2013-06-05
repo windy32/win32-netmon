@@ -2,39 +2,25 @@
 #define DETAIL_VIEW_H
 
 #include "NetView.h"
+#include "DetailModel.h"
 
 class DetailView : public NetView
 {
 protected:
-	typedef struct tagDtViewItem
-	{
-		__int64 curPackets;
-		__int64 prevPackets;
-
-		TCHAR processName[MAX_PATH];
-
-		struct tagDtViewItem()
-		{
-			curPackets = 0;
-			prevPackets = 0;
-			RtlZeroMemory(processName, sizeof(processName));
-		}
-	} DtViewItem;
-
-	static std::map<int, DtViewItem> _items;
+	// UI Elements & States
 	static HWND _hWnd;
 	static HWND _hList;
 	static int _iLanguageId;
 	static __int64 _curPage;
 	static WNDPROC _lpOldProcEdit;
-	static CRITICAL_SECTION _stCS;
+
+	// Model Object
+	static DetailModel *_model;
 
 protected:
 	static LRESULT CALLBACK MyProcEdit(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	static void WINAPI TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
-	static void InitDatabase();
-	static void SaveDatabase();
 
 	static void UpdateSize(HWND hWnd);
 	static void UpdateContent(bool rebuildList);
@@ -49,9 +35,8 @@ protected:
 	static void SwitchLanguage(HWND hWnd);
 
 public:
-	virtual void Init();
+	virtual void Init(DetailModel *model);
 	virtual void End();
-	virtual void InsertPacket(PacketInfoEx *pi);
 	virtual void SetProcessUid(int puid);
 
 	virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
