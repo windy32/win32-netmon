@@ -201,6 +201,14 @@
 			Name="Model &amp; View"
 			>
 			<File
+				RelativePath=".\views\DetailModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\DetailModel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\views\DetailView.cpp"
 				>
 			</File>

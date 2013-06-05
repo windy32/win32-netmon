@@ -9,12 +9,11 @@
 class NetView
 {
 protected:
-	static int     _process;
+	static int      _process;
+	static const int PROCESS_ALL;
 
 	static int     _width;
 	static int     _height;
-
-	static const int PROCESS_ALL;
 
 public:
 	virtual void SetProcessUid(int puid) = 0;
