@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DetailModel.h"
 #include "../Utils/Process.h"
+#include "../Utils/Utils.h"
 
 DetailModel::DetailModel()
 {
@@ -104,7 +105,7 @@ __int64 DetailModel::GetCurPackets(int process)
 	if (_items.count(process) != 0)
 		return _items[process].curPackets;
 	else
-		return -1;
+		return 0;
 }
 
 __int64 DetailModel::GetPrevPackets(int process)
@@ -112,5 +113,5 @@ __int64 DetailModel::GetPrevPackets(int process)
 	if (_items.count(process) != 0)
 		return _items[process].prevPackets;
 	else
-		return -1;
+		return 0;
 }

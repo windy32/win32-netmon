@@ -58,6 +58,7 @@ void DetailView::SetProcessUid(int puid)
 	_process = puid;
 	_curPage = 0;
 
+	// Dump
 	UpdateContent(true);
 }
 
@@ -121,89 +122,75 @@ void DetailView::UpdateSize(HWND hWnd)
 
 void DetailView::UpdateContent(bool rebuildList)
 {	
-	TCHAR status[256];
-
+	// Get Number of Packets
 	__int64 prevPackets = _model->GetPrevPackets(_process);
 	__int64 curPackets  = _model->GetCurPackets(_process);
 
+	// Clear List before rebuilding
+	if ((curPackets > prevPackets && _curPage == prevPackets / 100) || rebuildList)
+	{
+		Utils::ListViewClear(_hList);
+	}
+
+	// Update Status Label
+	TCHAR status[256];
+	TCHAR buf[MAX_PATH];
 	const TCHAR *szFormat = Language::GetString(IDS_DTVIEW_PAGE); // Like "%s Page %I64d / %I64d - %I64d"
 
-	if( curPackets == 0 )
+	if (_process == -1)
 	{
-		// Status Label
-		_stprintf_s(status, 256, szFormat, 
-			Language::GetString(IDS_ALL_PROCESS), 
-			(__int64)0, (__int64)0, (__int64)0);
-		SetDlgItemText(_hWnd, IDL_STATUS, status);
-
-		// Clear list if necessary
-		if( prevPackets != 0 )
-		{
-			Utils::ListViewClear(_hList);
-			_model->SetPrevPackets(_process, 0);
-		}
+		_tcscpy_s(buf, MAX_PATH, Language::GetString(IDS_ALL_PROCESS));
 	}
 	else
 	{
-		TCHAR buf[MAX_PATH];
-		if (_process == -1)
+		Process::GetProcessName(_process, buf, MAX_PATH);
+	}
+
+	_stprintf_s(status, 256, szFormat, 
+		buf, _curPage + 1, (curPackets - 1) / 100 + 1, curPackets);
+	SetDlgItemText(_hWnd, IDL_STATUS, status);
+
+	// Update Buttons
+	EnableWindow(GetDlgItem(_hWnd, IDB_GOTO), TRUE);
+	EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
+	EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
+
+	// Update ListView
+	if ((curPackets > prevPackets && _curPage == prevPackets / 100) // New packets arrived in current page,
+		|| rebuildList)                                            // or force update
+	{
+		// Select and insert items in current page
+		__int64 firstRow = _curPage * 100; // 0-Based
+
+		TCHAR command[256];
+		SQLiteRow row;
+
+		if( _process == PROCESS_ALL )
 		{
-			_tcscpy_s(buf, MAX_PATH, Language::GetString(IDS_ALL_PROCESS));
+			_stprintf_s(command, _countof(command), 
+				TEXT("Select * From Packet Limit 100 Offset %I64d;"), firstRow);
 		}
 		else
 		{
-			Process::GetProcessName(_process, buf, MAX_PATH);
+			_stprintf_s(command, _countof(command), 
+				TEXT("Select * From Packet Where ProcessUid = %d Limit 100 Offset %I64d;"), _process, firstRow);
 		}
 
-		_stprintf_s(status, 256, szFormat, 
-			buf, _curPage + 1, (curPackets - 1) / 100 + 1, curPackets);
-		SetDlgItemText(_hWnd, IDL_STATUS, status);
+		row.InsertType(SQLiteRow::TYPE_INT32); // 0 UID
+		row.InsertType(SQLiteRow::TYPE_INT32); // 1 PActivityUid
+		row.InsertType(SQLiteRow::TYPE_INT32); // 2 ProcessUid
+		row.InsertType(SQLiteRow::TYPE_INT32); // 3 AdapterUid
+		row.InsertType(SQLiteRow::TYPE_INT32); // 4 Direction
+		row.InsertType(SQLiteRow::TYPE_INT32); // 5 NetProtocol
+		row.InsertType(SQLiteRow::TYPE_INT32); // 6 TraProtocol
+		row.InsertType(SQLiteRow::TYPE_INT32); // 7 Size
+		row.InsertType(SQLiteRow::TYPE_INT64); // 8 Time
+		row.InsertType(SQLiteRow::TYPE_INT32); // 9 Port
 
-		// Button
-		EnableWindow(GetDlgItem(_hWnd, IDB_GOTO), TRUE);
-		EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
-		EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
+		SQLite::Select(command, &row, UpdateContentCallback);
 
-		// ListView
-		if( (curPackets > prevPackets && _curPage == prevPackets / 100) // New packets arrived in current page, s
-			|| rebuildList )                                            // or force update
-		{
-			// Select and insert items in current page
-			__int64 firstRow = _curPage * 100; // 0-Based
-
-			TCHAR command[256];
-			SQLiteRow row;
-
-			if( _process == PROCESS_ALL )
-			{
-				_stprintf_s(command, _countof(command), 
-					TEXT("Select * From Packet Limit 100 Offset %I64d;"), firstRow);
-			}
-			else
-			{
-				_stprintf_s(command, _countof(command), 
-					TEXT("Select * From Packet Where ProcessUid = %d Limit 100 Offset %I64d;"), _process, firstRow);
-			}
-
-			row.InsertType(SQLiteRow::TYPE_INT32); // 0 UID
-			row.InsertType(SQLiteRow::TYPE_INT32); // 1 PActivityUid
-			row.InsertType(SQLiteRow::TYPE_INT32); // 2 ProcessUid
-			row.InsertType(SQLiteRow::TYPE_INT32); // 3 AdapterUid
-			row.InsertType(SQLiteRow::TYPE_INT32); // 4 Direction
-			row.InsertType(SQLiteRow::TYPE_INT32); // 5 NetProtocol
-			row.InsertType(SQLiteRow::TYPE_INT32); // 6 TraProtocol
-			row.InsertType(SQLiteRow::TYPE_INT32); // 7 Size
-			row.InsertType(SQLiteRow::TYPE_INT64); // 8 Time
-			row.InsertType(SQLiteRow::TYPE_INT32); // 9 Port
-
-			// Delete all items
-			Utils::ListViewClear(_hList);
-
-			SQLite::Select(command, &row, UpdateContentCallback);
-
-			// Update prevPackets
-			_model->SetPrevPackets(_process, curPackets);
-		}
+		// Update prevPackets
+		_model->SetPrevPackets(_process, curPackets);
 	}
 }
 
@@ -378,7 +365,7 @@ LRESULT DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 __int64 DetailView::GetPacketCount()
 {
-	return _model->GetCurPackets(_process);
+	return _model->GetCurPackets(PROCESS_ALL);
 }
 
 void DetailView::OnAllPacketsDeleted()
