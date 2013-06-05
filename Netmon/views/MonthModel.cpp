@@ -10,19 +10,19 @@ MonthModel::MonthModel()
 {
 	_this = this;
 	_items[PROCESS_ALL] = MtModelItem();
-	_tcscpy_s(_items[PROCESS_ALL].processName, MAX_PATH, TEXT("All Process"));
 
 	InitDatabase();
 }
 
 void MonthModel::Fill()
 {
+	Lock();
+
 	// Calculate the desired length of the vectors
 	int exMonth = Utils::GetExMonth();
 	int length = exMonth - MtModelItem::firstMonth + 1;
 
 	// Fill vectors
-	Lock();
 	for(std::map<int, MtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
 	{
 		while( (int)it->second.months.size() < length)
@@ -57,12 +57,6 @@ void MonthModel::InitDatabase()
 	if( MtModelItem::firstMonth == -1 )
 	{
 		MtModelItem::firstMonth = Utils::GetExMonth();
-	}
-
-	// Fill processName
-	for(std::map<int, MtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
-	{
-		Process::GetProcessName(it->first, it->second.processName, MAX_PATH);
 	}
 }
 
@@ -154,11 +148,12 @@ void MonthModel::SaveDatabase()
 void MonthModel::InsertPacket(PacketInfoEx *pi)
 {
 	// Insert an MtViewItem if PUID not Exist
+	Lock();
 	if( _items.count(pi->puid) == 0 )
 	{
 		_items[pi->puid] = MtModelItem();
-		_tcscpy_s(_items[pi->puid].processName, MAX_PATH, pi->name);
 	}
+	Unlock();
 
 	// Fill
 	Fill();
@@ -208,5 +203,9 @@ int MonthModel::GetFirstMonth()
 
 int MonthModel::GetLastMonth()
 {
-	return MtModelItem::firstMonth + _items[PROCESS_ALL].months.size() - 1;
+	Lock();
+	int size = _items[PROCESS_ALL].months.size();
+	Unlock();
+
+	return MtModelItem::firstMonth + size - 1;
 }

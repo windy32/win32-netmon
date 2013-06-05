@@ -257,6 +257,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\views\StatisticsModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\StatisticsModel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\views\StatisticsView.cpp"
 				>
 			</File>

@@ -58,10 +58,12 @@ void RealtimeModel::InsertPacket(PacketInfoEx *pi)
 	// 10 processed with tx/rx rate: 6.75MB
 
 	// Insert a RtModelItem if PUID not Exist
+	Lock();
 	if( _items.count(pi->puid) == 0 )
 	{
 		_items[pi->puid] = RtModelItem();
 	}
+	Unlock();
 
 	// Fill Vectors
 	Fill();
