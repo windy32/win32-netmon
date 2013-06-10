@@ -266,7 +266,7 @@ void Utils::ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...)
 	}
 
 	// Modern Style is disabled
-	SetWindowTheme(hList, L"Explorer", NULL);
+	// SetWindowTheme(hList, L"Explorer", NULL);
 
 	// Initialize the LVCOLUMN structure.
 	LVCOLUMN stLVC;
