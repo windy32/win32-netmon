@@ -2,7 +2,7 @@
 #include "DetailView.h"
 
 #include "../utils/Utils.h"
-#include "../utils/Process.h"
+#include "../utils/ProcessModel.h"
 #include "../utils//Language.h"
 
 #include "../res/resource.h"
@@ -143,7 +143,7 @@ void DetailView::UpdateContent(bool rebuildList)
 	}
 	else
 	{
-		Process::GetProcessName(_process, buf, MAX_PATH);
+		ProcessModel::GetProcessName(_process, buf, MAX_PATH);
 	}
 
 	_stprintf_s(status, 256, szFormat, 

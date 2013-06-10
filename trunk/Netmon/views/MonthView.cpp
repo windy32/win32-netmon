@@ -2,7 +2,7 @@
 #include "MonthView.h"
 
 #include "../utils/Utils.h"
-#include "../utils/Process.h"
+#include "../utils/ProcessModel.h"
 
 #include "../res/resource.h"
 
@@ -278,7 +278,7 @@ void MonthView::DrawGraph()
 	}
 	else
 	{
-		Process::GetProcessName(_process, processName, MAX_PATH);
+		ProcessModel::GetProcessName(_process, processName, MAX_PATH);
 	}
 
 	if (item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024) // KB_KB

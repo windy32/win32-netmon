@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "StatisticsModel.h"
-#include "../Utils/Process.h"
+#include "../Utils/ProcessModel.h"
 
 StatisticsModel *StatisticsModel::_this;
 
@@ -459,9 +459,9 @@ void StatisticsModel::UpdateRate()
 		int txRate;
 		int rxRate;
 
-		if( Process::IsProcessActive(puid))
+		if( ProcessModel::IsProcessActive(puid))
 		{
-			Process::GetProcessRate(puid, &txRate, &rxRate);
+			ProcessModel::GetProcessRate(puid, &txRate, &rxRate);
 
 			txRate /= 1024; // Unit KB/s
 			rxRate /= 1024; 

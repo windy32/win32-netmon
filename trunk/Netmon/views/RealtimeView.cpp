@@ -2,7 +2,7 @@
 #include "RealtimeView.h"
 
 #include "../Utils/Utils.h"
-#include "../Utils/Process.h"
+#include "../Utils/ProcessModel.h"
 
 #pragma region Members of RealtimeView
 
@@ -461,7 +461,7 @@ void RealtimeView::DrawGraph()
 	else
 	{
 		TCHAR buf[MAX_PATH];
-		Process::GetProcessName(_process, buf, MAX_PATH);
+		ProcessModel::GetProcessName(_process, buf, MAX_PATH);
 		TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, buf, _tcslen(buf));
 	}
 
