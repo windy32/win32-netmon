@@ -17,7 +17,7 @@ private: // Utils Used by ProcessView
 
 public:
 	static void Init(HWND hList);
-	static void Update();
+	static void Update(bool redraw = false);
 };
 
 #endif

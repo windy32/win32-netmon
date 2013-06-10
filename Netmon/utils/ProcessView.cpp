@@ -67,7 +67,7 @@ void ProcessView::ListViewUpdate(int index, const ProcessModel::ProcessItem &ite
 		szColumn[0], szColumn[1], szColumn[2], szColumn[3], szColumn[4]);
 }
 
-void ProcessView::Update()
+void ProcessView::Update(bool redraw)
 {
 	// Update is called in:
 	//   1. ProcessModel::Init
@@ -99,5 +99,8 @@ void ProcessView::Update()
 		}
 	}
 
-	RedrawWindow(_hList, NULL, NULL, RDW_INVALIDATE);
+	if (redraw)
+	{
+		RedrawWindow(_hList, NULL, NULL, RDW_INVALIDATE);
+	}
 }
