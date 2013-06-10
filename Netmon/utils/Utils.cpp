@@ -264,6 +264,8 @@ void Utils::ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...)
 	{
 		ListView_SetExtendedListViewStyle(hList, LVS_EX_FULLROWSELECT);
 	}
+
+	// Modern Style is disabled
 	SetWindowTheme(hList, L"Explorer", NULL);
 
 	// Initialize the LVCOLUMN structure.

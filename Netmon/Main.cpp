@@ -950,10 +950,6 @@ static void OnCustomDraw(HWND hWnd, LPARAM lParam)
 	}
 	else if(cd->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
 	{
-		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
-	}
-	else if(cd->nmcd.dwDrawStage == (CDDS_ITEMPREPAINT|CDDS_SUBITEM))
-	{
 		if (g_hiddenProcesses[cd->nmcd.dwItemSpec]) // Hidden
 		{
 			cd->clrText = RGB(192, 192, 192);
@@ -962,7 +958,7 @@ static void OnCustomDraw(HWND hWnd, LPARAM lParam)
 		{
 			cd->clrText = RGB(0, 0, 0);
 		}
-		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_DODEFAULT);
+		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
 	}
 }
 
