@@ -47,6 +47,7 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 	TCHAR szCurrentDir[MAX_PATH];
 	TCHAR szProfile[MAX_PATH];
 	TCHAR *pFilePart;
+	TCHAR szHiddenProcesses[1000];
 
 	// Get full path name of Netmon.exe
 	GetModuleFileName(0, szCurrentExe, MAX_PATH);
@@ -89,6 +90,24 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 		SetDtViewMaxSpace(0); // No limit
 	}
 
+	if( _pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 1000) == FALSE)
+	{
+		SetHiddenProcesses(std::vector<int>());
+	}
+	else
+	{
+		int puid;
+		int offset = 0;
+		while (_stscanf_s(szHiddenProcesses + offset, TEXT("%d"), &puid) == 1)
+		{
+			_hiddenProcesses.push_back(puid);
+
+			// Offset
+			TCHAR buf[16];
+			_stprintf_s(buf, 16, TEXT("%d"), puid);
+			offset += _tcslen(buf);
+		}
+	}
 	return TRUE;
 }
 
@@ -167,6 +186,41 @@ BOOL NetmonProfile::SetDtViewMaxSpace(int iMaxSpace)
 	if( _pf.SetInt(TEXT("DtViewMaxSpace"), (int)iMaxSpace) == TRUE )
 	{
 		_iDtViewMaxSpace = iMaxSpace;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL NetmonProfile::GetHiddenProcesses(std::vector<int> &processes)
+{
+	processes = _hiddenProcesses;
+	return TRUE;
+}
+
+BOOL NetmonProfile::SetHiddenProcesses(const std::vector<int> &processes)
+{
+	TCHAR buf[1000];
+	TCHAR pid[16];
+
+	// Generate String
+	buf[0] = TEXT('\0');
+	for (unsigned int i = 0; i < processes.size(); i++)
+	{
+		if (i != processes.size() - 1)
+		{
+			_stprintf_s(pid, 16, TEXT("%d "), processes[i]);
+		}
+		else
+		{
+			_stprintf_s(pid, 16, TEXT("%d"), processes[i]);
+		}
+		_tcscat_s(buf, 1000, pid);
+	}
+
+	// Write to File
+	if( _pf.SetString(TEXT("HiddenProcess"), buf) == TRUE )
+	{
+		_hiddenProcesses = processes;
 		return TRUE;
 	}
 	return FALSE;

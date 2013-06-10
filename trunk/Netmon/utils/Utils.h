@@ -44,6 +44,7 @@ public:
 
 	static int ListViewGetRowCount(HWND hList);
 	static void ListViewGetText(HWND hList, int row, int column, TCHAR *buf, int cchLen);
+	static int ListViewGetSelectedItemIndex(HWND hList);
 
 	// Tab
 	static void TabInit(HWND hTab, int numTabs, ...);

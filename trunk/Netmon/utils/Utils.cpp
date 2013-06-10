@@ -380,6 +380,17 @@ void Utils::ListViewGetText(HWND hList, int row, int column, TCHAR *buf, int cch
 	ListView_GetItemText(hList, row, column, buf, cchLen - 1);
 }
 
+int Utils::ListViewGetSelectedItemIndex(HWND hList)
+{
+	int count = ListView_GetItemCount(hList);
+	for (int i = 0; i < count; i++)
+	{
+		if (ListView_GetItemState(hList, i, LVIS_SELECTED) == LVIS_SELECTED)
+			return i;
+	}
+	return -1;
+}
+
 // Tab
 void Utils::TabInit(HWND hTab, int numTabs, ...)
 {
