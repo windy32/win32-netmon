@@ -13,6 +13,7 @@ CRITICAL_SECTION ProcessModel::_cs;
 #pragma endregion
 
 extern NetmonProfile g_profile;
+extern std::vector<bool> g_hiddenProcesses;
 
 void ProcessModel::Init()
 {
@@ -176,16 +177,23 @@ void ProcessModel::ShowProcess(int puid)
 	// Modify the Model
 	int index = GetProcessIndex(puid);
 	Lock();
-	_processes[index].hidden = false;
+	if (index != -1)
+	{
+		_processes[index].hidden = false;
+	}
 	Unlock();
 
-	// Update View
-	ProcessView::Update();
+	if (index != -1)
+	{
+		// Update View
+		ProcessModel::ExportHiddenState(g_hiddenProcesses);
+		ProcessView::Update(true);
 
-	// Update Profile
-	std::vector<int> hiddenProcesses;
-	ExportHiddenProcesses(hiddenProcesses);
-	g_profile.SetHiddenProcesses(hiddenProcesses);
+		// Update Profile
+		std::vector<int> hiddenProcesses;
+		ExportHiddenProcesses(hiddenProcesses);
+		g_profile.SetHiddenProcesses(hiddenProcesses);
+	}
 }
 
 void ProcessModel::HideProcess(int puid)
@@ -193,16 +201,23 @@ void ProcessModel::HideProcess(int puid)
 	// Modify the Model
 	int index = GetProcessIndex(puid);
 	Lock();
-	_processes[index].hidden = true;
+	if (index != -1)
+	{
+		_processes[index].hidden = true;
+	}
 	Unlock();
 
-	// Update View
-	ProcessView::Update();
+	if (index != -1)
+	{
+		// Update View
+		ProcessModel::ExportHiddenState(g_hiddenProcesses);
+		ProcessView::Update(true);
 
-	// Update Profile
-	std::vector<int> hiddenProcesses;
-	ExportHiddenProcesses(hiddenProcesses);
-	g_profile.SetHiddenProcesses(hiddenProcesses);
+		// Update Profile
+		std::vector<int> hiddenProcesses;
+		ExportHiddenProcesses(hiddenProcesses);
+		g_profile.SetHiddenProcesses(hiddenProcesses);
+	}
 }
 
 void ProcessModel::Export(std::vector<ProcessModel::ProcessItem> &items)

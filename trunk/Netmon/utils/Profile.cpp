@@ -105,7 +105,7 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 			// Offset
 			TCHAR buf[16];
 			_stprintf_s(buf, 16, TEXT("%d"), puid);
-			offset += _tcslen(buf);
+			offset += _tcslen(buf) + 1;
 		}
 	}
 	return TRUE;
