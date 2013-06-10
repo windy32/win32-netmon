@@ -73,6 +73,7 @@ void ProcessView::Update()
 	//   1. ProcessModel::Init
 	//   2. ProcessModel::OnTimer
 	std::vector<ProcessModel::ProcessItem> processes;
+	ProcessModel::Export(processes);
 
 	if (Utils::ListViewGetRowCount(_hList) == 0) // Init
 	{
