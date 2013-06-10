@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "DetailModel.h"
-#include "../Utils/Process.h"
+#include "../Utils/ProcessModel.h"
 #include "../Utils/Utils.h"
 
 DetailModel::DetailModel()
@@ -16,11 +16,11 @@ void DetailModel::InitDatabase()
 	__int64 packetCount;
 	TCHAR command[256];
 
-	for(int i = 0; i < Process::GetProcessCount(); i++)
+	for(int i = 0; i < ProcessModel::GetProcessCount(); i++)
 	{
 		// Get puid, name and packetCount
-		puid = Process::GetProcessUid(i);
-		Process::GetProcessName(puid, name, _countof(name));
+		puid = ProcessModel::GetProcessUid(i);
+		ProcessModel::GetProcessName(puid, name, _countof(name));
 
 		_stprintf_s(command, _countof(command), TEXT("Select Count From PacketCount Where ProcessUid = \'%d\';"), puid);
 

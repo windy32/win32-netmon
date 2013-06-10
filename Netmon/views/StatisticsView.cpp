@@ -2,7 +2,7 @@
 #include "StatisticsView.h"
 
 #include "../utils/Utils.h"
-#include "../utils/Process.h"
+#include "../utils/ProcessModel.h"
 #include "../GdiWidget/GwPieChart.h"
 #include "../GdiWidget/GwHistogram.h"
 #include "../GdiWidget/GwLogHistogram.h"

@@ -42,6 +42,9 @@ public:
 	static void ListViewAppend(HWND hList, int numColumns, ...);
 	static void ListViewUpdate(HWND hList, int index, int numColumns, ...);
 
+	static int ListViewGetRowCount(HWND hList);
+	static void ListViewGetText(HWND hList, int row, int column, TCHAR *buf, int cchLen);
+
 	// Tab
 	static void TabInit(HWND hTab, int numTabs, ...);
 	static void TabSetText(HWND hTab, int numTabs, ...);

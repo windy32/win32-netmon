@@ -357,19 +357,27 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils\Process.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\Process.h"
-				>
-			</File>
-			<File
 				RelativePath=".\utils\ProcessCache.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\utils\ProcessCache.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessView.h"
 				>
 			</File>
 			<File

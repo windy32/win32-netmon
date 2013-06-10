@@ -370,6 +370,16 @@ void Utils::ListViewUpdate(HWND hList, int index, int numColumns, ...)
 	}
 }
 
+int Utils::ListViewGetRowCount(HWND hList)
+{
+	return ListView_GetItemCount(hList);
+}
+
+void Utils::ListViewGetText(HWND hList, int row, int column, TCHAR *buf, int cchLen)
+{
+	ListView_GetItemText(hList, row, column, buf, cchLen - 1);
+}
+
 // Tab
 void Utils::TabInit(HWND hTab, int numTabs, ...)
 {

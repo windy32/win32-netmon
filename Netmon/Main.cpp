@@ -5,7 +5,8 @@
 
 #include "utils/Utils.h"
 #include "utils/SQLite.h"
-#include "utils/Process.h"
+#include "utils/ProcessModel.h"
+#include "utils/ProcessView.h"
 #include "utils/PcapNetFilter.h"
 #include "utils/PortCache.h"
 #include "utils/ProcessCache.h"
@@ -403,7 +404,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		//    processName is still "Unknown" and processFullPath is still "-"
 
 		// - Get Process UID
-		processUID = Process::GetProcessUid(processName);
+		processUID = ProcessModel::GetProcessUid(processName);
 
 		// - Insert Into Process Table
 		if( processUID == -1 )
@@ -421,7 +422,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		_tcscpy_s(pie.fullPath, MAX_PATH, processFullPath);
 
 		// - Update Process List
-		Process::OnPacket(&pie);
+		ProcessModel::OnPacket(&pie);
 
 		// - Save to Database
 
@@ -899,8 +900,8 @@ static void OnProcessChanged(LPARAM lParam)
 		    lpstListView->uChanged == LVIF_STATE )
 		{
 			TCHAR name[256];
-			int puid = Process::GetProcessUid(lpstListView->iItem);
-			Process::GetProcessName(puid, name, _countof(name));
+			int puid = ProcessModel::GetProcessUid(lpstListView->iItem);
+			ProcessModel::GetProcessName(puid, name, _countof(name));
 
 			g_rtView.SetProcessUid(puid);
 			g_mtView.SetProcessUid(puid);
@@ -990,8 +991,6 @@ static void OnExit(HWND hWnd)
 	g_stView.End();
 	g_dtView.End();
 
-	Process::OnExit();
-
 	// End SQLite
 	SQLite::Close();
 
@@ -1005,7 +1004,7 @@ static void OnExit(HWND hWnd)
 ///----------------------------------------------------------------------------------------------//
 static void WINAPI OnTimer(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	Process::OnTimer();
+	ProcessModel::OnTimer();
 }
 
 static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -1092,7 +1091,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	ReleaseDC(hWnd, hDc);
 
 	// Init ListView
-	Process::Init(GetDlgItem(hWnd, IDL_PROCESS));
+	ProcessView::Init(GetDlgItem(hWnd, IDL_PROCESS));
 
 	// Init Tab
 	Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), 4, TEXT("Realtime"), TEXT("Month"), TEXT("Statistics"), TEXT("Detail"));
