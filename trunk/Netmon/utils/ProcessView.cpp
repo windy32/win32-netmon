@@ -101,6 +101,6 @@ void ProcessView::Update(bool redraw)
 
 	if (redraw)
 	{
-		RedrawWindow(_hList, NULL, NULL, RDW_INVALIDATE);
+		UpdateWindow(_hList);
 	}
 }

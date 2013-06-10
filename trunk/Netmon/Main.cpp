@@ -59,9 +59,6 @@ static enum enumHoverState
 static int g_iSidebarWidth;
 static int g_iSidebarHeight;
 
-// Hidden state used in OnCustomDraw
-std::vector<bool> g_hiddenProcesses;
-
 // Capture thread
 HANDLE g_hCaptureThread;
 bool   g_bCapture = false;
@@ -740,7 +737,6 @@ static void ProfileInit(HWND hWnd)
 	{
 		ProcessModel::HideProcess(hiddenProcesses[i]);
 	}
-	ProcessModel::ExportHiddenState(g_hiddenProcesses);
 	ProcessView::Update();
 
 	// Select default adapter
@@ -950,7 +946,10 @@ static void OnCustomDraw(HWND hWnd, LPARAM lParam)
 	}
 	else if(cd->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
 	{
-		if (g_hiddenProcesses[cd->nmcd.dwItemSpec]) // Hidden
+		std::vector<bool> hiddenProcesses;
+		ProcessModel::ExportHiddenState(hiddenProcesses);
+
+		if (hiddenProcesses[cd->nmcd.dwItemSpec]) // Hidden
 		{
 			cd->clrText = RGB(192, 192, 192);
 		}

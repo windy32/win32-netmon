@@ -13,7 +13,6 @@ CRITICAL_SECTION ProcessModel::_cs;
 #pragma endregion
 
 extern NetmonProfile g_profile;
-extern std::vector<bool> g_hiddenProcesses;
 
 void ProcessModel::Init()
 {
@@ -186,7 +185,6 @@ void ProcessModel::ShowProcess(int puid)
 	if (index != -1)
 	{
 		// Update View
-		ProcessModel::ExportHiddenState(g_hiddenProcesses);
 		ProcessView::Update(true);
 
 		// Update Profile
@@ -210,7 +208,6 @@ void ProcessModel::HideProcess(int puid)
 	if (index != -1)
 	{
 		// Update View
-		ProcessModel::ExportHiddenState(g_hiddenProcesses);
 		ProcessView::Update(true);
 
 		// Update Profile
