@@ -98,4 +98,6 @@ void ProcessView::Update()
 			ListViewInsert(processes[i]);
 		}
 	}
+
+	RedrawWindow(_hList, NULL, NULL, RDW_INVALIDATE);
 }

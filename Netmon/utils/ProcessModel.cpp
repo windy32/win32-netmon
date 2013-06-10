@@ -2,6 +2,7 @@
 #include "ProcessModel.h"
 #include "ProcessView.h"
 #include "ProcessCache.h"
+#include "Profile.h"
 #include "Utils.h"
 
 #pragma region Members of Process
@@ -10,6 +11,8 @@ std::vector<ProcessModel::ProcessItem> ProcessModel::_processes;
 CRITICAL_SECTION ProcessModel::_cs;
 
 #pragma endregion
+
+extern NetmonProfile g_profile;
 
 void ProcessModel::Init()
 {
@@ -168,6 +171,40 @@ void ProcessModel::ResetDirty(int puid)
 	Unlock();
 }
 
+void ProcessModel::ShowProcess(int puid)
+{
+	// Modify the Model
+	int index = GetProcessIndex(puid);
+	Lock();
+	_processes[index].hidden = false;
+	Unlock();
+
+	// Update View
+	ProcessView::Update();
+
+	// Update Profile
+	std::vector<int> hiddenProcesses;
+	ExportHiddenProcesses(hiddenProcesses);
+	g_profile.SetHiddenProcesses(hiddenProcesses);
+}
+
+void ProcessModel::HideProcess(int puid)
+{
+	// Modify the Model
+	int index = GetProcessIndex(puid);
+	Lock();
+	_processes[index].hidden = true;
+	Unlock();
+
+	// Update View
+	ProcessView::Update();
+
+	// Update Profile
+	std::vector<int> hiddenProcesses;
+	ExportHiddenProcesses(hiddenProcesses);
+	g_profile.SetHiddenProcesses(hiddenProcesses);
+}
+
 void ProcessModel::Export(std::vector<ProcessModel::ProcessItem> &items)
 {
 	Lock();
@@ -175,13 +212,27 @@ void ProcessModel::Export(std::vector<ProcessModel::ProcessItem> &items)
 	Unlock();
 }
 
-void ProcessModel::ExportHiddenState(std::vector<bool> states)
+void ProcessModel::ExportHiddenState(std::vector<bool> &states)
 {
 	states.clear();
 	Lock();
 	for (unsigned int i = 0; i < _processes.size(); i++)
 	{
 		states.push_back(_processes[i].hidden);
+	}
+	Unlock();
+}
+
+void ProcessModel::ExportHiddenProcesses(std::vector<int> &processes)
+{
+	processes.clear();
+	Lock();
+	for (unsigned int i = 0; i < _processes.size(); i++)
+	{
+		if (_processes[i].hidden)
+		{
+			processes.push_back(_processes[i].puid);
+		}
 	}
 	Unlock();
 }

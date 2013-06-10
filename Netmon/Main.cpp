@@ -60,19 +60,19 @@ static int g_iSidebarWidth;
 static int g_iSidebarHeight;
 
 // Capture thread
-HANDLE    g_hCaptureThread;
-bool      g_bCapture = false;
+HANDLE g_hCaptureThread;
+bool   g_bCapture = false;
 
 // Adapter
-int       g_nAdapters = 0;
-int       g_iAdapter = 0;
-TCHAR     g_szAdapterNames[16][256];
+int    g_nAdapters = 0;
+int    g_iAdapter = 0;
+TCHAR  g_szAdapterNames[16][256];
 
 // Model
-static RealtimeModel *g_rtModel;
-static MonthModel    *g_mtModel;
+static RealtimeModel   *g_rtModel;
+static MonthModel      *g_mtModel;
 static StatisticsModel *g_stModel;
-static DetailModel   *g_dtModel;
+static DetailModel     *g_dtModel;
 
 // View
 static RealtimeView   g_rtView;
@@ -730,6 +730,15 @@ static void ProfileInit(HWND hWnd)
 	// Load Netmon.ini
 	g_profile.Load(g_szAdapterNames[g_iAdapter]);
 
+	// Update Hidden State
+	std::vector<int> hiddenProcesses;
+	g_profile.GetHiddenProcesses(hiddenProcesses);
+	for (unsigned int i = 0; i < hiddenProcesses.size(); i++)
+	{
+		ProcessModel::HideProcess(hiddenProcesses[i]);
+	}
+	ProcessView::Update();
+
 	// Select default adapter
 	TCHAR szAdapter[256];
 	g_profile.GetAdapter(szAdapter, 256);
@@ -952,7 +961,7 @@ static void OnCustomDraw(HWND hWnd, LPARAM lParam)
 		}
 		else if (hidden[cd->nmcd.dwItemSpec]) // Hidden
 		{
-			cd->clrText = RGB(128, 128, 128);
+			cd->clrText = RGB(192, 192, 192);
 		}
 		else // Visible
 		{
@@ -989,6 +998,32 @@ static void OnRightClick(HWND hWnd, LPARAM lParam)
 		TrackPopupMenu(g_hProcessMenu, TPM_TOPALIGN | TPM_LEFTALIGN,  
 			GET_X_LPARAM(GetMessagePos()), GET_Y_LPARAM(GetMessagePos()), 0, hWnd, NULL); 
 	}
+}
+
+static void OnShowProcess(HWND hList)
+{
+	// Get Selected Index
+	int index = Utils::ListViewGetSelectedItemIndex(hList);
+
+	// Get PUID
+	TCHAR buf[16];
+	Utils::ListViewGetText(hList, index, 0, buf, 16);
+
+	// Set Hidden State
+	ProcessModel::ShowProcess(_tstoi(buf));
+}
+
+static void OnHideProcess(HWND hList)
+{
+	// Get Selected Index
+	int index = Utils::ListViewGetSelectedItemIndex(hList);
+
+	// Get PUID
+	TCHAR buf[16];
+	Utils::ListViewGetText(hList, index, 0, buf, 16);
+
+	// Set Hidden State
+	ProcessModel::HideProcess(_tstoi(buf));
 }
 
 static void OnShowWindow(HWND hWnd)
@@ -1257,6 +1292,14 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	else if( wParam == IDM_HELP_ABOUT || wParam == IDM_TRAY_ABOUT )
 	{
 		OnAbout(hWnd);
+	}
+	else if( wParam == IDM_PROCESS_SHOW)
+	{
+		OnShowProcess(GetDlgItem(hWnd, IDL_PROCESS));
+	}
+	else if( wParam == IDM_PROCESS_HIDE)
+	{
+		OnHideProcess(GetDlgItem(hWnd, IDL_PROCESS));
 	}
 }
 

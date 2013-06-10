@@ -11,6 +11,7 @@
 // AutoCapture=1
 // DtViewEnable=1
 // DtViewMaxSpace=0
+// HiddenProcess=1 3 6 7 9 16
 //
 // Related Windows API --------------------------------------------------------
 //
@@ -59,6 +60,7 @@ protected:
 	BOOL _bAutoCapture;
 	BOOL _bDtViewEnable;
 	int  _iDtViewMaxSpace;
+	std::vector<int> _hiddenProcesses;
 
 public:
 	// Netmon calls Load() at startup to get preferences from Netmon.ini.
@@ -85,6 +87,9 @@ public:
 
 	BOOL GetDtViewMaxSpace(int *pMaxSpace);
 	BOOL SetDtViewMaxSpace(int iMaxSpace);
+
+	BOOL GetHiddenProcesses(std::vector<int> &processes);
+	BOOL SetHiddenProcesses(const std::vector<int> &processes);
 };
 
 #endif

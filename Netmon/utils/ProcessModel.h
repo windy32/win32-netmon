@@ -46,10 +46,13 @@ public:
 	static void OnTimer();
 
 	static void ResetDirty(int puid);
+	static void ShowProcess(int puid);
+	static void HideProcess(int puid);
 
 	// Export Model Info
 	static void Export(std::vector<ProcessItem> &items);
-	static void ExportHiddenState(std::vector<bool> states);
+	static void ExportHiddenState(std::vector<bool> &states);
+	static void ExportHiddenProcesses(std::vector<int> &processes);
 
 public:
 	static int  GetProcessUid(int index);
