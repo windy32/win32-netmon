@@ -78,6 +78,8 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
 		_tcscpy_s(item.name, MAX_PATH, pi->name);
 		_tcscpy_s(item.fullPath, MAX_PATH, pi->fullPath);
 
+		item.hidden = false;
+
 		item.txRate = 0;
 		item.rxRate = 0;
 		item.prevTxRate = 0;
@@ -170,6 +172,17 @@ void ProcessModel::Export(std::vector<ProcessModel::ProcessItem> &items)
 {
 	Lock();
 	items = _processes;
+	Unlock();
+}
+
+void ProcessModel::ExportHiddenState(std::vector<bool> states)
+{
+	states.clear();
+	Lock();
+	for (unsigned int i = 0; i < _processes.size(); i++)
+	{
+		states.push_back(_processes[i].hidden);
+	}
 	Unlock();
 }
 
