@@ -33,6 +33,7 @@ HINSTANCE g_hInstance;
 static HWND      g_hDlgMain;
 static HWND      g_hCurPage;   // Current Child Dialog Box 
 static HMENU     g_hTrayMenu;
+static HMENU     g_hProcessMenu;
 
 // Sidebar GDI objects
 static HDC       g_hDcSidebarBg;
@@ -53,7 +54,7 @@ static HBITMAP   g_hBmpStopHover;
 static enum enumHoverState
 {
 	Start, Stop, Neither
-}g_enumHoverState = Neither;
+} g_enumHoverState = Neither;
 
 static int g_iSidebarWidth;
 static int g_iSidebarHeight;
@@ -547,6 +548,10 @@ static void UpdateMenuLanguage()
 	Utils::SetMenuString(g_hTrayMenu, 1, MF_BYPOSITION,  IDM_TRAY_ABOUT,       Language::GetString(IDS_MENU_TRAY_ABOUT));
 	Utils::SetMenuString(g_hTrayMenu, 2, MF_BYPOSITION,  IDM_TRAY_EXIT,        Language::GetString(IDS_MENU_TRAY_EXIT));
 
+	// Process
+	Utils::SetMenuString(g_hProcessMenu, 0, MF_BYPOSITION, IDM_PROCESS_SHOW, Language::GetString(IDS_MENU_PROCESS_SHOW));
+	Utils::SetMenuString(g_hProcessMenu, 1, MF_BYPOSITION, IDM_PROCESS_HIDE, Language::GetString(IDS_MENU_PROCESS_HIDE));
+
 	// Refresh menu bar
 	DrawMenuBar(g_hDlgMain);
 }
@@ -923,6 +928,69 @@ static void OnProcessChanged(LPARAM lParam)
 	}
 }
 
+static void OnCustomDraw(HWND hWnd, LPARAM lParam)
+{
+	NMLVCUSTOMDRAW *cd = (NMLVCUSTOMDRAW *)lParam;
+	if (cd->nmcd.dwDrawStage == CDDS_PREPAINT)
+	{
+		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
+	}
+	else if(cd->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
+	{
+		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
+	}
+	else if(cd->nmcd.dwDrawStage == (CDDS_ITEMPREPAINT|CDDS_SUBITEM))
+	{
+		// Get Hidden State
+		std::vector<bool> hidden;
+		ProcessModel::ExportHiddenState(hidden);
+
+		// Set Fore Color
+		if (cd->nmcd.dwItemSpec >= hidden.size()) // Default (visible)
+		{
+			cd->clrText = RGB(0, 0, 0);
+		}
+		else if (hidden[cd->nmcd.dwItemSpec]) // Hidden
+		{
+			cd->clrText = RGB(128, 128, 128);
+		}
+		else // Visible
+		{
+			cd->clrText = RGB(0, 0, 0);
+		}
+		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_DODEFAULT);
+	}
+}
+
+static void OnRightClick(HWND hWnd, LPARAM lParam)
+{
+	NMITEMACTIVATE *ia = (NMITEMACTIVATE *)lParam;
+	int index = ia->iItem;
+	if( index != -1 ) 
+	{
+		// Get Hidden State
+		std::vector<bool> hidden;
+		ProcessModel::ExportHiddenState(hidden);
+
+		if ((unsigned int)index < hidden.size())
+		{
+			if (hidden[index]) // Hidden
+			{
+				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_SHOW, MF_ENABLED);
+				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_HIDE, MF_GRAYED);
+			}
+			else // Visible
+			{
+				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_SHOW, MF_GRAYED);
+				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_HIDE, MF_ENABLED);
+			}
+		}
+
+		TrackPopupMenu(g_hProcessMenu, TPM_TOPALIGN | TPM_LEFTALIGN,  
+			GET_X_LPARAM(GetMessagePos()), GET_Y_LPARAM(GetMessagePos()), 0, hWnd, NULL); 
+	}
+}
+
 static void OnShowWindow(HWND hWnd)
 {
 	ShowWindow(hWnd, SW_SHOWNORMAL);
@@ -1032,6 +1100,10 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// Load Tray Icon Menu
 	g_hTrayMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_TRAY)); 
 	g_hTrayMenu = GetSubMenu(g_hTrayMenu, 0);
+
+	// Load Process Menu
+	g_hProcessMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_PROCESS));
+	g_hProcessMenu = GetSubMenu(g_hProcessMenu, 0);
 
 	// Create Tray Icon
 	nti.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN)); 
@@ -1260,13 +1332,28 @@ static void OnGetMinMaxInfo(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	if( wParam == IDT_VIEW )
+	if (wParam == IDT_VIEW )
 	{
-		OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
+		if (((NMHDR *)lParam)->code == TCN_SELCHANGE)
+		{
+			OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
+		}
 	}
-	else if( wParam == IDL_PROCESS )
+	else if (wParam == IDL_PROCESS)
 	{
-		OnProcessChanged(lParam);
+		if (((NMHDR *)lParam)->code == LVN_ITEMCHANGED ||
+			((NMHDR *)lParam)->code == NM_CLICK )
+		{
+			OnProcessChanged(lParam);
+		}
+		else if (((NMHDR *)lParam)->code == NM_CUSTOMDRAW)
+		{
+			OnCustomDraw(hWnd, lParam);
+		}
+		else if (((NMHDR *)lParam)->code == NM_RCLICK)
+		{
+			OnRightClick(hWnd, lParam);
+		}
 	}
 }
 

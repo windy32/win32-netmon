@@ -17,6 +17,8 @@ public:
 		TCHAR name[MAX_PATH];
 		TCHAR fullPath[MAX_PATH];
 
+		bool hidden;
+
 		// Valid Only When Active
 		bool dirty;
 
@@ -47,6 +49,7 @@ public:
 
 	// Export Model Info
 	static void Export(std::vector<ProcessItem> &items);
+	static void ExportHiddenState(std::vector<bool> states);
 
 public:
 	static int  GetProcessUid(int index);

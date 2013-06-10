@@ -111,6 +111,18 @@ IDM_TRAY MENU
 
 
 
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDM_PROCESS MENU
+{
+    POPUP "Process"
+    {
+        MENUITEM "Show Process", IDM_PROCESS_SHOW
+        MENUITEM "Hide Process", IDM_PROCESS_HIDE
+    }
+}
+
+
+
 //
 // Dialog resources
 //

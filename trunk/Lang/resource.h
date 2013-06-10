@@ -84,4 +84,7 @@
 #define IDS_MTVIEW_TEXT_MB_KB                   40076
 #define IDS_MTVIEW_TEXT_MB_MB                   40077
 
+#define IDS_MENU_PROCESS_SHOW                   40078
+#define IDS_MENU_PROCESS_HIDE                   40079
+
 // Remember to update "Language.h"
