@@ -104,6 +104,7 @@ public:
 	int  FindDevices();
 	TCHAR *GetName(int i);
 	bool Select(int i);
+	bool ReConnect(int i);
 
 	bool Capture(PacketInfo *pi, bool *capture);
 };

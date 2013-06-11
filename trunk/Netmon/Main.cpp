@@ -367,7 +367,11 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		TCHAR processFullPath[MAX_PATH] = TEXT("-");
 
 		// - Get a Packet (Process UID or PID is not Provided Here)
-		filter.Capture(&pi, &g_bCapture);
+		if (!filter.Capture(&pi, &g_bCapture))
+		{
+			filter.ReConnect(g_iAdapter);
+			continue;
+		}
 
 		// - Stop is Clicked
 		if( !g_bCapture )
