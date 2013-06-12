@@ -78,6 +78,8 @@ IDM_MAIN MENU
         {
             MENUITEM "First Adapter", IDM_VIEW_ADAPTER_FIRST
         }
+        MENUITEM SEPARATOR
+		MENUITEM "Show Hidden Process", IDM_VIEW_SHOW_HIDDEN
     }
     POPUP "Options"
     {

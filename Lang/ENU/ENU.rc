@@ -26,6 +26,7 @@ STRINGTABLE
     IDS_MENU_VIEW_STATISTICS      "Statistics"
     IDS_MENU_VIEW_DETAIL          "Detail"
     IDS_MENU_VIEW_ADAPTER         "Adapter"
+	IDS_MENU_VIEW_SHOW_HIDDEN     "Show Hidden Process"
     IDS_MENU_OPTIONS              "Options"
     IDS_MENU_OPTIONS_LANGUAGE     "Language"
     IDS_MENU_OPTIONS_PREFERENCES  "Preferences..."

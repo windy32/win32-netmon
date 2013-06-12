@@ -537,6 +537,7 @@ static void UpdateMenuLanguage()
 	Utils::SetMenuString(hMenuView, 2, MF_BYPOSITION, IDM_VIEW_STATISTICS,        Language::GetString(IDS_MENU_VIEW_STATISTICS));
 	Utils::SetMenuString(hMenuView, 3, MF_BYPOSITION, IDM_VIEW_DETAIL,            Language::GetString(IDS_MENU_VIEW_DETAIL));
 	Utils::SetMenuString(hMenuView, 5, MF_BYPOSITION, (UINT_PTR)hMenuViewAdapter, Language::GetString(IDS_MENU_VIEW_ADAPTER));
+	Utils::SetMenuString(hMenuView, 7, MF_BYPOSITION, IDM_VIEW_SHOW_HIDDEN,       Language::GetString(IDS_MENU_VIEW_SHOW_HIDDEN));
 
 	// Options
 	Utils::SetMenuString(hMenuOptions, 0, MF_BYPOSITION, (UINT_PTR)hMenuOptionsLanguage, Language::GetString(IDS_MENU_OPTIONS_LANGUAGE));
@@ -885,6 +886,22 @@ static void OnAdapterSelected(HWND hWnd, WPARAM wParam)
 	}
 }
 
+static void OnHiddenStateChanged(HWND hWnd)
+{
+	HMENU hMenu = GetMenu(hWnd);
+	HMENU hViewMenu = GetSubMenu(hMenu, 1);
+
+	UINT uMenuState = LOWORD(GetMenuState(hViewMenu, 7, MF_BYPOSITION));
+	if (uMenuState & MF_CHECKED) // Visible -> Hidden
+	{
+		CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
+	}
+	else // Hidden ->Visible
+	{
+		CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED);
+	}
+}
+
 static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
 {
 	if( wParam - IDM_OPTIONS_LANGUAGE_FIRST != g_iCurLanguage )
@@ -1108,6 +1125,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	NOTIFYICONDATA nti; 
 	HMENU hMainMenu;
+	HMENU hViewMenu;
 	HMENU hOptionsMenu;
 	HMENU hLanguageMenu;
 	HBRUSH hBrush;
@@ -1149,6 +1167,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SetMenu(hWnd, hMainMenu);
 	CreateLanguageMenuItems();
 
+	hViewMenu = GetSubMenu(hMainMenu, 1);
 	hOptionsMenu = GetSubMenu(hMainMenu, 2);
 	hLanguageMenu = GetSubMenu(hOptionsMenu, 0);
 
@@ -1156,6 +1175,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
 	CheckMenuRadioItem(hMainMenu, IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
 	CheckMenuRadioItem(hLanguageMenu, 0, g_nLanguage - 1, 0, MF_BYPOSITION);
+	CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED);
 
 	// Init Sidebar GDI Objects
 	hDc = GetDC(hWnd);
@@ -1266,6 +1286,10 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	else if( wParam >= IDM_VIEW_ADAPTER_FIRST && wParam < IDM_OPTIONS_LANGUAGE_FIRST )
 	{
 		OnAdapterSelected(hWnd, wParam);
+	}
+	else if( wParam == IDM_VIEW_SHOW_HIDDEN )
+	{
+		OnHiddenStateChanged(hWnd);
 	}
 	else if( wParam >= IDM_OPTIONS_LANGUAGE_FIRST )
 	{
