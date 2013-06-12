@@ -87,6 +87,9 @@ static int            g_iCurLanguage;
 // Profile
 NetmonProfile  g_profile;
 
+// View Setting
+static bool    g_bShowHidden;
+
 #pragma endregion
 
 ///----------------------------------------------------------------------------------------------//
@@ -894,11 +897,15 @@ static void OnHiddenStateChanged(HWND hWnd)
 	UINT uMenuState = LOWORD(GetMenuState(hViewMenu, 7, MF_BYPOSITION));
 	if (uMenuState & MF_CHECKED) // Visible -> Hidden
 	{
+		ProcessView::HideProcesses();
 		CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
+		g_bShowHidden = false;
 	}
 	else // Hidden ->Visible
 	{
+		ProcessView::ShowProcesses();
 		CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED);
+		g_bShowHidden = true;
 	}
 }
 
@@ -923,7 +930,7 @@ static void OnPreferences(HWND hWnd)
 	DialogBoxParam(g_hInstance, TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_dtView);
 }
 
-static void OnProcessChanged(LPARAM lParam)
+static void OnProcessChanged(HWND hWnd, LPARAM lParam)
 {
 	if(((NMHDR *)lParam)->code == LVN_ITEMCHANGED)
 	{
@@ -934,9 +941,9 @@ static void OnProcessChanged(LPARAM lParam)
 		    lpstListView->uNewState == (LVIS_FOCUSED | LVIS_SELECTED) &&
 		    lpstListView->uChanged == LVIF_STATE )
 		{
-			TCHAR name[256];
-			int puid = ProcessModel::GetProcessUid(lpstListView->iItem);
-			ProcessModel::GetProcessName(puid, name, _countof(name));
+			TCHAR szPUID[16];
+			Utils::ListViewGetText(GetDlgItem(hWnd, IDL_PROCESS), lpstListView->iItem, 0, szPUID, 16);
+			int puid = _tstoi(szPUID);
 
 			g_rtView.SetProcessUid(puid);
 			g_mtView.SetProcessUid(puid);
@@ -960,30 +967,40 @@ static void OnProcessChanged(LPARAM lParam)
 
 static void OnCustomDraw(HWND hWnd, LPARAM lParam)
 {
-	NMLVCUSTOMDRAW *cd = (NMLVCUSTOMDRAW *)lParam;
-	if (cd->nmcd.dwDrawStage == CDDS_PREPAINT)
+	if (g_bShowHidden) // Hidden processes are gray
 	{
-		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
-	}
-	else if(cd->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
-	{
-		std::vector<bool> hiddenProcesses;
-		ProcessModel::ExportHiddenState(hiddenProcesses);
+		NMLVCUSTOMDRAW *cd = (NMLVCUSTOMDRAW *)lParam;
+		if (cd->nmcd.dwDrawStage == CDDS_PREPAINT)
+		{
+			SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
+		}
+		else if(cd->nmcd.dwDrawStage == CDDS_ITEMPREPAINT)
+		{
+			std::vector<bool> hiddenProcesses;
+			ProcessModel::ExportHiddenState(hiddenProcesses);
 
-		if (hiddenProcesses[cd->nmcd.dwItemSpec]) // Hidden
-		{
-			cd->clrText = RGB(192, 192, 192);
+			if (hiddenProcesses[cd->nmcd.dwItemSpec]) // Hidden
+			{
+				cd->clrText = RGB(192, 192, 192);
+			}
+			else // Visible
+			{
+				cd->clrText = RGB(0, 0, 0);
+			}
+			SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
 		}
-		else // Visible
-		{
-			cd->clrText = RGB(0, 0, 0);
-		}
-		SetDlgMsgResult(hWnd, WM_NOTIFY, CDRF_NOTIFYSUBITEMDRAW);
 	}
+	// else, do nothing
 }
 
 static void OnRightClick(HWND hWnd, LPARAM lParam)
 {
+	// The context menu is available only when hidden processes are visible
+	if (!g_bShowHidden)
+	{
+		return;
+	}
+
 	NMITEMACTIVATE *ia = (NMITEMACTIVATE *)lParam;
 	int index = ia->iItem;
 	if( index != -1 ) 
@@ -1175,7 +1192,9 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
 	CheckMenuRadioItem(hMainMenu, IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
 	CheckMenuRadioItem(hLanguageMenu, 0, g_nLanguage - 1, 0, MF_BYPOSITION);
-	CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED);
+
+	CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED); // Hidden State
+	g_bShowHidden = true;
 
 	// Init Sidebar GDI Objects
 	hDc = GetDC(hWnd);
@@ -1405,7 +1424,7 @@ static void OnNotify(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if (((NMHDR *)lParam)->code == LVN_ITEMCHANGED ||
 			((NMHDR *)lParam)->code == NM_CLICK )
 		{
-			OnProcessChanged(lParam);
+			OnProcessChanged(hWnd, lParam);
 		}
 		else if (((NMHDR *)lParam)->code == NM_CUSTOMDRAW)
 		{
