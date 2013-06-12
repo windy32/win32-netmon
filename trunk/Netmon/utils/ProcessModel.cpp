@@ -151,11 +151,6 @@ void ProcessModel::OnTimer()
 	{
 		ProcessItem &item = _processes[i];
 
-		if (item.rxRate > 1000 * 1000) // Debug
-		{
-			int z = 0;
-		}
-
 		item.prevTxRate = item.txRate;
 		item.prevRxRate = item.rxRate;
 
