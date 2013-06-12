@@ -3,12 +3,16 @@
 #include "Utils.h"
 
 HWND ProcessView::_hList;
+bool ProcessView::_hideProcess;
+bool ProcessView::_prevHideProcess;
 
 // Initialize process list & ListView control
 void ProcessView::Init(HWND hList)
 {
 	// Init ListView Headers
 	_hList = hList;
+	_hideProcess = false;
+	_prevHideProcess = false;
 
 	Utils::ListViewInit(_hList, FALSE, 5, 
 		TEXT("UID"), TEXT("Process"), TEXT("Tx Rate"), TEXT("Rx Rate"), TEXT("Full Path"), 
@@ -29,8 +33,8 @@ void ProcessView::ListViewInsert(const ProcessModel::ProcessItem &item)
 
 	if( item.active )
 	{
-		_stprintf_s(szColumn[2], MAX_PATH, TEXT("%d"), item.prevTxRate);
-		_stprintf_s(szColumn[3], MAX_PATH, TEXT("%d"), item.prevRxRate);
+		_stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
+		_stprintf_s(szColumn[3], MAX_PATH, TEXT("%d.%d"), item.prevRxRate / 1024, (item.prevRxRate % 1024 + 51) / 108);
 		_tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
 	}
 	else
@@ -72,35 +76,121 @@ void ProcessView::Update(bool redraw)
 	// Update is called in:
 	//   1. ProcessModel::Init
 	//   2. ProcessModel::OnTimer
+	//   3. ProcessModel::ShowProcess(puid)
+	//   4. ProcessModel::HideProcess(puid)
+	//   5. ProcessView::ShowProcesses
+	//   6. ProcessView::HideProcesses
 	std::vector<ProcessModel::ProcessItem> processes;
 	ProcessModel::Export(processes);
 
-	if (Utils::ListViewGetRowCount(_hList) == 0) // Init
+	if (Utils::ListViewGetRowCount(_hList) == 0) // 1. Init
 	{
 		for (unsigned int i = 0; i < processes.size(); i++)
 		{
 			ListViewInsert(processes[i]);
 		}
 	}
-	else // OnTimer
+	else if (redraw == false && _hideProcess != _prevHideProcess) // 5 & 6
 	{
-		int rows = Utils::ListViewGetRowCount(_hList);
-		for (int i = 0; i < rows; i++)
+		if (_hideProcess) // Delete hidden processes
 		{
-			if (processes[i].dirty)
+			Utils::ListViewClear(_hList);
+			for (unsigned int i = 0; i < processes.size(); i++)
 			{
-				ListViewUpdate(i, processes[i]);
+				if (!processes[i].hidden)
+				{
+					ListViewInsert(processes[i]);
+				}
 			}
 		}
-
-		for (unsigned int i = rows; i < processes.size(); i++)
+		else // Show gray hidden processes
 		{
-			ListViewInsert(processes[i]);
+			Utils::ListViewClear(_hList);
+			for (unsigned int i = 0; i < processes.size(); i++)
+			{
+				ListViewInsert(processes[i]);
+			}
+		}
+		_prevHideProcess = _hideProcess;
+	}
+	else if (redraw == false) // 2. OnTimer
+	{
+		if (!_hideProcess) // hidden processes are displayed as grayed items
+		{
+			int rows = Utils::ListViewGetRowCount(_hList);
+			for (int i = 0; i < rows; i++)
+			{
+				if (processes[i].dirty)
+				{
+					ListViewUpdate(i, processes[i]);
+				}
+			}
+
+			for (unsigned int i = rows; i < processes.size(); i++)
+			{
+				ListViewInsert(processes[i]);
+			}
+		}
+		else
+		{
+			// Update Existent Items
+			int rows = Utils::ListViewGetRowCount(_hList);
+			for (int i = 0; i < rows; i++)
+			{
+				TCHAR szPUID[16];
+				Utils::ListViewGetText(_hList, i, 0, szPUID, 16);
+				int puid = _tstoi(szPUID);
+
+				for (unsigned int j = 0; j < processes.size(); j++)
+				{
+					if (puid == processes[j].puid && processes[i].dirty)
+					{
+						ListViewUpdate(i, processes[j]);
+					}
+				}
+			}
+
+			// Insert New Items
+			for (unsigned int i = 0; i < processes.size(); i++)
+			{
+				if (processes[i].hidden == false)
+				{
+					int rows = Utils::ListViewGetRowCount(_hList);
+					bool found = false;
+
+					for (int j = 0; j < rows; j++)
+					{
+						TCHAR szPUID[16];
+						Utils::ListViewGetText(_hList, j, 0, szPUID, 16);
+						int puid = _tstoi(szPUID);
+						found = true;
+						break;
+					}
+
+					if (!found)
+					{
+						ListViewInsert(processes[i]);
+					}
+				}
+			}
 		}
 	}
-
-	if (redraw)
+	else // 3. ShowProcess and 4. HideProcess
 	{
 		UpdateWindow(_hList);
 	}
+}
+
+void ProcessView::HideProcesses()
+{
+	_prevHideProcess = _hideProcess;
+	_hideProcess = true;
+	Update(false);
+}
+
+void ProcessView::ShowProcesses()
+{
+	_prevHideProcess = _hideProcess;
+	_hideProcess = false;
+	Update(false);
 }

@@ -10,6 +10,8 @@ class ProcessView
 private:
 	// It's associated with a ListView control
 	static HWND _hList;
+	static bool _hideProcess;
+	static bool _prevHideProcess;
 
 private: // Utils Used by ProcessView
 	static void ListViewInsert(const ProcessModel::ProcessItem &item);
@@ -18,6 +20,8 @@ private: // Utils Used by ProcessView
 public:
 	static void Init(HWND hList);
 	static void Update(bool redraw = false);
+	static void HideProcesses();
+	static void ShowProcesses();
 };
 
 #endif
