@@ -71,10 +71,10 @@ void ProcessView::ListViewUpdate(int index, const ProcessModel::ProcessItem &ite
 		szColumn[0], szColumn[1], szColumn[2], szColumn[3], szColumn[4]);
 }
 
-void ProcessView::Update(bool redraw)
+void ProcessView::Update(bool init, bool redraw)
 {
 	// Update is called in:
-	//   1. ProcessModel::Init
+	//   1. ProcessModel::Init ProfileInit
 	//   2. ProcessModel::OnTimer
 	//   3. ProcessModel::ShowProcess(puid)
 	//   4. ProcessModel::HideProcess(puid)
@@ -83,14 +83,18 @@ void ProcessView::Update(bool redraw)
 	std::vector<ProcessModel::ProcessItem> processes;
 	ProcessModel::Export(processes);
 
-	if (Utils::ListViewGetRowCount(_hList) == 0) // 1. Init
+	if (init) // 1. Init
 	{
+		Utils::ListViewClear(_hList);
 		for (unsigned int i = 0; i < processes.size(); i++)
 		{
-			ListViewInsert(processes[i]);
+			if (!_hideProcess || !processes[i].hidden)
+			{
+				ListViewInsert(processes[i]);
+			}
 		}
 	}
-	else if (redraw == false && _hideProcess != _prevHideProcess) // 5 & 6
+	else if (redraw == false && _hideProcess != _prevHideProcess) // 5. ShowProcesses & 6. HideProcesses
 	{
 		if (_hideProcess) // Delete hidden processes
 		{
@@ -143,7 +147,7 @@ void ProcessView::Update(bool redraw)
 
 				for (unsigned int j = 0; j < processes.size(); j++)
 				{
-					if (puid == processes[j].puid && processes[i].dirty)
+					if (puid == processes[j].puid && processes[j].dirty)
 					{
 						ListViewUpdate(i, processes[j]);
 					}
@@ -163,8 +167,11 @@ void ProcessView::Update(bool redraw)
 						TCHAR szPUID[16];
 						Utils::ListViewGetText(_hList, j, 0, szPUID, 16);
 						int puid = _tstoi(szPUID);
-						found = true;
-						break;
+						if (puid == processes[i].puid)
+						{
+							found = true;
+							break;
+						}
 					}
 
 					if (!found)
@@ -185,12 +192,12 @@ void ProcessView::HideProcesses()
 {
 	_prevHideProcess = _hideProcess;
 	_hideProcess = true;
-	Update(false);
+	Update(false, false);
 }
 
 void ProcessView::ShowProcesses()
 {
 	_prevHideProcess = _hideProcess;
 	_hideProcess = false;
-	Update(false);
+	Update(false, false);
 }

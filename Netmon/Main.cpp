@@ -745,7 +745,7 @@ static void ProfileInit(HWND hWnd)
 	{
 		ProcessModel::HideProcess(hiddenProcesses[i]);
 	}
-	ProcessView::Update();
+	ProcessView::Update(true);
 
 	// Select default adapter
 	TCHAR szAdapter[256];

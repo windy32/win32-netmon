@@ -29,7 +29,7 @@ void ProcessModel::Init()
 	InitializeCriticalSection(&_cs);
 
 	// Update View
-	ProcessView::Update();
+	ProcessView::Update(true);
 }
 
 void ProcessModel::InitCallback(SQLiteRow *row)
@@ -190,7 +190,7 @@ void ProcessModel::ShowProcess(int puid)
 	if (index != -1)
 	{
 		// Update View
-		ProcessView::Update(true);
+		ProcessView::Update(false, true);
 
 		// Update Profile
 		std::vector<int> hiddenProcesses;
@@ -213,7 +213,7 @@ void ProcessModel::HideProcess(int puid)
 	if (index != -1)
 	{
 		// Update View
-		ProcessView::Update(true);
+		ProcessView::Update(false, true);
 
 		// Update Profile
 		std::vector<int> hiddenProcesses;
