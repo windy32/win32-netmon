@@ -26,6 +26,7 @@ STRINGTABLE
     IDS_MENU_VIEW_STATISTICS      "统计数据"
     IDS_MENU_VIEW_DETAIL          "报文记录"
     IDS_MENU_VIEW_ADAPTER         "适配器"
+	IDS_MENU_VIEW_SHOW_HIDDEN     "显示隐藏进程"
     IDS_MENU_OPTIONS              "选项"
     IDS_MENU_OPTIONS_LANGUAGE     "语言"
     IDS_MENU_OPTIONS_PREFERENCES  "选项..."

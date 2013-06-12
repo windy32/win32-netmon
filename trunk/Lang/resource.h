@@ -87,4 +87,6 @@
 #define IDS_MENU_PROCESS_SHOW                   40078
 #define IDS_MENU_PROCESS_HIDE                   40079
 
+#define IDS_MENU_VIEW_SHOW_HIDDEN               40080
+
 // Remember to update "Language.h"
