@@ -201,7 +201,6 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 		pi->local_port = 0;
 		pi->remote_port = 0;
 
-		Sleep(1);
 		return true;
 	}
 	else
