@@ -309,6 +309,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GdiWidget\GwLabel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwLabel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GdiWidget\GwLogHistogram.cpp"
 				>
 			</File>
