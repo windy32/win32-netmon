@@ -12,7 +12,7 @@ GwLabel::GwLabel(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const
 	_hFont = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, false);
 
 	// Set Color
-	SetDCPenColor(_hdcTarget, RGB(0, 0, 0));
+	SetTextColor(_hdcTarget, RGB(0, 0, 0));
 }
 
 GwLabel::~GwLabel()

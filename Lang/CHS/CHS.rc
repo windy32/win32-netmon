@@ -61,6 +61,7 @@ STRINGTABLE
     IDS_MTVIEW_TEXT_KB_MB         "%s - %s (收到数据: %d KB / 发送数据: %d MB)"
     IDS_MTVIEW_TEXT_MB_KB         "%s - %s (收到数据: %d MB / 发送数据: %d KB)"
     IDS_MTVIEW_TEXT_MB_MB         "%s - %s (收到数据: %d MB / 发送数据: %d MB)"
+	IDS_STVIEW_SUMMARY            "综合信息"
     IDS_STVIEW_AVG_TX_PKT_SIZE    "平均上行报文大小"
     IDS_STVIEW_AVG_RX_PKT_SIZE    "平均下行报文大小"
     IDS_STVIEW_TX_IDLE_RATIO      "上行空闲率"
