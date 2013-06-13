@@ -58,6 +58,7 @@
 #define IDS_STVIEW_RATE                         40051
 #define IDS_STVIEW_TX                           40052
 #define IDS_STVIEW_RX                           40053
+
 #define IDS_DTVIEW_LIST_UID                     40054
 #define IDS_DTVIEW_LIST_PROCESS                 40055
 #define IDS_DTVIEW_LIST_DIR                     40056
@@ -88,5 +89,12 @@
 #define IDS_MENU_PROCESS_HIDE                   40079
 
 #define IDS_MENU_VIEW_SHOW_HIDDEN               40080
+
+#define IDS_STVIEW_AVG_TX_PKT_SIZE              40081
+#define IDS_STVIEW_AVG_RX_PKT_SIZE              40082
+#define IDS_STVIEW_TX_IDLE_RATIO                40084
+#define IDS_STVIEW_RX_IDLE_RATIO                40083
+#define IDS_STVIEW_AVG_TX_RATE                  40085
+#define IDS_STVIEW_AVG_RX_RATE                  40086
 
 // Remember to update "Language.h"
