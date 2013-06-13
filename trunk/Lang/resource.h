@@ -90,11 +90,12 @@
 
 #define IDS_MENU_VIEW_SHOW_HIDDEN               40080
 
-#define IDS_STVIEW_AVG_TX_PKT_SIZE              40081
-#define IDS_STVIEW_AVG_RX_PKT_SIZE              40082
+#define IDS_STVIEW_SUMMARY                      40081
+#define IDS_STVIEW_AVG_TX_PKT_SIZE              40082
+#define IDS_STVIEW_AVG_RX_PKT_SIZE              40083
 #define IDS_STVIEW_TX_IDLE_RATIO                40084
-#define IDS_STVIEW_RX_IDLE_RATIO                40083
-#define IDS_STVIEW_AVG_TX_RATE                  40085
-#define IDS_STVIEW_AVG_RX_RATE                  40086
+#define IDS_STVIEW_RX_IDLE_RATIO                40085
+#define IDS_STVIEW_AVG_TX_RATE                  40086
+#define IDS_STVIEW_AVG_RX_RATE                  40087
 
 // Remember to update "Language.h"

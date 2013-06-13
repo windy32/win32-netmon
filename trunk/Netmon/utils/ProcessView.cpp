@@ -16,7 +16,7 @@ void ProcessView::Init(HWND hList)
 
 	Utils::ListViewInit(_hList, FALSE, 5, 
 		TEXT("UID"), TEXT("Process"), TEXT("Tx Rate"), TEXT("Rx Rate"), TEXT("Full Path"), 
-		50, 140, 70, 70, 300);
+		50, 150, 70, 70, 400);
 
 	// Init Model
 	ProcessModel::Init();

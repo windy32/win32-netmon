@@ -88,7 +88,7 @@ void StatisticsView::DrawGraph()
 	// Rectangle for PacketSize Box
 	int psz_x      = ptl_x + ptl_width + 16;
 	int psz_y      = 8;
-	int psz_width  = 200;
+	int psz_width  = 160;
 	int psz_height = _height - 8 - 10 ;
 
 	// Rectangle for protocol box's content
@@ -100,7 +100,7 @@ void StatisticsView::DrawGraph()
 	// Rectangle for Rate Box
 	int rte_x      = psz_x + psz_width + 16;
 	int rte_y      = 8;
-	int rte_width  = 200;
+	int rte_width  = 160;
 	int rte_height = _height - 8 - 10 ;
 
 	// Rectangle for rate box's content
@@ -117,23 +117,10 @@ void StatisticsView::DrawGraph()
 	Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
 
 	// Summary --------------------------------------------------------------------------------------------------------
-	if (_process == PROCESS_ALL)
-	{
-		GwGroupbox boxSummay(_hdcBuf, smr_x, smr_y, smr_width, smr_height,
-			Language::GetString(IDS_ALL_PROCESS), RGB(0x30, 0x51, 0x9B));
-		boxSummay.Paint();
-		boxSummay.GetContentArea(&smrct_x, &smrct_y, &smrct_width, &smrct_height);
-	}
-	else
-	{
-		TCHAR buf[MAX_PATH];
-		ProcessModel::GetProcessName(_process, buf, MAX_PATH);
-
-		GwGroupbox boxSummay(_hdcBuf, smr_x, smr_y, smr_width, smr_height,
-			buf, RGB(0x30, 0x51, 0x9B));
-		boxSummay.Paint();
-		boxSummay.GetContentArea(&smrct_x, &smrct_y, &smrct_width, &smrct_height);
-	}
+	GwGroupbox boxSummay(_hdcBuf, smr_x, smr_y, smr_width, smr_height,
+		Language::GetString(IDS_STVIEW_SUMMARY), RGB(0x30, 0x51, 0x9B));
+	boxSummay.Paint();
+	boxSummay.GetContentArea(&smrct_x, &smrct_y, &smrct_width, &smrct_height);
 
 	__int64 avgTxPacketSize = 0;
 	__int64 avgRxPacketSize = 0;
@@ -147,46 +134,48 @@ void StatisticsView::DrawGraph()
 		txPacketCount += item.txPacketSize[i];
 		rxPacketCount += item.rxPacketSize[i];
 	}
-	avgTxPacketSize /= txPacketCount;
-	avgRxPacketSize /= rxPacketCount;
+	avgTxPacketSize = (txPacketCount == 0) ? 0 : avgTxPacketSize / txPacketCount;
+	avgRxPacketSize = (rxPacketCount == 0) ? 0 : avgRxPacketSize / rxPacketCount;
 
 	__int64 avgTxRate = 0;
 	__int64 avgRxRate = 0;
 	__int64 txSecondCount = 0;
 	__int64 rxSecondCount = 0;
 
-	for (int i = 0; i < 1025; i++) // 0 to 1024+ KB/s
+	for (int i = 1; i < 1025; i++) // 0 to 1024+ KB/s
 	{
 		avgTxRate += i * item.txRate[i];
 		avgRxRate += i * item.rxRate[i];
 		txSecondCount += item.txRate[i];
 		rxSecondCount += item.rxRate[i];
 	}
-	avgTxRate /= txSecondCount;
-	avgRxRate /= rxSecondCount;
+	avgTxRate = (txSecondCount == 0) ? 0 : avgTxRate / txSecondCount;
+	avgRxRate = (rxSecondCount == 0) ? 0 : avgRxRate / rxSecondCount;
 
-	int txIdleRatio = (int)(item.txRate[0] * 1000 / txSecondCount); // 0.0% ~ 100.0%
-	int rxIdleRatio = (int)(item.rxRate[0] * 1000 / rxSecondCount);
+	int txIdleRatio = (txSecondCount + item.txRate[0] == 0) ? 0 : 
+		(int)(item.txRate[0] * 1000 / (txSecondCount + item.txRate[0])); // 0.0% ~ 100.0%
+	int rxIdleRatio = (rxSecondCount + item.rxRate[0] == 0) ? 0 : 
+		(int)(item.rxRate[0] * 1000 / (rxSecondCount + item.rxRate[0]));
 
 	TCHAR buf[64];
 
 	_stprintf_s(buf, 64, TEXT("%s: %I64d"), Language::GetString(IDS_STVIEW_AVG_TX_PKT_SIZE), avgTxPacketSize);
-	GwLabel lblAverageTxPacketSize(_hdcBuf, smrct_x, smrct_y + 10, smrct_width, smrct_height, buf);
+	GwLabel lblAverageTxPacketSize(_hdcBuf, smrct_x, smrct_y + 4, smrct_width, smrct_height, buf);
 
 	_stprintf_s(buf, 64, TEXT("%s: %I64d"), Language::GetString(IDS_STVIEW_AVG_RX_PKT_SIZE), avgRxPacketSize);
-	GwLabel lblAverageRxPacketSize(_hdcBuf, smrct_x, smrct_y + 30, smrct_width, smrct_height, buf);
+	GwLabel lblAverageRxPacketSize(_hdcBuf, smrct_x, smrct_y + 24, smrct_width, smrct_height, buf);
 
 	_stprintf_s(buf, 64, TEXT("%s: %d.%d%%"), Language::GetString(IDS_STVIEW_TX_IDLE_RATIO), txIdleRatio / 10, txIdleRatio % 10);
-	GwLabel lblTxIdleRatio(_hdcBuf, smrct_x, smrct_y + 50, smrct_width, smrct_height, buf);
+	GwLabel lblTxIdleRatio(_hdcBuf, smrct_x, smrct_y + 44, smrct_width, smrct_height, buf);
 
 	_stprintf_s(buf, 64, TEXT("%s: %d.%d%%"), Language::GetString(IDS_STVIEW_RX_IDLE_RATIO), rxIdleRatio / 10, rxIdleRatio % 10);
-	GwLabel lblRxIdleRatio(_hdcBuf, smrct_x, smrct_y + 70, smrct_width, smrct_height, buf);
+	GwLabel lblRxIdleRatio(_hdcBuf, smrct_x, smrct_y + 64, smrct_width, smrct_height, buf);
 
 	_stprintf_s(buf, 64, TEXT("%s: %I64d KB/s"), Language::GetString(IDS_STVIEW_AVG_TX_RATE), avgTxRate);
-	GwLabel lblAverageTxRate(_hdcBuf, smrct_x, smrct_y + 90, smrct_width, smrct_height, buf);
+	GwLabel lblAverageTxRate(_hdcBuf, smrct_x, smrct_y + 84, smrct_width, smrct_height, buf);
 
 	_stprintf_s(buf, 64, TEXT("%s: %I64d KB/s"), Language::GetString(IDS_STVIEW_AVG_RX_RATE), avgRxRate);
-	GwLabel lblAverageRxRate(_hdcBuf, smrct_x, smrct_y + 110, smrct_width, smrct_height, buf);
+	GwLabel lblAverageRxRate(_hdcBuf, smrct_x, smrct_y + 104, smrct_width, smrct_height, buf);
 
 	lblAverageTxPacketSize.Paint();
 	lblAverageRxPacketSize.Paint();
@@ -278,10 +267,10 @@ void StatisticsView::DrawGraph()
 
 	GwLogHistogram txRteHistogram(_hdcBuf, 
 		rtect_x, rtect_y, rtect_width, rtect_height / 2, 
-		item.txRate, 1025, rteScales, 3, Language::GetString(IDS_STVIEW_TX), RGB(0xDF, 0x00, 0x24), 4, 4);
+		item.txRate + 1, 1025 - 1, rteScales, 3, Language::GetString(IDS_STVIEW_TX), RGB(0xDF, 0x00, 0x24), 4, 4);
 	GwLogHistogram rxRteHistogram(_hdcBuf, 
 		rtect_x, rtect_y + rtect_height / 2, rtect_width, rtect_height / 2, 
-		item.rxRate, 1025, rteScales, 3, Language::GetString(IDS_STVIEW_RX), RGB(0x31, 0x77, 0xC1), 4, 4);
+		item.rxRate + 1, 1025 - 1, rteScales, 3, Language::GetString(IDS_STVIEW_RX), RGB(0x31, 0x77, 0xC1), 4, 4);
 
 	txRteHistogram.Paint();
 	rxRteHistogram.Paint();

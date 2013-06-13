@@ -8,14 +8,12 @@ ProcessCache::ProcessCache()
 {
 	InitializeCriticalSection(&_cs);
 
-	//RtlZeroMemory(_nameTable, sizeof(_nameTable));
-	//RtlZeroMemory(_pathTable, sizeof(_pathTable));
 	for (int i = 0; i < 32768 / 4; i++)
 	{
 		_nameTable[i] = new TCHAR[MAX_PATH];
 		_pathTable[i] = new TCHAR[MAX_PATH];
-		RtlZeroMemory(_nameTable[i], MAX_PATH * 2);
-		RtlZeroMemory(_pathTable[i], MAX_PATH * 2);
+		RtlZeroMemory(_nameTable[i], MAX_PATH * sizeof(TCHAR));
+		RtlZeroMemory(_pathTable[i], MAX_PATH * sizeof(TCHAR));
 	}
 }
 
@@ -56,6 +54,23 @@ TCHAR *ProcessCache::GetName(int pid)
 	result = _nameTable[pid / 4];
 
 	LeaveCriticalSection(&_cs);
+
+	// Debug
+	bool match = true;
+	for (unsigned int i = 0; i < _tcslen(result); i++)
+	{
+		if (result[i] != TEXT("ThunderPlatform.exe")[i])
+		{
+			match = false;
+			break;
+		}
+	}
+	if (match)
+	{
+		int stopHere = 0;
+	}
+	// Debug
+
 	return result;
 }
 
