@@ -397,8 +397,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		// - Get Process Name & Full Path
 		if( pid != -1 )
 		{
-			_tcscpy_s(processName, MAX_PATH, ProcessCache::instance()->GetName(pid));
-			_tcscpy_s(processFullPath, MAX_PATH, ProcessCache::instance()->GetFullPath(pid));
+			ProcessCache::instance()->GetName(pid, processName, MAX_PATH);
+			ProcessCache::instance()->GetFullPath(pid, processFullPath, MAX_PATH);
 
 			if (processName[0] == TEXT('\0')) // Cannot get process name from the table
 			{

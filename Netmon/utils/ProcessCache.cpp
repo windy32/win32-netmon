@@ -29,74 +29,30 @@ ProcessCache *ProcessCache::instance()
 	return _instance;
 }
 
-TCHAR *ProcessCache::GetName(int pid)
+void ProcessCache::GetName(int pid, TCHAR *buf, int cchLen)
 {
-	bool rebuild = false;
-	TCHAR *result;
 	EnterCriticalSection(&_cs);
 	
 	if (_tcslen(_nameTable[pid / 4]) == 0)
 	{
-		rebuild = true; // For debugging
-		Utils::DbgPrint(TEXT("Rebuild Table...\n")); // For debugging
-
 		rebuildTable();
-		result = _nameTable[pid / 4];
-		if (_tcslen(result) == 0)
-		{
-			Utils::DbgPrint(TEXT("PID %d Not Found\n"), pid);
-		}
-		else
-		{
-			Utils::DbgPrint(TEXT("PID %d : \"%s\"\n"), pid, _nameTable[pid / 4]);
-		}
 	}
-	result = _nameTable[pid / 4];
+	_tcscpy_s(buf, cchLen, _nameTable[pid / 4]);
 
 	LeaveCriticalSection(&_cs);
-
-	// Debug
-	bool match = true;
-	for (unsigned int i = 0; i < _tcslen(result); i++)
-	{
-		if (result[i] != TEXT("ThunderPlatform.exe")[i])
-		{
-			match = false;
-			break;
-		}
-	}
-	if (match)
-	{
-		int stopHere = 0;
-	}
-	// Debug
-
-	return result;
 }
 
-TCHAR *ProcessCache::GetFullPath(int pid)
+void ProcessCache::GetFullPath(int pid, TCHAR *buf, int cchLen)
 {
-	TCHAR *result;
 	EnterCriticalSection(&_cs);
 
 	if (_tcslen(_pathTable[pid / 4]) == 0)
 	{
-		Utils::DbgPrint(TEXT("Rebuild Table...\n")); // For debugging
 		rebuildTable();
-		result = _pathTable[pid / 4];
-		if (_tcslen(result) == 0)
-		{
-			Utils::DbgPrint(TEXT("PID %d Not Found\n"), pid);
-		}
-		else
-		{
-			Utils::DbgPrint(TEXT("PID %d : \"%s\"\n"), pid, _pathTable[pid / 4]);
-		}
 	}
-	result = _tcslen(_pathTable[pid / 4]) == 0 ? TEXT("-") : _pathTable[pid / 4];
+	_tcscpy_s(buf, cchLen, _pathTable[pid / 4]);
 
 	LeaveCriticalSection(&_cs);
-	return result;
 }
 
 BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
@@ -109,15 +65,6 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
 		rebuildTable(false);
 	}
 	result =  (_tcscmp(_nameTable[pid / 4], name) == 0) ? TRUE : FALSE;
-
-	if (result == TRUE) // For debugging
-	{
-		// Utils::DbgPrint(TEXT("PID %d, \"%s\" is alive\n"), pid, name);
-	}
-	else
-	{
-		Utils::DbgPrint(TEXT("PID %d, \"%s\" is dead\n"), pid, name);
-	}
 
 	LeaveCriticalSection(&_cs);
 	return result;
@@ -157,7 +104,7 @@ void ProcessCache::rebuildTable(bool dump)
 		}
 		else
 		{
-			TCHAR fullPath[260];
+			TCHAR fullPath[MAX_PATH];
 			_tcscpy_s(_nameTable[pid / 4], MAX_PATH, processName);
 			if (GetModuleFileNameEx(hProcess, 0, fullPath, MAX_PATH) > 0) // Success
 			{
@@ -166,10 +113,6 @@ void ProcessCache::rebuildTable(bool dump)
 			else
 			{
 				_tcscpy_s(_pathTable[pid / 4], MAX_PATH, TEXT("-"));
-			}
-			if (dump)
-			{
-				Utils::DbgPrint(TEXT("   PID = %d, Name = \"%s\", FullPath = \"%s\"\n"), pid, processName, fullPath);
 			}
 		}
 		CloseHandle(hProcess);
