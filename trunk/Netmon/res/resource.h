@@ -15,7 +15,6 @@
 #define IDB_START_HOVER                         122
 #define IDB_STOP                                124
 #define IDB_STOP_HOVER                          126
-#define CUR_VSPLIT                              128
 #define IDS_SIDEBAR                             1001
 #define IDE_THIRD_PARTY                         1002
 #define IDB_PAGEUP                              1003

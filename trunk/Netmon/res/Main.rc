@@ -218,14 +218,6 @@ FONT 9, "MS Shell Dlg 2", 0, 0, 0
 
 
 //
-// Cursor resources
-//
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-CUR_VSPLIT         CURSOR         ".\\vsplit.cur"
-
-
-
-//
 // Icon resources
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL

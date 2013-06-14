@@ -90,6 +90,9 @@ NetmonProfile  g_profile;
 // View Setting
 static bool    g_bShowHidden;
 
+// Splitter
+static bool    g_bDragging = false;
+
 #pragma endregion
 
 ///----------------------------------------------------------------------------------------------//
@@ -1443,6 +1446,8 @@ static void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int x = GET_X_LPARAM(lParam); 
 	int y = GET_Y_LPARAM(lParam); 
 
+	Utils::DbgPrint(TEXT("MouseMove (%d, %d)\n"), x, y);
+
 	enum enumHoverState newState = Neither;
 	if (x >= 15 && x < 33)
 	{
@@ -1464,6 +1469,63 @@ static void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			g_enumHoverState = newState;
 			DrawSidebar();
 		}
+	}
+
+	// Update Cursor
+	RECT stListRect;
+	GetWindowRect(GetDlgItem(hWnd, IDL_PROCESS), &stListRect);
+
+	if (x > 50 && 
+		y > stListRect.bottom - stListRect.top && 
+		y < stListRect.bottom - stListRect.top + 10)
+	{
+		HCURSOR hCursor = LoadCursor(NULL, IDC_SIZENS);
+		SetCursor(hCursor);
+	}
+	else
+	{
+		HCURSOR hCursor = LoadCursor(NULL, IDC_ARROW);
+		SetCursor(hCursor);
+	}
+
+	// Drag
+	if (g_bDragging)
+	{
+		// Move Window
+		RECT stClientRect;
+		GetClientRect(hWnd, &stClientRect);
+		int clientWidth = stClientRect.right - stClientRect.left;
+		int clientHeight = stClientRect.bottom - stClientRect.top;
+
+		int listHeight = min(y, clientHeight - 255);
+		listHeight = max(134, listHeight);
+		int tabHeight = clientHeight - listHeight - 12;
+
+		MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 
+			50 - 1, 
+			0, 
+			clientWidth - 50 + 2, 
+			listHeight, 
+			TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 
+			50 + 6, 
+			listHeight + 6, 
+			clientWidth - 50 - 12, 
+			tabHeight, 
+			TRUE);
+
+		// Resize the Child Window in Tab Control
+		RECT stRect;
+		GetWindowRect(GetDlgItem(hWnd, IDT_VIEW), &stRect);
+
+		stRect.bottom -= stRect.top;
+		stRect.right -= stRect.left;
+		stRect.left = 0;
+		stRect.top = 0;
+
+		TabCtrl_AdjustRect(GetDlgItem(hWnd, IDT_VIEW), FALSE, &stRect);
+
+		SetWindowPos(g_hCurPage, HWND_TOP, stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, SWP_SHOWWINDOW);
 	}
 }
 
@@ -1506,6 +1568,31 @@ static void OnLButtonDown(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			DrawSidebar();
 		}
 	}
+
+	// Drag Start
+	RECT stListRect;
+	GetWindowRect(GetDlgItem(hWnd, IDL_PROCESS), &stListRect);
+
+	if (x > 50 && 
+		y > stListRect.bottom - stListRect.top && 
+		y < stListRect.bottom - stListRect.top + 10)
+	{
+		g_bDragging = true;
+		SetCapture(hWnd);
+	}
+}
+
+static void OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	// Get Mouse Position
+	int x = GET_X_LPARAM(lParam); 
+	int y = GET_Y_LPARAM(lParam); 
+
+	if (g_bDragging)
+	{
+		g_bDragging = false;
+		ReleaseCapture();
+	}
 }
 
 ///----------------------------------------------------------------------------------------------//
@@ -1517,6 +1604,7 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	PROCESS_MSG(WM_MOUSEMOVE,       OnMouseMove)
 	PROCESS_MSG(WM_LBUTTONDOWN,     OnLButtonDown)
+	PROCESS_MSG(WM_LBUTTONUP,       OnLButtonUp)
 	PROCESS_MSG(WM_INITDIALOG,      OnInitDialog)    // Init
 	PROCESS_MSG(WM_CLOSE,           OnClose)
 	PROCESS_MSG(WM_QUERYENDSESSION, OnQueryEndSession)
