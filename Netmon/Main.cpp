@@ -1417,7 +1417,7 @@ static void OnGetMinMaxInfo(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	stMMI->ptMaxPosition.x = 0;
 	stMMI->ptMaxPosition.y = 0;
 
-	stMMI->ptMinTrackSize.x = 850;
+	stMMI->ptMinTrackSize.x = 855;
 	stMMI->ptMinTrackSize.y = 446;
 
 	stMMI->ptMaxTrackSize.x = GetSystemMetrics(SM_CXFULLSCREEN);
