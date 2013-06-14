@@ -1266,6 +1266,17 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	// Start the Timer that Updates Process List
 	SetTimer(hWnd, 1, 1000, OnTimer);
 
+	// Check Data for MonthView
+	if( Utils::GetExMonth() < g_mtModel->GetFirstMonth())
+	{
+		MessageBox(g_hDlgMain, 
+			TEXT("An invalid date is detected.\n")
+			TEXT("Please check system date settings."), TEXT("Error"), MB_OK | MB_ICONWARNING);
+
+		EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
+		return;
+	}
+
 	// Init profile
 	ProfileInit(hWnd);
 }
