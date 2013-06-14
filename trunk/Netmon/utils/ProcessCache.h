@@ -35,8 +35,8 @@ protected:
 public:
 	static ProcessCache *instance();
 
-	TCHAR *GetName(int pid);
-	TCHAR *GetFullPath(int pid);
+	void GetName(int pid, TCHAR *buf, int cchLen);
+	void GetFullPath(int pid, TCHAR *buf, int cchLen);
 	BOOL IsProcessAlive(int pid, const TCHAR *name, bool rebuild);
 };
 
