@@ -65,7 +65,7 @@ void StatisticsView::DrawGraph()
 	// Rectangle for summary box
 	int smr_x      = 12;
 	int smr_y      = 8;
-	int smr_width  = 160;
+	int smr_width  = 165;
 	int smr_height = _height - 8 - 10;
 
 	int smrct_x      = 0;
