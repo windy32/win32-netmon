@@ -190,55 +190,50 @@ void StatisticsView::DrawGraph()
 	boxProtocol.Paint();
 	boxProtocol.GetContentArea(&ptlct_x, &ptlct_y, &ptlct_width, &ptlct_height);
 
-	COLORREF colors[5] = 
+	COLORREF colors[4] = 
 	{
 		RGB(0xB0, 0xC4, 0xDE),
 		RGB(0x9A, 0xCD, 0x32),
 		RGB(0xDE, 0xD8, 0x87),
-		RGB(0x64, 0x95, 0xED),
 		RGB(0xC6, 0xE2, 0xFF)
 	};
 
-	const TCHAR *txDescs[5] = 
+	const TCHAR *txDescs[4] = 
 	{
 		Language::GetString(IDS_STVIEW_TX_TCP),
 		Language::GetString(IDS_STVIEW_TX_UDP),
 		Language::GetString(IDS_STVIEW_TX_ICMP),
-		Language::GetString(IDS_STVIEW_TX_IGMP),
 		Language::GetString(IDS_STVIEW_TX_OTHER),
 	};
 
-	__int64 txValues[5] = 
+	__int64 txValues[4] = 
 	{
 		item.tx.tcpBytes,
 		item.tx.udpBytes,
 		item.tx.icmpBytes,
-		item.tx.igmpBytes,
 		item.tx.otherBytes
 	};
 
-	const TCHAR *rxDescs[5] = 
+	const TCHAR *rxDescs[4] = 
 	{
 		Language::GetString(IDS_STVIEW_RX_TCP),
 		Language::GetString(IDS_STVIEW_RX_UDP),
 		Language::GetString(IDS_STVIEW_RX_ICMP),
-		Language::GetString(IDS_STVIEW_RX_IGMP),
 		Language::GetString(IDS_STVIEW_RX_OTHER),
 	};
 
-	__int64 rxValues[5] = 
+	__int64 rxValues[4] = 
 	{
 		item.rx.tcpBytes,
 		item.rx.udpBytes,
 		item.rx.icmpBytes,
-		item.rx.igmpBytes,
 		item.rx.otherBytes
 	};
 
-	GwPieChart txPieChart(_hdcBuf, ptlct_x, ptlct_y, ptlct_width, (ptlct_height - 4) / 2, txDescs, colors, txValues, 5);
+	GwPieChart txPieChart(_hdcBuf, ptlct_x, ptlct_y, ptlct_width, (ptlct_height - 4) / 2, txDescs, colors, txValues, 4);
 	txPieChart.Paint();
 
-	GwPieChart rxPieChart(_hdcBuf, ptlct_x, ptlct_y + (ptlct_height - 4) / 2 + 4, ptlct_width, ptlct_height / 2, rxDescs, colors, rxValues, 5);
+	GwPieChart rxPieChart(_hdcBuf, ptlct_x, ptlct_y + (ptlct_height - 4) / 2 + 4, ptlct_width, ptlct_height / 2, rxDescs, colors, rxValues, 4);
 	rxPieChart.Paint();
 
 	// Packet Size ----------------------------------------------------------------------------------------------------

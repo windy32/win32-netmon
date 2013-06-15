@@ -53,14 +53,6 @@ void StatisticsModel::SaveDatabase()
 			it->second.rx.icmpPackets);
 		SQLite::Exec(command, true);
 
-		// IGMP
-		_stprintf_s(command, _countof(command), TEXT("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), puid, TRA_IGMP, 
-			it->second.tx.igmpBytes, 
-			it->second.rx.igmpBytes, 
-			it->second.tx.igmpPackets, 
-			it->second.rx.igmpPackets);
-		SQLite::Exec(command, true);
-
 		// OTHER
 		_stprintf_s(command, _countof(command), TEXT("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), puid, TRA_OTHER, 
 			it->second.tx.otherBytes, 
@@ -249,18 +241,6 @@ void StatisticsModel::InitDatabaseProtocolCallback(SQLiteRow *row)
 		svItemAll.rx.icmpPackets += rxPackets;
 		break;
 
-	case TRA_IGMP:
-		svItem.tx.igmpBytes = txBytes;
-		svItem.rx.igmpBytes = rxBytes;
-		svItem.tx.igmpPackets = txPackets;
-		svItem.rx.igmpPackets = rxPackets;
-
-		svItemAll.tx.igmpBytes += txBytes;
-		svItemAll.rx.igmpBytes += rxBytes;
-		svItemAll.tx.igmpPackets += txPackets;
-		svItemAll.rx.igmpPackets += rxPackets;
-		break;
-
 	case TRA_OTHER:
 		svItem.tx.otherBytes = txBytes;
 		svItem.rx.otherBytes = rxBytes;
@@ -371,11 +351,6 @@ void StatisticsModel::InsertPacket(PacketInfoEx *pi)
 			itemAll.tx.icmpBytes += pi->size;
 			break;
 
-		case TRA_IGMP:
-			item.tx.igmpBytes += pi->size;
-			itemAll.tx.igmpBytes += pi->size;
-			break;
-
 		case TRA_OTHER:
 			item.tx.otherBytes += pi->size;
 			itemAll.tx.otherBytes += pi->size;
@@ -411,11 +386,6 @@ void StatisticsModel::InsertPacket(PacketInfoEx *pi)
 		case TRA_ICMP:
 			item.rx.icmpBytes += pi->size;
 			itemAll.rx.icmpBytes += pi->size;
-			break;
-
-		case TRA_IGMP:
-			item.rx.igmpBytes += pi->size;
-			itemAll.rx.igmpBytes += pi->size;
 			break;
 
 		case TRA_OTHER:

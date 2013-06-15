@@ -9,7 +9,6 @@
 #define TRA_TCP   6
 #define TRA_UDP   17
 #define TRA_ICMP  1
-#define TRA_IGMP  2
 #define TRA_OTHER 0
 
 #define DIR_UP    1
