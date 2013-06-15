@@ -1279,16 +1279,6 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// Init profile
 	ProfileInit(hWnd);
-
-	// Hide the main window if started automatically
-	TCHAR netmonPath[MAX_PATH];
-	if (g_profile.GetAutoStart(netmonPath, MAX_PATH))
-	{
-		if (_tcslen(netmonPath) > 0)
-		{
-			ShowWindow(hWnd, SW_HIDE);
-		}
-	}
 }
 
 static void OnClose(HWND hWnd, WPARAM wParam, LPARAM lParam)
