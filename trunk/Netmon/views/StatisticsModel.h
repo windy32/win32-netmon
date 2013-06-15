@@ -15,13 +15,11 @@ public:
 			__int64 tcpPackets;
 			__int64 udpPackets;
 			__int64 icmpPackets;
-			__int64 igmpPackets;
 			__int64 otherPackets;
 
 			__int64 tcpBytes;
 			__int64 udpBytes;
 			__int64 icmpBytes;
-			__int64 igmpBytes;
 			__int64 otherBytes;
 		} rx, tx;
 

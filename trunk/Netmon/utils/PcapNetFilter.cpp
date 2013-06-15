@@ -284,10 +284,6 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 		{
 			pi->trasportProtocol = TRA_ICMP;
 		}
-		else if( ih->protocol == 2 )
-		{
-			pi->trasportProtocol = TRA_IGMP;
-		}
 	}
 	else if( mh->protocol == htons(0x0806))
 	{

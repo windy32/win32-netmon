@@ -83,8 +83,7 @@ void DetailView::ListViewInsert(int uid, int puid, int dir, int protocol, int si
 		Language::GetString(IDS_DTVIEW_LIST_RX));
 	_stprintf_s(szColumn[3], MAX_PATH, (protocol == TRA_TCP) ? TEXT("TCP") : 
 	                                   (protocol == TRA_UDP) ? TEXT("UDP") : 
-	                                   (protocol == TRA_ICMP) ? TEXT("ICMP") : 
-	                                   (protocol == TRA_IGMP) ? TEXT("IGMP") : TEXT("OTHER"));
+	                                   (protocol == TRA_ICMP) ? TEXT("ICMP") : TEXT("OTHER"));
 	_stprintf_s(szColumn[4], MAX_PATH, TEXT("%d"), size);
 	_stprintf_s(szColumn[5], MAX_PATH, szDateTime);
 
