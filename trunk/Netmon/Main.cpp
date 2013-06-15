@@ -93,6 +93,9 @@ static bool    g_bShowHidden;
 // Splitter
 static bool    g_bDragging = false;
 
+// Options -h
+static bool    g_bHideWindow = false;
+
 #pragma endregion
 
 ///----------------------------------------------------------------------------------------------//
@@ -1279,6 +1282,12 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// Init profile
 	ProfileInit(hWnd);
+
+	// Show window if option "-h" is not present
+	if (!g_bHideWindow)
+	{
+		ShowWindow(hWnd, SW_SHOW);
+	}
 }
 
 static void OnClose(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -1661,6 +1670,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 	else
 	{
 		g_iCurLanguage = 0; // Select some language as current
+	}
+
+	// Option "-h"
+	if (strcmp(lpCmdLine, "-h") == 0)
+	{
+		g_bHideWindow = true;
 	}
 
 	// Display the window

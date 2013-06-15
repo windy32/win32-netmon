@@ -43,7 +43,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdS
 	}
 	else if( lpCmdLine[0] != 0 )// Enable AutoRun
 	{
-		RegSetValueEx(hRunKey, TEXT("Netmon"), 0, REG_SZ, (BYTE *)lpCmdLine, _tcslen(lpCmdLine) * sizeof(TCHAR) + 1);
+		TCHAR cmd[MAX_PATH];
+		_stprintf_s(cmd, MAX_PATH, TEXT("\"%s\" -h"), lpCmdLine);
+		RegSetValueEx(hRunKey, TEXT("Netmon"), 0, REG_SZ, (BYTE *)cmd, _tcslen(cmd) * sizeof(TCHAR) + 1);
 	}
 	else // No argument, do nothing
 	{
