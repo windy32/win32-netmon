@@ -188,6 +188,7 @@ void MonthModel::InsertPacket(PacketInfoEx *pi)
 
 void MonthModel::Export(int process, int curMonth, MonthItem &item)
 {
+	Fill();
 	Lock();
 	if (_items.count(process) != 0)
 	{
