@@ -107,24 +107,26 @@ void MonthView::DrawGraph()
 	maxTraffic /= (1024 * 1024); // Unit is now MB
 
 	// Decide Scale
-	//    1.  (    0 MB,    50 MB]    50,    40,    30,    20     10,    0
-	//    2.  (    0 MB,   100 MB]   100,    80,    60,    40,    20,    0
-	//    3.  (  100 MB,   200 MB]   200,   150,   100,    50,     0
-	//    4.  (  200 MB,   500 MB]   500,   400,   300,   200,   100,    0
-	//    5.  (  500 MB,  1000 MB]  1000,   800,   600,   400,   200,    0
-	//    6.  ( 1000 MB,  2000 MB]  2000,  1500,  1000,   500,     0
-	//    7.  ( 2000 MB,  5000 MB]  5000,  4000,  3000,  2000,  1000,    0
-	//    8.  ( 5000 MB, 10000 MB] 10000,  8000,  6000,  4000,  2000,    0
-	//    9.  (10000 MB, 20000 MB] 20000, 15000, 10000,  5000,     0,
-	//    10. (20000 MB, 50000 MB] 50000, 40000, 30000, 20000, 10000,    0
+	//    1.  (    0 MB,    10 MB]    10,     8,     6,     4,     2,    0
+	//    2.  (   10 MB,    20 MB]    20,    15,    10,     5,     0
+	//    3.  (   20 MB,    50 MB]    50,    40,    30,    20,    10,    0
+	//    4.  (   50 MB,   100 MB]   100,    80,    60,    40,    20,    0
+	//    5.  (  100 MB,   200 MB]   200,   150,   100,    50,     0
+	//    6.  (  200 MB,   500 MB]   500,   400,   300,   200,   100,    0
+	//    7.  (  500 MB,  1000 MB]  1000,   800,   600,   400,   200,    0
+	//    8.  ( 1000 MB,  2000 MB]  2000,  1500,  1000,   500,     0
+	//    9.  ( 2000 MB,  5000 MB]  5000,  4000,  3000,  2000,  1000,    0
+	//    10. ( 5000 MB, 10000 MB] 10000,  8000,  6000,  4000,  2000,    0
+	//    11. (10000 MB, 20000 MB] 20000, 15000, 10000,  5000,     0,
+	//    12. (20000 MB, 50000 MB] 50000, 40000, 30000, 20000, 10000,    0
 	//    ( ...More traffic are not currently supported )
-	const int traffic[10] = {50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000};
-	const int segments[10] = {5, 5, 4, 5, 5, 4, 5, 5, 4, 5};
+	const int traffic[12] = {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000};
+	const int segments[12] = {5, 4, 5, 5, 4, 5, 5, 4, 5, 5, 4, 5};
 
 	int numSegment = 0;
 	int scaleTraffic;
 
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 12; i++)
 	{
 		if( maxTraffic <= traffic[i] )
 		{
@@ -136,8 +138,8 @@ void MonthView::DrawGraph()
 
 	if( numSegment == 0 ) // More than 50000 MB
 	{
-		scaleTraffic = traffic[10 - 1];
-		numSegment = segments[10 - 1];
+		scaleTraffic = traffic[12 - 1];
+		numSegment = segments[12 - 1];
 	}
 
 	// Clear Background
@@ -244,8 +246,8 @@ void MonthView::DrawGraph()
 
 	for(int i = 0; i < numDays; i++)
 	{
-		int rxTraffic = (int)(item.dayRx[i] >> 20);
-		int yPos = (y2 - y1) * rxTraffic / scaleTraffic;
+		int rxTraffic = (int)(item.dayRx[i] >> 15);
+		int yPos = (y2 - y1) * rxTraffic / (32 * scaleTraffic);
 
 		Rectangle(_hdcBuf, x1 + 4 + colWidth * i, y2 - yPos - 1, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2);
 	}
@@ -255,8 +257,8 @@ void MonthView::DrawGraph()
 
 	for(int i = 0; i < numDays; i++)
 	{
-		int txTraffic = (int)(item.dayTx[i] >> 20);
-		int yPos = (y2 - y1) * txTraffic / scaleTraffic;
+		int txTraffic = (int)(item.dayTx[i] >> 15);
+		int yPos = (y2 - y1) * txTraffic / (32 * scaleTraffic);
 
 		Rectangle(_hdcBuf, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2 - yPos - 1, x1 + colWidth - 4 + colWidth * i, y2);
 	}
