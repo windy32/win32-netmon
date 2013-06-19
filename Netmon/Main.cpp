@@ -1466,8 +1466,6 @@ static void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int x = GET_X_LPARAM(lParam); 
 	int y = GET_Y_LPARAM(lParam); 
 
-	Utils::DbgPrint(TEXT("MouseMove (%d, %d)\n"), x, y);
-
 	enum enumHoverState newState = Neither;
 	if (x >= 15 && x < 33)
 	{
