@@ -744,6 +744,27 @@ static void ProfileInit(HWND hWnd)
 	// Load Netmon.ini
 	g_profile.Load(g_szAdapterNames[g_iAdapter]);
 
+    // Set Default Language
+	TCHAR szLanguage[64];
+	g_profile.GetLanguage(szLanguage, 64);
+	for (int i = 0; i < g_nLanguage; i++)
+	{
+		TCHAR szEnglishName[64];
+		TCHAR szNativeName[64];
+		Language::GetName(i, szEnglishName, 64, szNativeName, 64);
+		if (_tcscmp(szEnglishName, szLanguage) == 0)
+		{
+			Language::Select(g_iCurLanguage = i);
+
+			// Update language menu radio button
+			HMENU hOptionsMenu = GetSubMenu(GetMenu(hWnd), 2);
+			HMENU hLanguageMenu = GetSubMenu(hOptionsMenu, 0);
+			CheckMenuRadioItem(hLanguageMenu, 0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
+
+			break;
+		}
+	}
+
 	// Update Hidden State
 	std::vector<int> hiddenProcesses;
 	g_profile.GetHiddenProcesses(hiddenProcesses);
@@ -923,6 +944,12 @@ static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
 		g_iCurLanguage = wParam - IDM_OPTIONS_LANGUAGE_FIRST;
 		Language::Select(g_iCurLanguage);
 		UpdateLanguage();
+
+		// Update Profile
+		TCHAR szEnglishName[64];
+		TCHAR szNativeName[64];
+		Language::GetName(g_iCurLanguage, szEnglishName, 64, szNativeName, 64);
+		g_profile.SetLanguage(szEnglishName);
 
 		// Update language menu radio button
 		HMENU hOptionsMenu = GetSubMenu(GetMenu(hWnd), 2);
@@ -1197,7 +1224,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	EnableMenuItem(hMainMenu, IDM_FILE_CAPTURE, MF_ENABLED);
 	EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
 	CheckMenuRadioItem(hMainMenu, IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
-	CheckMenuRadioItem(hLanguageMenu, 0, g_nLanguage - 1, 0, MF_BYPOSITION);
+	CheckMenuRadioItem(hLanguageMenu, 0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
 
 	CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED); // Hidden State
 	g_bShowHidden = true;
@@ -1260,9 +1287,6 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	g_stView.Init(g_stModel);
 	g_dtView.Init(g_dtModel);
 
-	// Update language
-	UpdateLanguage();
-
 	// Simulate Selection of the First Item. 
 	OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
 
@@ -1282,6 +1306,9 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	// Init profile
 	ProfileInit(hWnd);
+
+	// Update language
+	UpdateLanguage();
 
 	// Show window if option "-h" is not present
 	if (!g_bHideWindow)
@@ -1665,9 +1692,20 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 		CloseHandle(hPipe);
 		return 1;
 	}
-	else
+	else // Select English as default if available
 	{
-		g_iCurLanguage = 0; // Select some language as current
+		TCHAR szEnglishName[64];
+		TCHAR szNativeName[64];
+		for (int i = 0; i < g_nLanguage; i++)
+		{
+			Language::GetName(i, szEnglishName, 64, szNativeName, 64);
+			if (_tcscmp(szEnglishName, TEXT("English")) == 0)
+			{
+				g_iCurLanguage = i;
+				break;
+			}
+		}
+		Language::Select(g_iCurLanguage);
 	}
 
 	// Option "-h"
