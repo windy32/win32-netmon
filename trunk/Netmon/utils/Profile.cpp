@@ -108,6 +108,12 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 			offset += _tcslen(buf) + 1;
 		}
 	}
+
+	if( _pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE )
+	{
+		SetLanguage(TEXT("English"));
+	}
+
 	return TRUE;
 }
 
@@ -221,6 +227,22 @@ BOOL NetmonProfile::SetHiddenProcesses(const std::vector<int> &processes)
 	if( _pf.SetString(TEXT("HiddenProcess"), buf) == TRUE )
 	{
 		_hiddenProcesses = processes;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL NetmonProfile::GetLanguage(TCHAR *szLanguage, int cchLen)
+{
+	_tcscpy_s(szLanguage, 64, _szLanguage);
+	return TRUE;
+}
+
+BOOL NetmonProfile::SetLanguage(const TCHAR *szLanguage)
+{
+	if (_pf.SetString(TEXT("Language"), szLanguage) == TRUE)
+	{
+		_tcscpy_s(_szLanguage, 64, szLanguage);
 		return TRUE;
 	}
 	return FALSE;
