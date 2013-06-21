@@ -128,7 +128,7 @@ void MonthView::DrawGraph()
 
 	for(int i = 0; i < 12; i++)
 	{
-		if( maxTraffic <= traffic[i] )
+		if( maxTraffic < traffic[i] )
 		{
 			scaleTraffic = traffic[i];
 			numSegment = segments[i];
