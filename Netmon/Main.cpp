@@ -1324,6 +1324,11 @@ static void OnClose(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnQueryEndSession(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	SetDlgMsgResult(hWnd, WM_QUERYENDSESSION, TRUE);
+}
+
+static void OnEndSession(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
 	OnExit(hWnd);
 }
 
@@ -1653,6 +1658,7 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	PROCESS_MSG(WM_INITDIALOG,      OnInitDialog)    // Init
 	PROCESS_MSG(WM_CLOSE,           OnClose)
 	PROCESS_MSG(WM_QUERYENDSESSION, OnQueryEndSession)
+	PROCESS_MSG(WM_ENDSESSION,      OnEndSession)
 	PROCESS_MSG(WM_COMMAND,         OnCommand)
 	PROCESS_MSG(WM_USER_TRAY,       OnUserTray)      // Tray icon messages
 	PROCESS_MSG(WM_PAINT,           OnPaint)
