@@ -62,6 +62,7 @@ protected:
 	int  _iDtViewMaxSpace;
 	std::vector<int> _hiddenProcesses;
 	TCHAR _szLanguage[64];
+	BOOL _bShowHidden;
 
 public:
 	// Netmon calls Load() at startup to get preferences from Netmon.ini.
@@ -94,6 +95,9 @@ public:
 
 	BOOL GetLanguage(TCHAR *szLanguage, int cchLen);
 	BOOL SetLanguage(const TCHAR *szLanguage);
+
+	BOOL GetShowHidden(BOOL *pShowHidden);
+	BOOL SetShowHidden(BOOL bShowHidden);
 };
 
 #endif

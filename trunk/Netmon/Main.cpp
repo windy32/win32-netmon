@@ -88,7 +88,7 @@ static int            g_iCurLanguage;
 NetmonProfile  g_profile;
 
 // View Setting
-static bool    g_bShowHidden;
+bool           g_bShowHidden;
 
 // Splitter
 static bool    g_bDragging = false;
@@ -801,6 +801,21 @@ static void ProfileInit(HWND hWnd)
 			SendMessage(hWnd, WM_COMMAND, IDM_FILE_CAPTURE, 0);
 		}
 	}
+
+	// Set the "Show Hidden Process" option
+	BOOL bShowHidden;
+	if (g_profile.GetShowHidden(&bShowHidden))
+	{
+		if (!bShowHidden) // Hide processes when necessary
+		{
+			ProcessView::HideProcesses();
+
+			HMENU hMenu = GetMenu(hWnd);
+			HMENU hViewMenu = GetSubMenu(hMenu, 1);
+			CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
+			g_bShowHidden = false;
+		}
+	}
 }
 
 ///----------------------------------------------------------------------------------------------// 
@@ -926,12 +941,14 @@ static void OnHiddenStateChanged(HWND hWnd)
 	{
 		ProcessView::HideProcesses();
 		CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
+		g_profile.SetShowHidden(FALSE);		
 		g_bShowHidden = false;
 	}
 	else // Hidden ->Visible
 	{
 		ProcessView::ShowProcesses();
 		CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED);
+		g_profile.SetShowHidden(TRUE);		
 		g_bShowHidden = true;
 	}
 }
