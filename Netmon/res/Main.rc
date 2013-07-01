@@ -230,7 +230,7 @@ ICO_MAIN           ICON           ".\\res\\Icon.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     1,3,1,0
+    FILEVERSION     1,4,0,0
     PRODUCTVERSION  0,0,0,0
     FILEOS          VOS__WINDOWS32
     FILETYPE        VFT_APP
@@ -245,7 +245,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "FileDescription", "Network Monitor for Windows"
             VALUE "LegalCopyright", "Copyright (C) 2011 - 2013 F32"
             VALUE "ProductName", "Netmon"
-            VALUE "ProductVersion", "1.3.1"
+            VALUE "ProductVersion", "1.4.0"
         }
     }
     BLOCK "VarFileInfo"
