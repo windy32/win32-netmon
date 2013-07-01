@@ -114,6 +114,11 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 		SetLanguage(TEXT("English"));
 	}
 
+	if( _pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE )
+	{
+		SetShowHidden(TRUE);
+	}
+
 	return TRUE;
 }
 
@@ -243,6 +248,22 @@ BOOL NetmonProfile::SetLanguage(const TCHAR *szLanguage)
 	if (_pf.SetString(TEXT("Language"), szLanguage) == TRUE)
 	{
 		_tcscpy_s(_szLanguage, 64, szLanguage);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL NetmonProfile::GetShowHidden(BOOL *pShowHidden)
+{
+	*pShowHidden = _bShowHidden;
+	return TRUE;
+}
+
+BOOL NetmonProfile::SetShowHidden(BOOL bShowHidden)
+{
+	if (_pf.SetInt(TEXT("ShowHidden"), (int)bShowHidden) == TRUE)
+	{
+		_bShowHidden = bShowHidden;
 		return TRUE;
 	}
 	return FALSE;
