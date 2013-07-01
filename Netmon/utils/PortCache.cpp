@@ -9,10 +9,6 @@ PortCache::PortCache()
 
 int PortCache::GetTcpPortPid(int port)
 {
-#ifdef DEBUG
-	return DEBUG_PID;
-#endif
-
 	if( _tcpPortTable[port] != 0 )
 	{
 		return _tcpPortTable[port];
@@ -43,10 +39,6 @@ int PortCache::GetTcpPortPid(int port)
 
 int PortCache::GetUdpPortPid(int port)
 {
-#ifdef DEBUG
-	return DEBUG_PID;
-#endif
-
 	if( _udpPortTable[port] != 0 )
 	{
 		return _udpPortTable[port];
