@@ -406,6 +406,8 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		int y2 = _height - 26;
 
 		int colWidth = (_width - 8 - 48) / numDays;
+		colWidth = min(22, colWidth);
+
 		x2 = x1 + colWidth * numDays;
 
 		// Page State
