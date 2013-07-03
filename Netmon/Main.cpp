@@ -411,6 +411,16 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 				pid = -1;
 				_tcscpy_s(processName, MAX_PATH, TEXT("Unknown"));
 				_tcscpy_s(processFullPath, MAX_PATH, TEXT("-"));
+
+				// Map from Port -> PID is successful, but pid does not exist, rebuild cache
+				if (pi.trasportProtocol == TRA_TCP)
+				{
+					pc.RebuildTcpTable();
+				}
+				else if (pi.trasportProtocol == TRA_UDP)
+				{
+					pc.RebuildUdpTable();
+				}
 			}
 		}
 		// else
