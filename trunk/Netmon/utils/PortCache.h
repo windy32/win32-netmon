@@ -29,6 +29,8 @@ public:
 
 	int GetTcpPortPid(int port);
 	int GetUdpPortPid(int port);
+	void RebuildTcpTable();
+	void RebuildUdpTable();
 };
 
 #endif
