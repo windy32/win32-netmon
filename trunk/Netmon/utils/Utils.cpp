@@ -526,7 +526,7 @@ void Utils::GetVersionString(TCHAR *buf, int cchLen)
 void Utils::SetMenuString(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem)
 {
 	UINT uMenuState = LOWORD(GetMenuState(hMnu, uPosition, uFlags));
-	ModifyMenu(hMnu, uPosition, (uFlags | uMenuState | MF_STRING) & (~MF_SEPARATOR), uIDNewItem, lpNewItem);
+	ModifyMenu(hMnu, uPosition, (uFlags | uMenuState | MF_STRING) & (~MF_SEPARATOR) & (~MF_USECHECKBITMAPS) & (~MF_OWNERDRAW), uIDNewItem, lpNewItem);
 }
 
 // Process
