@@ -21,8 +21,8 @@ protected:
 	//
 	//     GetName / GetFullPath returns the name / full path for the corresponding pid.
 	//     If the name or full path cannot be found, return value is NULL.
-	TCHAR *_nameTable[32768 / 4];
-	TCHAR *_pathTable[32768 / 4];
+	TCHAR *_nameTable[65536 / 4];
+	TCHAR *_pathTable[65536 / 4];
 
 	CRITICAL_SECTION _cs;
 

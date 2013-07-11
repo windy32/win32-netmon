@@ -8,7 +8,7 @@ ProcessCache::ProcessCache()
 {
 	InitializeCriticalSection(&_cs);
 
-	for (int i = 0; i < 32768 / 4; i++)
+	for (int i = 0; i < 65536 / 4; i++)
 	{
 		_nameTable[i] = new TCHAR[MAX_PATH];
 		_pathTable[i] = new TCHAR[MAX_PATH];
@@ -73,7 +73,7 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
 void ProcessCache::rebuildTable(bool dump)
 {
 	// Clear Tables
-	for (int i = 0; i < 32768 / 4; i++)
+	for (int i = 0; i < 65536 / 4; i++)
 	{
 		RtlZeroMemory(_nameTable[i], MAX_PATH * 2);
 		RtlZeroMemory(_pathTable[i], MAX_PATH * 2);
