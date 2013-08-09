@@ -31,6 +31,8 @@ ProcessCache *ProcessCache::instance()
 
 void ProcessCache::GetName(int pid, TCHAR *buf, int cchLen)
 {
+	assert(pid >= 0 && pid < 65536);
+
 	EnterCriticalSection(&_cs);
 	
 	if (_tcslen(_nameTable[pid / 4]) == 0)
@@ -44,6 +46,8 @@ void ProcessCache::GetName(int pid, TCHAR *buf, int cchLen)
 
 void ProcessCache::GetFullPath(int pid, TCHAR *buf, int cchLen)
 {
+	assert(pid >= 0 && pid < 65536);
+
 	EnterCriticalSection(&_cs);
 
 	if (_tcslen(_pathTable[pid / 4]) == 0)
@@ -57,6 +61,8 @@ void ProcessCache::GetFullPath(int pid, TCHAR *buf, int cchLen)
 
 BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
 {
+	assert(pid >= 0 && pid < 65536);
+
 	BOOL result;
 	EnterCriticalSection(&_cs);
 
@@ -90,6 +96,8 @@ void ProcessCache::rebuildTable(bool dump)
 		// Get pid and file name
 		int pid = p.th32ProcessID;
 		TCHAR *processName = p.szExeFile;
+
+		assert(pid >= 0 && pid < 65536);
 
 		// Get full path (if possible)
 		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
