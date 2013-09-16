@@ -19,6 +19,28 @@ class PcapNetFilter
 		unsigned short protocol;
 	} MacHeader;
 
+/*
+  00 26 18 b1 cb d3 dc d2 fc 98 64 f9 88 64 11 00 21 6c 05 ca 00 21
+  ~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~ ~~~~~ ~~ ~~ ~~~~~ ~~~~~ ~~~~~
+  Destination Addr  Source Address    Ethernet Type           PPP Protocol: 0x0021* (IP)
+                                      0x8862 / 0x8864*
+---------- MAC Packet ---------------------+-- PPPoE Packet -+-----
+                                            Version / Type: 0x11*
+                                               Code: 0x00*
+                                                  Session ID
+                                                        Length (1482)
+*/
+
+	typedef struct tagPppoeHeader
+	{
+		unsigned ver      : 4;
+		unsigned type     : 4;
+		unsigned code     : 8;
+		unsigned session  : 16;
+		unsigned length   : 16;
+		unsigned protocol : 16;
+	} PppoeHeader;
+
 	// IPv4 Header
 	typedef struct tagIpHeader
 	{

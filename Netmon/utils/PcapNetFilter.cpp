@@ -213,10 +213,11 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 	struct pcap_pkthdr *header;
 	const unsigned char *pkt_data;
 
-	MacHeader *mh = 0;
-	IpHeader  *ih = 0;
-	UdpHeader *uh = 0;
-	TcpHeader *th = 0;
+	MacHeader   *mh = 0;
+	PppoeHeader *ph = 0;
+	IpHeader    *ih = 0;
+	UdpHeader   *uh = 0;
+	TcpHeader   *th = 0;
 
 	// Capture one packet
 	while( true )
@@ -246,9 +247,25 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 		if( res > 0 )
 		{
 			mh = (MacHeader *)(pkt_data);
-			ih = (IpHeader  *)(pkt_data + sizeof(MacHeader));
-			uh = (UdpHeader *)(pkt_data + sizeof(MacHeader) + sizeof(IpHeader));
-			th = (TcpHeader *)(pkt_data + sizeof(MacHeader) + sizeof(IpHeader));
+
+			if (mh->protocol == htons(0x8864)) // PPPoE session stage
+			{
+				ph = (PppoeHeader *)(pkt_data + sizeof(MacHeader));
+				if (ph->ver != 1 || ph->type != 1 || ph->code != 0) // code = 0: session data
+				{
+					continue; // Unknown PPPoE packet
+				}
+
+				ih = (IpHeader  *)(pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader));
+				uh = (UdpHeader *)(pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader) + sizeof(IpHeader));
+				th = (TcpHeader *)(pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader) + sizeof(IpHeader));
+			}
+			else
+			{
+				ih = (IpHeader  *)(pkt_data + sizeof(MacHeader));
+				uh = (UdpHeader *)(pkt_data + sizeof(MacHeader) + sizeof(IpHeader));
+				th = (TcpHeader *)(pkt_data + sizeof(MacHeader) + sizeof(IpHeader));
+			}
 
 			if( memcmp(_macAddr, mh->dst, 6) == 0 || 
 				memcmp(_macAddr, mh->src, 6) == 0 )
@@ -260,7 +277,14 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 
 	// Fill Packet Info
 	//  - size and Time
-	pi->size    = header->len - sizeof(MacHeader);
+	if (mh->protocol == htons(0x8864))
+	{
+		pi->size = header->len - sizeof(MacHeader) - sizeof(PppoeHeader);
+	}
+	else
+	{
+		pi->size = header->len - sizeof(MacHeader);
+	}
 	pi->time_s  = header->ts.tv_sec; 
 	pi->time_us = header->ts.tv_usec;
 
@@ -268,7 +292,8 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 	pi->networkProtocol  = NET_OTHER;
 	pi->trasportProtocol = TRA_OTHER;
 
-	if( mh->protocol == htons(0x0800))
+	if (mh->protocol == htons(0x0800) || // IPv4
+	   (mh->protocol == htons(0x8864) && ph->protocol == htons(0x0021))) // PPPoE IPv4
 	{
 		pi->networkProtocol = NET_IPv4;
 
