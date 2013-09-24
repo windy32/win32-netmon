@@ -167,24 +167,10 @@ bool PcapNetFilter::Select(int i)
 
 bool PcapNetFilter::ReConnect(int i)
 {
-	// Close previous fp
-	pcap_close(_fp);
-
-	// Reconnect
-	char errbuf[PCAP_ERRBUF_SIZE];
-
-	// Get the Name of Npf Device
-	pcap_if_t *dev = _devices;
-
-	for(int t = 0; t < i; t++)
-	{
-		dev = dev->next;
-	}
-
-	// Open Device
-	_fp = pcap_open_live(dev->name, 64, 0, 20, errbuf);
-
-	return _fp != NULL;
+	End();
+	Init();
+	FindDevices();
+	return Select(i);
 }
 
 bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
