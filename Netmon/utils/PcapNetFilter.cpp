@@ -51,19 +51,19 @@ int PcapNetFilter::FindDevices()
 	char errbuf[PCAP_ERRBUF_SIZE];
 
 	// Get All Devices
-    if (pcap_findalldevs(&_devices, errbuf) == -1)
-    {
+	if (pcap_findalldevs(&_devices, errbuf) == -1)
+	{
 		return -1;
-    }
+	}
 
 	// Get Number of Devices
 	_numDevices = 0;
 
-    for(pcap_if_t *d = _devices; d; d = d->next)
-    {
+	for(pcap_if_t *d = _devices; d; d = d->next)
+	{
 		_numDevices += 1;
-    }
-    
+	}
+
 	return _numDevices;
 }
 
@@ -74,7 +74,7 @@ TCHAR *PcapNetFilter::GetName(int i) // Return ANSI string
 
 	// Get the Name of Npf Device
 	pcap_if_t *dev = _devices;
-	
+
 	for(int t = 0; t < i; t++)
 	{
 		dev = dev->next;
@@ -84,18 +84,18 @@ TCHAR *PcapNetFilter::GetName(int i) // Return ANSI string
 	Utils::AnsiToUtf16(name, tName, 256);
 
 	// Scan Real Adapters
-    PIP_ADAPTER_INFO pAdapterInfo;
-    PIP_ADAPTER_INFO pAdapter = NULL;
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
 
 	ULONG ulOutBufLen = sizeof (IP_ADAPTER_INFO);
 	pAdapterInfo = (PIP_ADAPTER_INFO) malloc(sizeof(IP_ADAPTER_INFO));
 
 	// - first call
-    if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
 	{
-        free(pAdapterInfo);
-        pAdapterInfo = (PIP_ADAPTER_INFO) malloc(ulOutBufLen);
-    }
+		free(pAdapterInfo);
+		pAdapterInfo = (PIP_ADAPTER_INFO) malloc(ulOutBufLen);
+	}
 
 	GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
 
@@ -121,7 +121,7 @@ bool PcapNetFilter::Select(int i)
 
 	// Get the Name of Npf Device
 	pcap_if_t *dev = _devices;
-	
+
 	for(int t = 0; t < i; t++)
 	{
 		dev = dev->next;
@@ -136,18 +136,18 @@ bool PcapNetFilter::Select(int i)
 	}
 
 	// Save its Mac Address
-    PIP_ADAPTER_INFO pAdapterInfo;
-    PIP_ADAPTER_INFO pAdapter = NULL;
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL;
 
 	ULONG ulOutBufLen = sizeof (IP_ADAPTER_INFO);
 	pAdapterInfo = (PIP_ADAPTER_INFO) malloc(sizeof(IP_ADAPTER_INFO));
 
 	// - first call
-    if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
 	{
-        free(pAdapterInfo);
-        pAdapterInfo = (PIP_ADAPTER_INFO) malloc(ulOutBufLen);
-    }
+		free(pAdapterInfo);
+		pAdapterInfo = (PIP_ADAPTER_INFO) malloc(ulOutBufLen);
+	}
 
 	GetAdaptersInfo(pAdapterInfo, &ulOutBufLen);
 
@@ -228,7 +228,7 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 		{
 			return false;
 		}
-		
+
 		// Filter Group Packets
 		if( res > 0 )
 		{
@@ -279,7 +279,7 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
 	pi->trasportProtocol = TRA_OTHER;
 
 	if (mh->protocol == htons(0x0800) || // IPv4
-	   (mh->protocol == htons(0x8864) && ph->protocol == htons(0x0021))) // PPPoE IPv4
+		(mh->protocol == htons(0x8864) && ph->protocol == htons(0x0021))) // PPPoE IPv4
 	{
 		pi->networkProtocol = NET_IPv4;
 
