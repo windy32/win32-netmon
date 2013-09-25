@@ -12,7 +12,7 @@ protected:
 	// CreateToolhelp32Snapshot / Process32First / Process32Next / OpenProcess / GetModuleFileNameEx
 	// for better performance.
 	// 
-	// If the map from pid to name and full path is loged in the table, ProcessCache will return quickly.
+	// If the map from pid to name and full path is logged in the table, ProcessCache will return quickly.
 	// 
 	// If not, ProcessCache calls CreateToolhelp32Snapshot / Process32First / Process32Next / 
 	// OpenProcess / GetModuleFileNameEx to update the pid table, and then return the result.
@@ -21,8 +21,13 @@ protected:
 	//
 	//     GetName / GetFullPath returns the name / full path for the corresponding pid.
 	//     If the name or full path cannot be found, return value is NULL.
-	TCHAR *_nameTable[65536 / 4];
-	TCHAR *_pathTable[65536 / 4];
+	typedef struct tagProcessInfo
+	{
+		TCHAR name[MAX_PATH];
+		TCHAR path[MAX_PATH];
+	} ProcessInfo;
+
+	std::map<int, ProcessInfo> _processTable;
 
 	CRITICAL_SECTION _cs;
 
