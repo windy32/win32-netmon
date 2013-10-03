@@ -168,6 +168,7 @@ bool PcapNetFilter::Select(int i)
 bool PcapNetFilter::ReConnect(int i)
 {
 	End();
+	Sleep(20000);
 	Init();
 	FindDevices();
 	return Select(i);
