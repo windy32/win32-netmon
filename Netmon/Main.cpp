@@ -1459,20 +1459,6 @@ static void OnReconnect(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	_tcscpy_s(nid.szInfoTitle, _countof(nid.szInfoTitle), Language::GetString(IDS_TRAY_RECONNECT_TITLE));
 	_tcscpy_s(nid.szInfo, _countof(nid.szInfo), Language::GetString(IDS_TRAY_RECONNECT_DESC));
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
-
-	// 
-	//nid.hWnd = hWnd;
-	//data.uID = IDI_SMALL;
-	//data.uFlags = NIF_MESSAGE|NIF_TIP|NIF_ICON|NIF_INFO;
-	//wcscpy(data.szTip,_T("hello world"));
-	//data.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_SMALL));
-	//data.uCallbackMessage = SHOW_TASK;
-	//wcscpy(data.szInfo,_T("hello world"));
-	//wcscpy(data.szInfoTitle,_T("hello"));
-	//data.uTimeout = 20000;
-	//data.dwInfoFlags=NIIF_INFO;
-	//Shell_NotifyIcon(NIM_MODIFY,&data);
-	//return TRUE;
 }
 
 static void OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
