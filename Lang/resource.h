@@ -90,4 +90,7 @@
 #define IDS_MENU_PROCESS_HIDE                   40084
 #define IDS_MENU_VIEW_SHOW_HIDDEN               40085
 
+#define IDS_TRAY_RECONNECT_TITLE                40086
+#define IDS_TRAY_RECONNECT_DESC                 40087
+
 // Remember to update "Language.h"
