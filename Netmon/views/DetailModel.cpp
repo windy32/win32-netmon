@@ -46,6 +46,8 @@ void DetailModel::InitDatabase()
 
 void DetailModel::SaveDatabase()
 {
+	Lock();
+
 	// Delete all records
 	SQLite::Exec(TEXT("Delete From PacketCount;"), true);
 
@@ -68,6 +70,8 @@ void DetailModel::SaveDatabase()
 		SQLite::Exec(command, true);
 	}
 
+	Unlock();
+
 	// Flush
 	SQLite::Flush();
 }
@@ -75,6 +79,8 @@ void DetailModel::SaveDatabase()
 
 void DetailModel::InsertPacket(PacketInfoEx *pi)
 {
+	Lock();
+
 	// Insert an DtViewItem if PUID not Exist
 	if( _items.count(pi->puid) == 0 )
 	{
@@ -84,6 +90,8 @@ void DetailModel::InsertPacket(PacketInfoEx *pi)
 	// Update packet count
 	_items[pi->puid].curPackets += 1;
 	_items[PROCESS_ALL].curPackets += 1;
+
+	Unlock();
 }
 
 void DetailModel::SetPrevPackets(int process, __int64 numPackets)
