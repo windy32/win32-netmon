@@ -1196,6 +1196,14 @@ static void OnExit(HWND hWnd)
 static void WINAPI OnTimer(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 	ProcessModel::OnTimer();
+
+	// Save database every 30 minutes
+	if (dwTime % 30 * 60 * 1000 == 15 * 60 * 1000)
+	{
+		g_mtModel->SaveDatabase();
+		g_stModel->SaveDatabase();
+		g_dtModel->SaveDatabase();
+	}
 }
 
 static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)

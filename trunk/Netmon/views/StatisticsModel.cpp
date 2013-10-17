@@ -16,6 +16,8 @@ void StatisticsModel::SaveDatabase()
 {
 	TCHAR command[256];
 
+	Lock();
+
 	// Delete all records - Protocol
 	SQLite::Exec(TEXT("Delete From Protocol;"), true);
 
@@ -137,6 +139,8 @@ void StatisticsModel::SaveDatabase()
 			}
 		}
 	}
+
+	Unlock();
 
 	// Flush
 	SQLite::Flush();

@@ -107,6 +107,8 @@ void MonthModel::InitDatabaseCallback(SQLiteRow *row)
 
 void MonthModel::SaveDatabase()
 {
+	Lock();
+
 	// Delete all records
 	SQLite::Exec(TEXT("Delete From Traffic;"), true);
 
@@ -140,6 +142,8 @@ void MonthModel::SaveDatabase()
 			}
 		}
 	}
+
+	Unlock();
 
 	// Flush
 	SQLite::Flush();
