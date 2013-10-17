@@ -102,6 +102,8 @@ STRINGTABLE
     IDS_PREF_DTVIEW_DELETE_ALL    "Delete All"
     IDS_PREF_OK                   "OK"
     IDS_PREF_CANCEL               "Cancel"
+	IDS_TRAY_RECONNECT_TITLE      "Information"
+	IDS_TRAY_RECONNECT_DESC       "Netmon has been stopped automatically, please click start again"
 }
 
 

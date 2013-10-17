@@ -102,6 +102,8 @@ STRINGTABLE
     IDS_PREF_DTVIEW_DELETE_ALL    "删除所有记录"
     IDS_PREF_OK                   "确定"
     IDS_PREF_CANCEL               "取消"
+	IDS_TRAY_RECONNECT_TITLE      "提示"
+	IDS_TRAY_RECONNECT_DESC       "Netmon已自动停止监视，请重新点击开始按钮"
 }
 
 

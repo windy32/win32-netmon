@@ -22,6 +22,7 @@
 #include "views/DetailView.h"
 
 #define WM_USER_TRAY (WM_USER + 1)
+#define WM_RECONNECT (WM_USER + 2)
 
 ///----------------------------------------------------------------------------------------------//
 ///                                    Global Variables                                          //
@@ -378,8 +379,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
 		// - Get a Packet (Process UID or PID is not Provided Here)
 		if (!filter.Capture(&pi, &g_bCapture))
 		{
-			filter.ReConnect(g_iAdapter);
-			continue;
+			PostMessage(g_hDlgMain, WM_RECONNECT, 0, 0);
+			break;
 		}
 
 		// - Stop is Clicked
@@ -1445,6 +1446,35 @@ static void OnUserTray(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	}
 }
 
+static void OnReconnect(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+	OnStop(hWnd);
+
+	// Display a balloon on the tray icon
+	NOTIFYICONDATA nid = { sizeof(nid) };
+	nid.hWnd = hWnd;
+	nid.uFlags = NIF_INFO;
+	nid.dwInfoFlags = NIIF_INFO;
+	nid.uID = 0;
+	_tcscpy_s(nid.szInfoTitle, _countof(nid.szInfoTitle), Language::GetString(IDS_TRAY_RECONNECT_TITLE));
+	_tcscpy_s(nid.szInfo, _countof(nid.szInfo), Language::GetString(IDS_TRAY_RECONNECT_DESC));
+	Shell_NotifyIcon(NIM_MODIFY, &nid);
+
+	// 
+	//nid.hWnd = hWnd;
+	//data.uID = IDI_SMALL;
+	//data.uFlags = NIF_MESSAGE|NIF_TIP|NIF_ICON|NIF_INFO;
+	//wcscpy(data.szTip,_T("hello world"));
+	//data.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_SMALL));
+	//data.uCallbackMessage = SHOW_TASK;
+	//wcscpy(data.szInfo,_T("hello world"));
+	//wcscpy(data.szInfoTitle,_T("hello"));
+	//data.uTimeout = 20000;
+	//data.dwInfoFlags=NIIF_INFO;
+	//Shell_NotifyIcon(NIM_MODIFY,&data);
+	//return TRUE;
+}
+
 static void OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT stPS;
@@ -1696,6 +1726,7 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	PROCESS_MSG(WM_ENDSESSION,      OnEndSession)
 	PROCESS_MSG(WM_COMMAND,         OnCommand)
 	PROCESS_MSG(WM_USER_TRAY,       OnUserTray)      // Tray icon messages
+	PROCESS_MSG(WM_RECONNECT,       OnReconnect)     // Resume from hibernation
 	PROCESS_MSG(WM_PAINT,           OnPaint)
 	PROCESS_MSG(WM_SIZE,            OnSize)          // Resize Sidebar, ListView and Tab Control
 	PROCESS_MSG(WM_GETMINMAXINFO,   OnGetMinMaxInfo) // Set Window's minimun size
