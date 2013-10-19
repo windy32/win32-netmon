@@ -1199,7 +1199,10 @@ static void WINAPI OnTimer(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	ProcessModel::OnTimer();
 
 	// Save database every 30 minutes
-	if (dwTime % 30 * 60 * 1000 == 15 * 60 * 1000)
+	SYSTEMTIME time;
+	GetLocalTime(&time);
+
+	if (time.wSecond == 0 && (time.wMinute == 0 || time.wMinute == 30))
 	{
 		g_mtModel->SaveDatabase();
 		g_stModel->SaveDatabase();
