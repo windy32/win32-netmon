@@ -1207,6 +1207,7 @@ static void WINAPI OnTimer(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 		g_mtModel->SaveDatabase();
 		g_stModel->SaveDatabase();
 		g_dtModel->SaveDatabase();
+		SQLite::Flush();
 	}
 }
 
