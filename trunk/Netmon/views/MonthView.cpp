@@ -107,39 +107,50 @@ void MonthView::DrawGraph()
 	maxTraffic /= (1024 * 1024); // Unit is now MB
 
 	// Decide Scale
-	//    1.  (    0 MB,    10 MB]    10,     8,     6,     4,     2,    0
-	//    2.  (   10 MB,    20 MB]    20,    15,    10,     5,     0
-	//    3.  (   20 MB,    50 MB]    50,    40,    30,    20,    10,    0
-	//    4.  (   50 MB,   100 MB]   100,    80,    60,    40,    20,    0
-	//    5.  (  100 MB,   200 MB]   200,   150,   100,    50,     0
-	//    6.  (  200 MB,   500 MB]   500,   400,   300,   200,   100,    0
-	//    7.  (  500 MB,  1000 MB]  1000,   800,   600,   400,   200,    0
-	//    8.  ( 1000 MB,  2000 MB]  2000,  1500,  1000,   500,     0
-	//    9.  ( 2000 MB,  5000 MB]  5000,  4000,  3000,  2000,  1000,    0
-	//    10. ( 5000 MB, 10000 MB] 10000,  8000,  6000,  4000,  2000,    0
-	//    11. (10000 MB, 20000 MB] 20000, 15000, 10000,  5000,     0,
-	//    12. (20000 MB, 50000 MB] 50000, 40000, 30000, 20000, 10000,    0
+	//    1.  (    0 MB,    10 MB]    10,     5,   2.5,  1.25
+	//    2.  (   10 MB,    20 MB]    20,    10,     5,   2.5
+	//    3.  (   20 MB,    50 MB]    50,    25,  12.5,  6.25
+	//    4.  (   50 MB,   100 MB]   100,    50,    25,  12.5
+	//    5.  (  100 MB,   200 MB]   200,   100,    50,    25
+	//    6.  (  200 MB,   500 MB]   500,   250,   125,  62.5
+	//    7.  (  500 MB,  1000 MB]  1000,   500,   250,   125
+	//    8.  ( 1000 MB,  2000 MB]  2000,  1000,   500,   250
+	//    9.  ( 2000 MB,  5000 MB]  5000,  2500,  1250,   625
+	//    10. ( 5000 MB, 10000 MB] 10000,  5000,  2500,  1250
+	//    11. (10000 MB, 20000 MB] 20000, 10000,  5000,  2500
+	//    12. (20000 MB, 50000 MB] 50000, 25000, 12500,  6250
 	//    ( ...More traffic are not currently supported )
 	const int traffic[12] = {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000};
-	const int segments[12] = {5, 4, 5, 5, 4, 5, 5, 4, 5, 5, 4, 5};
-
-	int numSegment = 0;
-	int scaleTraffic;
+	const int precision[12][4] = 
+	{
+		{0, 0, 1, 2}, {0, 0, 0, 1}, {0, 0, 1, 2}, 
+		{0, 0, 0, 1}, {0, 0, 0, 0}, {0, 0, 0, 1}, 
+		{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, 
+		{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}
+	};
+	int scaleTraffic = 0;
+	int scalePrecision[4];
 
 	for(int i = 0; i < 12; i++)
 	{
 		if( maxTraffic < traffic[i] )
 		{
 			scaleTraffic = traffic[i];
-			numSegment = segments[i];
+			scalePrecision[0] = precision[i][0];
+			scalePrecision[1] = precision[i][1];
+			scalePrecision[2] = precision[i][2];
+			scalePrecision[3] = precision[i][3];
 			break;
 		}
 	}
 
-	if( numSegment == 0 ) // More than 50000 MB
+	if( scaleTraffic == 0 ) // More than 50000 MB
 	{
 		scaleTraffic = traffic[12 - 1];
-		numSegment = segments[12 - 1];
+		scalePrecision[0] = precision[12 - 1][0];
+		scalePrecision[1] = precision[12 - 1][1];
+		scalePrecision[2] = precision[12 - 1][2];
+		scalePrecision[3] = precision[12 - 1][3];
 	}
 
 	// Clear Background
@@ -176,21 +187,10 @@ void MonthView::DrawGraph()
 	SelectObject(_hdcBuf, GetStockObject(DC_PEN));
 	SetDCPenColor(_hdcBuf, RGB(0xBB, 0xBB, 0xBB));
 
-	if( numSegment == 4 )
+	for(int i = 1; i < 4; i++)
 	{
-		for(int i = 1; i < 5 - 1; i++)
-		{
-			MoveToEx(_hdcBuf, x1 + 1, y1 + (y2 - y1) * i / 4, 0);
-			LineTo(_hdcBuf, x2 - 1, y1 + (y2 - y1) * i / 4);
-		}
-	}
-	else if( numSegment == 5 )
-	{
-		for(int i = 1; i < 6 - 1; i++)
-		{
-			MoveToEx(_hdcBuf, x1 + 1, y1 + (y2 - y1) * i / 5, 0);
-			LineTo(_hdcBuf, x2 - 1, y1 + (y2 - y1) * i / 5);
-		}
+		MoveToEx(_hdcBuf, x1 + 1, y1 + (y2 - y1) * i / 4, 0);
+		LineTo(_hdcBuf, x2 - 1, y1 + (y2 - y1) * i / 4);
 	}
 
 	SetDCPenColor(_hdcBuf, RGB(0x00, 0x00, 0x00));
@@ -219,24 +219,15 @@ void MonthView::DrawGraph()
 
 	// Draw Scale
 	TCHAR yAxisText[16];
+	TCHAR yAxisTextFormat[16];
 	SetTextAlign(_hdcBuf, TA_LEFT);
 	SetTextColor(_hdcBuf, RGB(0x00, 0x00, 0x00));
 
-	if( numSegment == 4 )
+	for(int i = 0; i < 4; i++)
 	{
-		for(int i = 0; i < 5 - 1; i++)
-		{
-			_stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d MB"), scaleTraffic * (4 - i) / 4);
-			TextOut(_hdcBuf, x2 + 3, y1 + (y2 - y1) * i / 4 - 5 , yAxisText, _tcslen(yAxisText));
-		}
-	}
-	else if( numSegment == 5 )
-	{
-		for(int i = 0; i < 6 - 1; i++)
-		{
-			_stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d MB"), scaleTraffic * (5 - i) / 5);
-			TextOut(_hdcBuf, x2 + 3, y1 + (y2 - y1) * i / 5 - 5, yAxisText, _tcslen(yAxisText));
-		}
+		_stprintf_s(yAxisTextFormat, _countof(yAxisTextFormat), TEXT("%%.%dlf MB"), scalePrecision[i]);
+		_stprintf_s(yAxisText, _countof(yAxisText), yAxisTextFormat, scaleTraffic / (double)(1 << i));
+		TextOut(_hdcBuf, x2 + 3, y1 + (y2 - y1) * i / 4 - 5 , yAxisText, _tcslen(yAxisText));
 	}
 
 	// Draw Traffic
@@ -246,9 +237,11 @@ void MonthView::DrawGraph()
 
 	for(int i = 0; i < numDays; i++)
 	{
-		int rxTraffic = (int)(item.dayRx[i] >> 15);
-		int yPos = (y2 - y1) * rxTraffic / (32 * scaleTraffic);
-
+		double rxTraffic = (item.dayRx[i] >> 10) / (scaleTraffic * 1024.0);
+		int yPos = 
+			(rxTraffic < 0.125) ? 
+			(int)((y2 - y1) * rxTraffic * 2.0) : // Linear
+			(int)((y2 - y1) * (1.0 + Utils::Log(rxTraffic, 2.0) / 4.0)); // Log
 		Rectangle(_hdcBuf, x1 + 4 + colWidth * i, y2 - yPos - 1, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2);
 	}
 
@@ -257,9 +250,11 @@ void MonthView::DrawGraph()
 
 	for(int i = 0; i < numDays; i++)
 	{
-		int txTraffic = (int)(item.dayTx[i] >> 15);
-		int yPos = (y2 - y1) * txTraffic / (32 * scaleTraffic);
-
+		double txTraffic = (item.dayTx[i] >> 10) / (scaleTraffic * 1024.0);
+		int yPos = 
+			(txTraffic < 0.125) ? 
+			(int)((y2 - y1) * txTraffic * 2.0) : // Linear
+			(int)((y2 - y1) * (1.0 + Utils::Log(txTraffic, 2.0) / 4.0)); // Log
 		Rectangle(_hdcBuf, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2 - yPos - 1, x1 + colWidth - 4 + colWidth * i, y2);
 	}
 

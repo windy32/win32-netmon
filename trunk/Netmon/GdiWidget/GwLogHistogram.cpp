@@ -109,9 +109,9 @@ void GwLogHistogram::Paint()
 
 			// Calc y value of the histogram
 			double logVal;
-			if( avr / maxAvr < Utils::Exp(_logSegments, 1.0 / _logBase))
+			if( avr / maxAvr < 1.0 / Utils::Exp(_logSegments - 1, _logBase))
 			{
-				logVal = 0;
+				logVal = (avr / maxAvr) * Utils::Exp(_logSegments - 1, _logBase) / _logSegments;
 			}
 			else 
 			{
