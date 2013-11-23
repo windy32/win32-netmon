@@ -22,6 +22,7 @@ public:
 	static void Update(bool init = false, bool redraw = false);
 	static void HideProcesses();
 	static void ShowProcesses();
+	static bool IsHidden();
 };
 
 #endif

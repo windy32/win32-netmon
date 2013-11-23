@@ -201,3 +201,8 @@ void ProcessView::ShowProcesses()
 	_hideProcess = false;
 	Update(false, false);
 }
+
+bool ProcessView::IsHidden()
+{
+	return _hideProcess;
+}
