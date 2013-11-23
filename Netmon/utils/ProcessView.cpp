@@ -41,7 +41,7 @@ void ProcessView::ListViewInsert(const ProcessModel::ProcessItem &item)
 	{
 		_tcscpy_s(szColumn[2], MAX_PATH, TEXT("-"));
 		_tcscpy_s(szColumn[3], MAX_PATH, TEXT("-"));
-		_tcscpy_s(szColumn[4], MAX_PATH, TEXT("-"));
+		_tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
 	}
 
 	Utils::ListViewAppend(_hList, 5, 
@@ -63,7 +63,7 @@ void ProcessView::ListViewUpdate(int index, const ProcessModel::ProcessItem &ite
 	{
 		_tcscpy_s(szColumn[2], MAX_PATH, TEXT("-"));
 		_tcscpy_s(szColumn[3], MAX_PATH, TEXT("-"));
-		_tcscpy_s(szColumn[4], MAX_PATH, TEXT("-"));
+		_tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
 	}
 
 	Utils::ListViewUpdate(_hList, index, 5, 
