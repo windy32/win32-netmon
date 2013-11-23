@@ -1056,32 +1056,34 @@ static void OnCustomDraw(HWND hWnd, LPARAM lParam)
 
 static void OnRightClick(HWND hWnd, LPARAM lParam)
 {
-	// The context menu is available only when hidden processes are visible
-	if (!g_bShowHidden)
-	{
-		return;
-	}
-
 	NMITEMACTIVATE *ia = (NMITEMACTIVATE *)lParam;
 	int index = ia->iItem;
 	if( index != -1 ) 
 	{
-		// Get Hidden State
-		std::vector<bool> hidden;
-		ProcessModel::ExportHiddenState(hidden);
-
-		if ((unsigned int)index < hidden.size())
+		if (!ProcessView::IsHidden())
 		{
-			if (hidden[index]) // Hidden
+			// Get Hidden State
+			std::vector<bool> hidden;
+			ProcessModel::ExportHiddenState(hidden);
+
+			if ((unsigned int)index < hidden.size())
 			{
-				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_SHOW, MF_ENABLED);
-				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_HIDE, MF_GRAYED);
+				if (hidden[index]) // Hidden
+				{
+					EnableMenuItem(g_hProcessMenu, IDM_PROCESS_SHOW, MF_ENABLED);
+					EnableMenuItem(g_hProcessMenu, IDM_PROCESS_HIDE, MF_GRAYED);
+				}
+				else // Visible
+				{
+					EnableMenuItem(g_hProcessMenu, IDM_PROCESS_SHOW, MF_GRAYED);
+					EnableMenuItem(g_hProcessMenu, IDM_PROCESS_HIDE, MF_ENABLED);
+				}
 			}
-			else // Visible
-			{
-				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_SHOW, MF_GRAYED);
-				EnableMenuItem(g_hProcessMenu, IDM_PROCESS_HIDE, MF_ENABLED);
-			}
+		}
+		else
+		{
+			EnableMenuItem(g_hProcessMenu, IDM_PROCESS_SHOW, MF_GRAYED);
+			EnableMenuItem(g_hProcessMenu, IDM_PROCESS_HIDE, MF_ENABLED);
 		}
 
 		TrackPopupMenu(g_hProcessMenu, TPM_TOPALIGN | TPM_LEFTALIGN,  
@@ -1113,6 +1115,13 @@ static void OnHideProcess(HWND hList)
 
 	// Set Hidden State
 	ProcessModel::HideProcess(_tstoi(buf));
+	if (ProcessView::IsHidden())
+	{
+		g_rtView.SetProcessUid(-1);
+		g_mtView.SetProcessUid(-1);
+		g_stView.SetProcessUid(-1);
+		g_dtView.SetProcessUid(-1);
+	}
 }
 
 static void OnShowWindow(HWND hWnd)

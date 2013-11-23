@@ -208,7 +208,14 @@ void ProcessModel::HideProcess(int puid)
 	if (index != -1)
 	{
 		// Update View
-		ProcessView::Update(false, true);
+		if (!ProcessView::IsHidden())
+		{
+			ProcessView::Update(false, true);
+		}
+		else
+		{
+			ProcessView::Update(true);
+		}
 
 		// Update Profile
 		std::vector<int> hiddenProcesses;
