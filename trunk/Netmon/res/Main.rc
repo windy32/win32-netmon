@@ -79,7 +79,7 @@ IDM_MAIN MENU
             MENUITEM "First Adapter", IDM_VIEW_ADAPTER_FIRST
         }
         MENUITEM SEPARATOR
-		MENUITEM "Show Hidden Process", IDM_VIEW_SHOW_HIDDEN
+        MENUITEM "Show Hidden Process", IDM_VIEW_SHOW_HIDDEN
     }
     POPUP "Options"
     {
@@ -101,6 +101,18 @@ IDM_MAIN MENU
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDM_PROCESS MENU
+{
+    POPUP "Process"
+    {
+        MENUITEM "Show Process", IDM_PROCESS_SHOW
+        MENUITEM "Hide Process", IDM_PROCESS_HIDE
+    }
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDM_TRAY MENU
 {
     POPUP "Tray"
@@ -108,18 +120,6 @@ IDM_TRAY MENU
         MENUITEM "Show Window", IDM_TRAY_SHOW_WINDOW
         MENUITEM "About...", IDM_TRAY_ABOUT
         MENUITEM "Exit", IDM_TRAY_EXIT
-    }
-}
-
-
-
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDM_PROCESS MENU
-{
-    POPUP "Process"
-    {
-        MENUITEM "Show Process", IDM_PROCESS_SHOW
-        MENUITEM "Hide Process", IDM_PROCESS_HIDE
     }
 }
 
@@ -193,6 +193,7 @@ FONT 9, "MS Shell Dlg 2", 0, 0, 0
     AUTOCHECKBOX    "Max disk space for packet detail (10 - 1024 MB)", IDC_PREF_MAX_DTVIEW, 24, 84, 162, 8
     EDITTEXT        IDE_PREF_MAX_DTVIEW, 192, 82, 30, 12, ES_AUTOHSCROLL
     PUSHBUTTON      "Delete All", IDB_PREF_DELETE_ALL, 24, 98, 60, 14
+    PUSHBUTTON      "Compact", IDB_PREF_COMPACT, 90, 98, 54, 14
     PUSHBUTTON      "OK", IDB_PREF_OK, 144, 126, 42, 14
     PUSHBUTTON      "Cancel", IDB_PREF_CANCEL, 192, 126, 43, 14
 }
