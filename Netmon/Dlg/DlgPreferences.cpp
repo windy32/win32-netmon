@@ -306,6 +306,20 @@ static void OnDeleteAll(HWND hWnd)
 	}
 }
 
+static void OnCompact(HWND hWnd)
+{
+	if( g_bCapture )
+	{
+		MessageBox(hWnd, TEXT("Please stop capture first."), TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		SQLite::Flush();
+		SQLite::Exec(TEXT("Vacuum;"), false);
+		MessageBox(hWnd, TEXT("Compact finished."), TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+	}
+}
+
 ///----------------------------------------------------------------------------------------------// 
 ///                                    L1 Message Handlers                                       //
 ///----------------------------------------------------------------------------------------------//
@@ -342,7 +356,8 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	MoveWindow(GetDlgItem(hWnd, IDC_PREF_ENABLE),          25,  110, 300, 20, FALSE);
 	MoveWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW),      25,  135, 280, 20, FALSE);
 	MoveWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW),      315, 135, 65,  20, FALSE);
-	MoveWindow(GetDlgItem(hWnd, IDB_PREF_DELETE_ALL),      25,  160, 120, 25, FALSE);
+	MoveWindow(GetDlgItem(hWnd, IDB_PREF_DELETE_ALL),      25,  160, 100, 25, FALSE);
+	MoveWindow(GetDlgItem(hWnd, IDB_PREF_COMPACT),         135, 160, 100, 25, FALSE);
 	MoveWindow(GetDlgItem(hWnd, IDB_PREF_OK),              230, 210, 80,  25, FALSE);
 	MoveWindow(GetDlgItem(hWnd, IDB_PREF_CANCEL),          315, 210, 80,  25, FALSE);
 
@@ -385,6 +400,10 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	else if( wParam == IDB_PREF_DELETE_ALL )
 	{
 		OnDeleteAll(hWnd);
+	}
+	else if( wParam == IDB_PREF_COMPACT )
+	{
+		OnCompact(hWnd);
 	}
 }
 

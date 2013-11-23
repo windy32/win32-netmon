@@ -55,5 +55,6 @@
 #define IDC_PREF_MAX_DTVIEW                     51011
 #define IDE_PREF_MAX_DTVIEW                     51012
 #define IDB_PREF_DELETE_ALL                     51013
-#define IDB_PREF_OK                             51014
-#define IDB_PREF_CANCEL                         51015
+#define IDB_PREF_COMPACT                        51014
+#define IDB_PREF_OK                             51015
+#define IDB_PREF_CANCEL                         51016
