@@ -1455,7 +1455,11 @@ static void OnUserTray(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		// Show Tray Icon Popup Menu
 		POINT point;
 		GetCursorPos(&point); 
+
+        // Hide the menu when the user clicks outside of the menu
+        SetForegroundWindow(hWnd);
 		TrackPopupMenu(g_hTrayMenu, TPM_RIGHTBUTTON, point.x, point.y, 0, hWnd, NULL);
+        PostMessage(hWnd, WM_NULL, 0, 0);
 	}
 }
 
