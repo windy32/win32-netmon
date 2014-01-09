@@ -140,9 +140,9 @@ void ProcessModel::OnTimer()
 		{
 			if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name, !rebuilt))
 			{
-				rebuilt = true;
 				item.active = false;
 			}
+			rebuilt = true;
 		}
 	}
 
