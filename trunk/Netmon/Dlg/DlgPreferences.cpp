@@ -119,6 +119,7 @@ static void InitLanguage(HWND hWnd)
 	SetDlgItemText(hWnd, IDG_PREF_DETAIL_VIEW,     Language::GetString(IDS_PREF_DTVIEW));
 	SetDlgItemText(hWnd, IDC_PREF_ENABLE,          Language::GetString(IDS_PREF_DTVIEW_ENABLE));
 	SetDlgItemText(hWnd, IDC_PREF_MAX_DTVIEW,      Language::GetString(IDS_PREF_DTVIEW_MAX_SPACE));
+    SetDlgItemText(hWnd, IDB_PREF_COMPACT,         Language::GetString(IDS_PREF_DTVIEW_COMPACT));
 	SetDlgItemText(hWnd, IDB_PREF_DELETE_ALL,      Language::GetString(IDS_PREF_DTVIEW_DELETE_ALL));
 	SetDlgItemText(hWnd, IDB_PREF_OK,              Language::GetString(IDS_PREF_OK));
 	SetDlgItemText(hWnd, IDB_PREF_CANCEL,          Language::GetString(IDS_PREF_CANCEL));

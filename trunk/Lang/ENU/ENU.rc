@@ -100,6 +100,7 @@ STRINGTABLE
     IDS_PREF_DTVIEW_ENABLE        "Enable"
     IDS_PREF_DTVIEW_MAX_SPACE     "Max disk space for packet detail (10 - 1024MB)"
     IDS_PREF_DTVIEW_DELETE_ALL    "Delete All"
+    IDS_PREF_DTVIEW_COMPACT       "Compact"
     IDS_PREF_OK                   "OK"
     IDS_PREF_CANCEL               "Cancel"
 	IDS_TRAY_RECONNECT_TITLE      "Information"
