@@ -51,7 +51,7 @@ STRINGTABLE
     IDS_PLIST_RXRATE              "Rx Rate"
     IDS_PLIST_FULLPATH            "Full Path"
     IDS_ABOUT_NETMON              "Netmon %s"
-    IDS_ABOUT_COPYRIGHT           "Copyright (C) 2011 - 2013 F32 <feng32@163.com>"
+    IDS_ABOUT_COPYRIGHT           "Copyright (C) 2011 - 2014 F32 <feng32@163.com>"
     IDS_ABOUT_ALL_RIGHTS          "All rights reserved"
     IDS_ABOUT_THIRD_PARTIES       "Third Parties"
     IDS_ABOUT_CLOSE               "Close"
