@@ -12,7 +12,8 @@ protected:
     // CreateToolhelp32Snapshot / Process32First / Process32Next / OpenProcess / GetModuleFileNameEx
     // for better performance.
     // 
-    // If the map from pid to name and full path is logged in the table, ProcessCache will return quickly.
+    // If the map from pid to name and full path is logged in the table, 
+    // ProcessCache will return quickly.
     // 
     // If not, ProcessCache calls CreateToolhelp32Snapshot / Process32First / Process32Next / 
     // OpenProcess / GetModuleFileNameEx to update the pid table, and then return the result.

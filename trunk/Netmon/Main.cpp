@@ -511,7 +511,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
                               (pi.trasportProtocol == TRA_IGMP) ? TEXT("IGMP") : TEXT("Other");
             TCHAR *dir = (pi.dir == DIR_UP) ? TEXT("Up") : 
                          (pi.dir == DIR_DOWN) ? TEXT("Down") : TEXT("");
-            _stprintf_s(msg, _countof(msg), TEXT("[Time = %d.%06d] [Size = %4d Bytes] [Port = %d, %d] %s %s\n"), 
+            _stprintf_s(msg, _countof(msg), 
+                TEXT("[Time = %d.%06d] [Size = %4d Bytes] [Port = %d, %d] %s %s\n"), 
                 pi.time_s, pi.time_us, pi.size, pi.remote_port, pi.local_port, dir, protocol);
 
             OutputDebugString(msg);
@@ -541,41 +542,64 @@ static void UpdateMenuLanguage()
     HMENU hMenuOptionsLanguage = GetSubMenu(hMenuOptions, 0);
 
     // Menu bar
-    Utils::SetMenuString(hMenuMain, 0, MF_BYPOSITION, (UINT_PTR)hMenuFile,    Language::GetString(IDS_MENU_FILE));
-    Utils::SetMenuString(hMenuMain, 1, MF_BYPOSITION, (UINT_PTR)hMenuView,    Language::GetString(IDS_MENU_VIEW));
-    Utils::SetMenuString(hMenuMain, 2, MF_BYPOSITION, (UINT_PTR)hMenuOptions, Language::GetString(IDS_MENU_OPTIONS));
-    Utils::SetMenuString(hMenuMain, 3, MF_BYPOSITION, (UINT_PTR)hMenuHelp,    Language::GetString(IDS_MENU_HELP));
+    Utils::SetMenuString(hMenuMain, 0, MF_BYPOSITION, (UINT_PTR)hMenuFile,
+        Language::GetString(IDS_MENU_FILE));
+    Utils::SetMenuString(hMenuMain, 1, MF_BYPOSITION, (UINT_PTR)hMenuView,
+        Language::GetString(IDS_MENU_VIEW));
+    Utils::SetMenuString(hMenuMain, 2, MF_BYPOSITION, (UINT_PTR)hMenuOptions,
+        Language::GetString(IDS_MENU_OPTIONS));
+    Utils::SetMenuString(hMenuMain, 3, MF_BYPOSITION, (UINT_PTR)hMenuHelp,
+        Language::GetString(IDS_MENU_HELP));
 
     // File
-    Utils::SetMenuString(hMenuFile, 0, MF_BYPOSITION, IDM_FILE_CAPTURE, Language::GetString(IDS_MENU_FILE_CAPTURE));
-    Utils::SetMenuString(hMenuFile, 1, MF_BYPOSITION, IDM_FILE_STOP,    Language::GetString(IDS_MENU_FILE_STOP));
-    Utils::SetMenuString(hMenuFile, 3, MF_BYPOSITION, IDM_FILE_EXIT,    Language::GetString(IDS_MENU_FILE_EXIT));
+    Utils::SetMenuString(hMenuFile, 0, MF_BYPOSITION, IDM_FILE_CAPTURE, 
+        Language::GetString(IDS_MENU_FILE_CAPTURE));
+    Utils::SetMenuString(hMenuFile, 1, MF_BYPOSITION, IDM_FILE_STOP,
+        Language::GetString(IDS_MENU_FILE_STOP));
+    Utils::SetMenuString(hMenuFile, 3, MF_BYPOSITION, IDM_FILE_EXIT,
+        Language::GetString(IDS_MENU_FILE_EXIT));
 
     // View
-    Utils::SetMenuString(hMenuView, 0, MF_BYPOSITION, IDM_VIEW_REALTIME,          Language::GetString(IDS_MENU_VIEW_REALTIME));
-    Utils::SetMenuString(hMenuView, 1, MF_BYPOSITION, IDM_VIEW_MONTH,             Language::GetString(IDS_MENU_VIEW_MONTH));
-    Utils::SetMenuString(hMenuView, 2, MF_BYPOSITION, IDM_VIEW_STATISTICS,        Language::GetString(IDS_MENU_VIEW_STATISTICS));
-    Utils::SetMenuString(hMenuView, 3, MF_BYPOSITION, IDM_VIEW_DETAIL,            Language::GetString(IDS_MENU_VIEW_DETAIL));
-    Utils::SetMenuString(hMenuView, 5, MF_BYPOSITION, (UINT_PTR)hMenuViewAdapter, Language::GetString(IDS_MENU_VIEW_ADAPTER));
-    Utils::SetMenuString(hMenuView, 7, MF_BYPOSITION, IDM_VIEW_SHOW_HIDDEN,       Language::GetString(IDS_MENU_VIEW_SHOW_HIDDEN));
+    Utils::SetMenuString(hMenuView, 0, MF_BYPOSITION, IDM_VIEW_REALTIME,
+        Language::GetString(IDS_MENU_VIEW_REALTIME));
+    Utils::SetMenuString(hMenuView, 1, MF_BYPOSITION, IDM_VIEW_MONTH,
+        Language::GetString(IDS_MENU_VIEW_MONTH));
+    Utils::SetMenuString(hMenuView, 2, MF_BYPOSITION, IDM_VIEW_STATISTICS,
+        Language::GetString(IDS_MENU_VIEW_STATISTICS));
+    Utils::SetMenuString(hMenuView, 3, MF_BYPOSITION, IDM_VIEW_DETAIL,
+        Language::GetString(IDS_MENU_VIEW_DETAIL));
+    Utils::SetMenuString(hMenuView, 5, MF_BYPOSITION, (UINT_PTR)hMenuViewAdapter, 
+        Language::GetString(IDS_MENU_VIEW_ADAPTER));
+    Utils::SetMenuString(hMenuView, 7, MF_BYPOSITION, IDM_VIEW_SHOW_HIDDEN,
+        Language::GetString(IDS_MENU_VIEW_SHOW_HIDDEN));
 
     // Options
-    Utils::SetMenuString(hMenuOptions, 0, MF_BYPOSITION, (UINT_PTR)hMenuOptionsLanguage, Language::GetString(IDS_MENU_OPTIONS_LANGUAGE));
-    Utils::SetMenuString(hMenuOptions, 1, MF_BYPOSITION, IDM_OPTIONS_PREFERENCES,        Language::GetString(IDS_MENU_OPTIONS_PREFERENCES));
+    Utils::SetMenuString(hMenuOptions, 0, MF_BYPOSITION, (UINT_PTR)hMenuOptionsLanguage,
+        Language::GetString(IDS_MENU_OPTIONS_LANGUAGE));
+    Utils::SetMenuString(hMenuOptions, 1, MF_BYPOSITION, IDM_OPTIONS_PREFERENCES,
+        Language::GetString(IDS_MENU_OPTIONS_PREFERENCES));
 
     // Help
-    Utils::SetMenuString(hMenuHelp, 0, MF_BYPOSITION, IDM_HELP_TOPIC,    Language::GetString(IDS_MENU_HELP_TOPIC));
-    Utils::SetMenuString(hMenuHelp, 1, MF_BYPOSITION, IDM_HELP_HOMEPAGE, Language::GetString(IDS_MENU_HELP_HOMEPAGE));
-    Utils::SetMenuString(hMenuHelp, 3, MF_BYPOSITION, IDM_HELP_ABOUT,    Language::GetString(IDS_MENU_HELP_ABOUT));
+    Utils::SetMenuString(hMenuHelp, 0, MF_BYPOSITION, IDM_HELP_TOPIC,
+        Language::GetString(IDS_MENU_HELP_TOPIC));
+    Utils::SetMenuString(hMenuHelp, 1, MF_BYPOSITION, IDM_HELP_HOMEPAGE,
+        Language::GetString(IDS_MENU_HELP_HOMEPAGE));
+    Utils::SetMenuString(hMenuHelp, 3, MF_BYPOSITION, IDM_HELP_ABOUT,
+        Language::GetString(IDS_MENU_HELP_ABOUT));
 
     // Tray
-    Utils::SetMenuString(g_hTrayMenu, 0, MF_BYPOSITION,  IDM_TRAY_SHOW_WINDOW, Language::GetString(IDS_MENU_TRAY_SHOW_WINDOW));
-    Utils::SetMenuString(g_hTrayMenu, 1, MF_BYPOSITION,  IDM_TRAY_ABOUT,       Language::GetString(IDS_MENU_TRAY_ABOUT));
-    Utils::SetMenuString(g_hTrayMenu, 2, MF_BYPOSITION,  IDM_TRAY_EXIT,        Language::GetString(IDS_MENU_TRAY_EXIT));
+    Utils::SetMenuString(g_hTrayMenu, 0, MF_BYPOSITION, IDM_TRAY_SHOW_WINDOW,
+        Language::GetString(IDS_MENU_TRAY_SHOW_WINDOW));
+    Utils::SetMenuString(g_hTrayMenu, 1, MF_BYPOSITION, IDM_TRAY_ABOUT,
+        Language::GetString(IDS_MENU_TRAY_ABOUT));
+    Utils::SetMenuString(g_hTrayMenu, 2, MF_BYPOSITION, IDM_TRAY_EXIT,
+        Language::GetString(IDS_MENU_TRAY_EXIT));
 
     // Process
-    Utils::SetMenuString(g_hProcessMenu, 0, MF_BYPOSITION, IDM_PROCESS_SHOW, Language::GetString(IDS_MENU_PROCESS_SHOW));
-    Utils::SetMenuString(g_hProcessMenu, 1, MF_BYPOSITION, IDM_PROCESS_HIDE, Language::GetString(IDS_MENU_PROCESS_HIDE));
+    Utils::SetMenuString(g_hProcessMenu, 0, MF_BYPOSITION, IDM_PROCESS_SHOW, 
+        Language::GetString(IDS_MENU_PROCESS_SHOW));
+    Utils::SetMenuString(g_hProcessMenu, 1, MF_BYPOSITION, IDM_PROCESS_HIDE, 
+        Language::GetString(IDS_MENU_PROCESS_HIDE));
 
     // Refresh menu bar
     DrawMenuBar(g_hDlgMain);
@@ -644,7 +668,8 @@ static void CreateLanguageMenuItems()
         // Create menu item
         if( i == 0 )
         {
-            ModifyMenu(hMenuLanguage, 0, MF_BYPOSITION | MF_STRING, IDM_OPTIONS_LANGUAGE_FIRST + 0, szMenuItem);
+            ModifyMenu(hMenuLanguage, 
+                0, MF_BYPOSITION | MF_STRING, IDM_OPTIONS_LANGUAGE_FIRST + 0, szMenuItem);
         }
         else
         {
@@ -696,7 +721,8 @@ static void EnumDevices()
     {
         MessageBox(g_hDlgMain, 
             TEXT("Cannot initizlize WinPcap library.\n")
-            TEXT("Please make sure WinPcap version 4.1.2 is correctly installed."), TEXT("Error"), MB_OK | MB_ICONWARNING);
+            TEXT("Please make sure WinPcap version 4.1.2 is correctly installed."), 
+            TEXT("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
         DeleteMenu(hMenuAdapter, 0, MF_BYPOSITION);
@@ -709,7 +735,8 @@ static void EnumDevices()
     if( g_nAdapters <= 0 )
     {
         MessageBox(g_hDlgMain, 
-            TEXT("No network adapters has been found on this machine."), TEXT("Error"), MB_OK | MB_ICONWARNING);
+            TEXT("No network adapters has been found on this machine."), 
+            TEXT("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
         DeleteMenu(hMenuView, 5, MF_BYPOSITION);
@@ -856,24 +883,33 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
     RECT stRect;
 
     DLGPROC lpProc[C_PAGES] = { ProcDlgRealtime, ProcDlgMonth, ProcDlgStatistics, ProcDlgDetail };
-    LPCTSTR lpName[C_PAGES] = { TEXT("DLG_REALTIME"), TEXT("DLG_MONTH"), TEXT("DLG_STATISTICS"), TEXT("DLG_DETAIL") };
+    LPCTSTR lpName[C_PAGES] = { 
+        TEXT("DLG_REALTIME"), 
+        TEXT("DLG_MONTH"), 
+        TEXT("DLG_STATISTICS"), 
+        TEXT("DLG_DETAIL") 
+    };
 
     // Check MenuItem
     if( i == 0 )
     {
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
     }
     else if( i == 1 )
     {
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
     }
     else if( i == 2 )
     {
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
     }
     else if( i == 3 )
     {
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
     }
 
     // Destroy the Current Child Dialog
@@ -905,22 +941,26 @@ static void OnViewSwitch(HWND hWnd, WPARAM wParam)
     if( wParam == IDM_VIEW_REALTIME )
     {
         TabCtrl_SetCurSel(hTab, 0);
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
     }
     else if( wParam == IDM_VIEW_MONTH )
     {
         TabCtrl_SetCurSel(hTab, 1);
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
     }
     else if( wParam == IDM_VIEW_STATISTICS )
     {
         TabCtrl_SetCurSel(hTab, 2);
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
     }
     else if( wParam == IDM_VIEW_DETAIL )
     {
         TabCtrl_SetCurSel(hTab, 3);
-        CheckMenuRadioItem(GetMenu(hWnd), IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
+        CheckMenuRadioItem(GetMenu(hWnd), 
+            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
     }
 
     OnSelChanged(hWnd, hTab);
@@ -988,7 +1028,8 @@ static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
 
 static void OnPreferences(HWND hWnd)
 {
-    DialogBoxParam(g_hInstance, TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_dtView);
+    DialogBoxParam(g_hInstance, 
+        TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_dtView);
 }
 
 static void OnProcessChanged(HWND hWnd, LPARAM lParam)
@@ -1003,7 +1044,8 @@ static void OnProcessChanged(HWND hWnd, LPARAM lParam)
             lpstListView->uChanged == LVIF_STATE )
         {
             TCHAR szPUID[16];
-            Utils::ListViewGetText(GetDlgItem(hWnd, IDL_PROCESS), lpstListView->iItem, 0, szPUID, 16);
+            Utils::ListViewGetText(
+                GetDlgItem(hWnd, IDL_PROCESS), lpstListView->iItem, 0, szPUID, 16);
             int puid = _tstoi(szPUID);
 
             g_rtView.SetProcessUid(puid);
@@ -1232,7 +1274,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     // Init SQLite
     TCHAR dbPath[MAX_PATH];
-    Utils::GetSomeFilePathNameInCurrentDir(dbPath, MAX_PATH, TEXT("Netmon.db"));
+    Utils::GetFilePathInCurrentDir(dbPath, MAX_PATH, TEXT("Netmon.db"));
     SQLite::Open(dbPath);
     InitDatabase();
 
@@ -1272,8 +1314,10 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     EnableMenuItem(hMainMenu, IDM_FILE_CAPTURE, MF_ENABLED);
     EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
-    CheckMenuRadioItem(hMainMenu, IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
-    CheckMenuRadioItem(hLanguageMenu, 0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
+    CheckMenuRadioItem(hMainMenu, 
+        IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
+    CheckMenuRadioItem(hLanguageMenu, 
+        0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
 
     CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED); // Hidden State
     g_bShowHidden = true;
@@ -1285,8 +1329,8 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     g_hDcSidebarBuf = CreateCompatibleDC(hDc);
     
     g_hBmpSidebarBg = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_SIDEBAR));
-    g_hBmpSidebarBuf = CreateCompatibleBitmap(hDc, 50, 2000); // 2000 pixels in height, which is supposed to be enouph
-
+    g_hBmpSidebarBuf = CreateCompatibleBitmap(hDc, 50, 2000); // 2000 pixels in height, 
+                                                              // which is supposed to be enough
     SelectObject(g_hDcSidebarBg, g_hBmpSidebarBg);
     SelectObject(g_hDcSidebarBuf, g_hBmpSidebarBuf);
 
@@ -1316,7 +1360,8 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     ProcessView::Init(GetDlgItem(hWnd, IDL_PROCESS));
 
     // Init Tab
-    Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), 4, TEXT("Realtime"), TEXT("Month"), TEXT("Statistics"), TEXT("Detail"));
+    Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), 
+        4, TEXT("Realtime"), TEXT("Month"), TEXT("Statistics"), TEXT("Detail"));
 
     // Set Window Size
     MoveWindow(hWnd, 100, 100, 721, 446, FALSE);
@@ -1473,8 +1518,10 @@ static void OnReconnect(HWND hWnd, WPARAM wParam, LPARAM lParam)
     nid.uFlags = NIF_INFO;
     nid.dwInfoFlags = NIIF_INFO;
     nid.uID = 0;
-    _tcscpy_s(nid.szInfoTitle, _countof(nid.szInfoTitle), Language::GetString(IDS_TRAY_RECONNECT_TITLE));
-    _tcscpy_s(nid.szInfo, _countof(nid.szInfo), Language::GetString(IDS_TRAY_RECONNECT_DESC));
+    _tcscpy_s(nid.szInfoTitle, _countof(nid.szInfoTitle), 
+        Language::GetString(IDS_TRAY_RECONNECT_TITLE));
+    _tcscpy_s(nid.szInfo, _countof(nid.szInfo), 
+        Language::GetString(IDS_TRAY_RECONNECT_DESC));
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
@@ -1494,8 +1541,12 @@ static void OnSize(HWND hWnd, WPARAM wParam, LPARAM lParam)
     int clientWidth = lParam & 0xFFFF;
     int clientHeight = lParam >> 16;
     
-    MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 50 - 1, 0, clientWidth - 50 + 2, 60 + (clientHeight - 240) / 2, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 50 + 6, 60 + 6 + (clientHeight - 240) / 2, clientWidth - 50 - 12, clientHeight - 60 - 12 - (clientHeight - 240) / 2, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 
+        50 - 1, 0, 
+        clientWidth - 50 + 2, 60 + (clientHeight - 240) / 2, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 
+        50 + 6, 60 + 6 + (clientHeight - 240) / 2, 
+        clientWidth - 50 - 12, clientHeight - 60 - 12 - (clientHeight - 240) / 2, TRUE);
     g_iSidebarWidth = 50;
     g_iSidebarHeight = clientHeight;
 
@@ -1510,7 +1561,9 @@ static void OnSize(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     TabCtrl_AdjustRect(GetDlgItem(hWnd, IDT_VIEW), FALSE, &stRect);
 
-    SetWindowPos(g_hCurPage, HWND_TOP, stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, SWP_SHOWWINDOW);
+    SetWindowPos(g_hCurPage, HWND_TOP, 
+        stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, 
+        SWP_SHOWWINDOW);
 
     // Draw Sidebar
     DrawSidebar();
@@ -1643,7 +1696,9 @@ static void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
         TabCtrl_AdjustRect(GetDlgItem(hWnd, IDT_VIEW), FALSE, &stRect);
 
-        SetWindowPos(g_hCurPage, HWND_TOP, stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, SWP_SHOWWINDOW);
+        SetWindowPos(g_hCurPage, HWND_TOP, 
+            stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, 
+            SWP_SHOWWINDOW);
     }
 }
 
@@ -1718,7 +1773,7 @@ static void OnLButtonUp(HWND hWnd, WPARAM wParam, LPARAM lParam)
 ///----------------------------------------------------------------------------------------------//
 static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    #define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
+#define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
 
     PROCESS_MSG(WM_MOUSEMOVE,       OnMouseMove)
     PROCESS_MSG(WM_LBUTTONDOWN,     OnLButtonDown)
@@ -1735,7 +1790,7 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     PROCESS_MSG(WM_GETMINMAXINFO,   OnGetMinMaxInfo) // Set Window's minimun size
     PROCESS_MSG(WM_NOTIFY,          OnNotify)
 
-    #undef PROCESS_MSG
+#undef PROCESS_MSG
 
     return FALSE;
 }

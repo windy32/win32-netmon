@@ -3,8 +3,12 @@
 
 #include "../Utils/utils.h"
 
-GwLogHistogram::GwLogHistogram(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, __int64 *values, int cValue, int *scales, int cScale, const TCHAR *caption, COLORREF color, int logBase, int logSegments)
-: GwHistogram(hdcTarget, x, y, maxWidth, maxHeight, values, cValue, scales, cScale, caption, color)
+GwLogHistogram::GwLogHistogram(
+    HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+    __int64 *values, int cValue, int *scales, int cScale, 
+    const TCHAR *caption, COLORREF color, int logBase, int logSegments)
+    : GwHistogram(
+        hdcTarget, x, y, maxWidth, maxHeight, values, cValue, scales, cScale, caption, color)
 {
     _logBase = logBase;
     _logSegments = logSegments;
@@ -64,7 +68,8 @@ void GwLogHistogram::Paint()
         TCHAR szText[32];
         _stprintf_s(szText, _countof(szText), TEXT("%d"), _scales[i]);
         
-        GwTextOut((_scales[i] - 1) * (_width - 2) / _cValue, _boxHeight + 3, szText, _tcslen(szText));
+        GwTextOut((_scales[i] - 1) * (_width - 2) / _cValue, _boxHeight + 3, 
+            szText, _tcslen(szText));
     }
 
     // Histogram

@@ -33,8 +33,10 @@ void ProcessView::ListViewInsert(const ProcessModel::ProcessItem &item)
 
     if( item.active )
     {
-        _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
-        _stprintf_s(szColumn[3], MAX_PATH, TEXT("%d.%d"), item.prevRxRate / 1024, (item.prevRxRate % 1024 + 51) / 108);
+        _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), 
+            item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
+        _stprintf_s(szColumn[3], MAX_PATH, TEXT("%d.%d"), 
+            item.prevRxRate / 1024, (item.prevRxRate % 1024 + 51) / 108);
         _tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
     }
     else
@@ -55,8 +57,10 @@ void ProcessView::ListViewUpdate(int index, const ProcessModel::ProcessItem &ite
 
     if( item.active )
     {
-        _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
-        _stprintf_s(szColumn[3], MAX_PATH, TEXT("%d.%d"), item.prevRxRate / 1024, (item.prevRxRate % 1024 + 51) / 108);
+        _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), 
+            item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
+        _stprintf_s(szColumn[3], MAX_PATH, TEXT("%d.%d"), 
+            item.prevRxRate / 1024, (item.prevRxRate % 1024 + 51) / 108);
         _tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
     }
     else
@@ -94,8 +98,8 @@ void ProcessView::Update(bool init, bool redraw)
             }
         }
     }
-    else if (redraw == false && _hideProcess != _prevHideProcess) // 5. ShowProcesses & 6. HideProcesses
-    {
+    else if (redraw == false && _hideProcess != _prevHideProcess) // 5. ShowProcesses & 
+    {                                                             // 6. HideProcesses
         if (_hideProcess) // Delete hidden processes
         {
             Utils::ListViewClear(_hList);

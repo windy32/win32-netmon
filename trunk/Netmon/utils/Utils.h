@@ -69,13 +69,15 @@ public:
     static void GetVersionString(TCHAR *buf, int cchLen);
 
     // Menu
-    static void SetMenuString(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem);
+    static void SetMenuString(
+        HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem);
 
     // Process
-    static BOOL StartProcessAndWait(const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs);
+    static BOOL StartProcessAndWait(
+        const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs);
 
     // File & Directory
-    static void GetSomeFilePathNameInCurrentDir(TCHAR *buf, int cchLen, const TCHAR *szFileName);
+    static void GetFilePathInCurrentDir(TCHAR *buf, int cchLen, const TCHAR *szFileName);
 };
 
 #endif

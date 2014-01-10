@@ -56,7 +56,8 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
     {
         rebuildTable(false);
     }
-    result = (_processTable.count(pid) > 0 && _tcscmp(_processTable[pid].name, name) == 0) ? TRUE : FALSE;
+    result = (_processTable.count(pid) > 0 && _tcscmp(_processTable[pid].name, name) == 0) ? 
+        TRUE : FALSE;
 
     LeaveCriticalSection(&_cs);
     return result;
@@ -89,7 +90,8 @@ void ProcessCache::rebuildTable(bool dump)
             _processTable[pid] = info;
             if (dump)
             {
-                Utils::DbgPrint(TEXT("   PID = %d, Name = \"%s\", FullPath = \"%s\"\n"), pid, processName, TEXT("-"));
+                Utils::DbgPrint(TEXT("   PID = %d, Name = \"%s\", FullPath = \"%s\"\n"), 
+                    pid, processName, TEXT("-"));
             }
         }
         else

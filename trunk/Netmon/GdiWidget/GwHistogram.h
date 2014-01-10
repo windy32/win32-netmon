@@ -27,7 +27,8 @@ protected:
     void CalcSize();
 
 public:
-    GwHistogram(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, __int64 *values, int cValue, int *scales, int cScale, const TCHAR *caption, COLORREF color);
+    GwHistogram(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+        __int64 *values, int cValue, int *scales, int cScale, const TCHAR *caption, COLORREF color);
     virtual ~GwHistogram();
 
     virtual void Paint();

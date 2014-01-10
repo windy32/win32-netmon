@@ -68,7 +68,8 @@ void DetailView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 }
 
 // ListView Operations
-void DetailView::ListViewInsert(int uid, int puid, int dir, int protocol, int size, __int64 time, int port)
+void DetailView::ListViewInsert(
+    int uid, int puid, int dir, int protocol, int size, __int64 time, int port)
 {
     // Prepare Columns
     TCHAR szDateTime[MAX_PATH];
@@ -111,12 +112,12 @@ void DetailView::UpdateSize(HWND hWnd)
     _width  = stRect.right - stRect.left;
     _height = stRect.bottom - stRect.top;
 
-    MoveWindow(GetDlgItem(hWnd, IDL_DETAIL),   10,           10,           _width - 20, _height - 50, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PAGEUP),   10,           _height - 34, 50,          24,           TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PAGEDOWN), 70,           _height - 34, 50,          24,           TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDL_STATUS),   130,          _height - 30, 300,         20,           TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDB_GOTO),     _width - 150, _height - 34, 80,          24,           TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDE_GOTO),     _width - 60,  _height - 34, 50,          24,           TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDL_DETAIL),   10, 10, _width - 20, _height - 50, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDB_PAGEUP),   10,  _height - 34,  50, 24, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDB_PAGEDOWN), 70,  _height - 34,  50, 24, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDL_STATUS),   130, _height - 30, 300, 20, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDB_GOTO),     _width - 150, _height - 34, 80, 24, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDE_GOTO),     _width - 60,  _height - 34, 50, 24, TRUE);
 }
 
 void DetailView::UpdateContent(bool rebuildList)
@@ -134,7 +135,7 @@ void DetailView::UpdateContent(bool rebuildList)
     // Update Status Label
     TCHAR status[256];
     TCHAR buf[MAX_PATH];
-    const TCHAR *szFormat = Language::GetString(IDS_DTVIEW_PAGE); // Like "%s Page %I64d / %I64d - %I64d"
+    const TCHAR *szFormat = Language::GetString(IDS_DTVIEW_PAGE); // %s Page %I64d / %I64d - %I64d"
 
     if (_process == -1)
     {
@@ -152,11 +153,11 @@ void DetailView::UpdateContent(bool rebuildList)
     // Update Buttons
     EnableWindow(GetDlgItem(_hWnd, IDB_GOTO), TRUE);
     EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
+    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+        (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
 
-    // Update ListView
-    if ((curPackets > prevPackets && _curPage == prevPackets / 100) // New packets arrived in current page,
-        || rebuildList)                                            // or force update
+    // Update ListView (when new packets arrived in current page, or force update)
+    if ((curPackets > prevPackets && _curPage == prevPackets / 100) || rebuildList)
     {
         // Select and insert items in current page
         __int64 firstRow = _curPage * 100; // 0-Based
@@ -172,7 +173,8 @@ void DetailView::UpdateContent(bool rebuildList)
         else
         {
             _stprintf_s(command, _countof(command), 
-                TEXT("Select * From Packet Where ProcessUid = %d Limit 100 Offset %I64d;"), _process, firstRow);
+                TEXT("Select * From Packet Where ProcessUid = %d Limit 100 Offset %I64d;"), 
+                _process, firstRow);
         }
 
         row.InsertType(SQLiteRow::TYPE_INT32); // 0 UID
@@ -215,7 +217,8 @@ void DetailView::OnPageUp()
     __int64 curPackets  = _model->GetCurPackets(_process);
 
     EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
+    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+        (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
 }
 
 void DetailView::OnPageDown()
@@ -226,7 +229,8 @@ void DetailView::OnPageDown()
     __int64 curPackets  = _model->GetCurPackets(_process);
 
     EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
+    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+        (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
 }
 
 void DetailView::OnGoto()
@@ -249,7 +253,8 @@ void DetailView::OnGoto()
         UpdateContent(true);
 
         EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), (_curPage > 0) ? TRUE : FALSE);
-        EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
+        EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+            (_curPage + 1 < (curPackets - 1) / 100 + 1) ? TRUE : FALSE);
     }
 }
 
@@ -280,7 +285,8 @@ LRESULT DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         _hWnd = hWnd;
         _hList = GetDlgItem(hWnd, IDL_DETAIL);
 
-        _lpOldProcEdit = (WNDPROC)SetWindowLong(GetDlgItem(_hWnd, IDE_GOTO), GWL_WNDPROC, (LONG)MyProcEdit);
+        _lpOldProcEdit = 
+            (WNDPROC)SetWindowLong(GetDlgItem(_hWnd, IDE_GOTO), GWL_WNDPROC, (LONG)MyProcEdit);
 
         // Size Window
         RECT stRect = *(RECT *)lParam;

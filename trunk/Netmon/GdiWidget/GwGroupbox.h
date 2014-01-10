@@ -20,7 +20,8 @@ protected:
     void CalcSize();
 
 public:
-    GwGroupbox(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR *caption, COLORREF color);
+    GwGroupbox(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+        const TCHAR *caption, COLORREF color);
     virtual ~GwGroupbox();
 
     virtual void Paint();

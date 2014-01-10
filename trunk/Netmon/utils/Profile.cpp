@@ -15,9 +15,9 @@ BOOL Profile::GetString(const TCHAR *szOption, TCHAR *buf, int cchLen)
 BOOL Profile::GetInt(const TCHAR *szOption, int *pValue)
 {
     TCHAR buf[256];
-    if( GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0 ) // Key empty or not exist
+    if( GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0 )
     {
-        return FALSE;
+        return FALSE; // Key empty or not exist
     }
     else // Key not empty
     {

@@ -11,7 +11,8 @@ protected:
     // PortCache class has a GetTcpPortPid() / GetUdpPortPid interface, which is used to replace
     // GetExtendedTcpTable / GetExtendedUdpTable for better performance.
     // 
-    // If the map from a certain port to pid is loged in port table, PortCache will return pid quickly.
+    // If the map from a certain port to pid is loged in port table, 
+    // PortCache will return pid quickly.
     // 
     // If not, PortCache calls GetExtendedTcpTable / GetExtendedUdpTable to update the port table, 
     // and then return the result.

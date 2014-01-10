@@ -22,7 +22,8 @@ void DetailModel::InitDatabase()
         puid = ProcessModel::GetProcessUid(i);
         ProcessModel::GetProcessName(puid, name, _countof(name));
 
-        _stprintf_s(command, _countof(command), TEXT("Select Count From PacketCount Where ProcessUid = \'%d\';"), puid);
+        _stprintf_s(command, _countof(command), 
+            TEXT("Select Count From PacketCount Where ProcessUid = \'%d\';"), puid);
 
         SQLiteRow row;
         row.InsertType(SQLiteRow::TYPE_INT64); // 0 Count(*)
@@ -64,7 +65,8 @@ void DetailModel::SaveDatabase()
 
         // Build Command
         TCHAR command[256];
-        _stprintf_s(command, _countof(command), TEXT("Insert Into PacketCount Values(%d, %I64d);"), puid, count);
+        _stprintf_s(command, _countof(command), 
+            TEXT("Insert Into PacketCount Values(%d, %I64d);"), puid, count);
 
         // Insert
         SQLite::Exec(command, true);

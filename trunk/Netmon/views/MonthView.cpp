@@ -225,8 +225,10 @@ void MonthView::DrawGraph()
 
     for(int i = 0; i < 4; i++)
     {
-        _stprintf_s(yAxisTextFormat, _countof(yAxisTextFormat), TEXT("%%.%dlf MB"), scalePrecision[i]);
-        _stprintf_s(yAxisText, _countof(yAxisText), yAxisTextFormat, scaleTraffic / (double)(1 << i));
+        _stprintf_s(yAxisTextFormat, _countof(yAxisTextFormat), 
+            TEXT("%%.%dlf MB"), scalePrecision[i]);
+        _stprintf_s(yAxisText, _countof(yAxisText), 
+            yAxisTextFormat, scaleTraffic / (double)(1 << i));
         TextOut(_hdcBuf, x2 + 3, y1 + (y2 - y1) * i / 4 - 5 , yAxisText, _tcslen(yAxisText));
     }
 
@@ -242,7 +244,9 @@ void MonthView::DrawGraph()
             (rxTraffic < 0.125) ? 
             (int)((y2 - y1) * rxTraffic * 2.0) : // Linear
             (int)((y2 - y1) * (1.0 + Utils::Log(rxTraffic, 2.0) / 4.0)); // Log
-        Rectangle(_hdcBuf, x1 + 4 + colWidth * i, y2 - yPos - 1, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2);
+        Rectangle(_hdcBuf, 
+            x1 + 4 + colWidth * i, y2 - yPos - 1, 
+            x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2);
     }
 
     // - Tx
@@ -255,7 +259,9 @@ void MonthView::DrawGraph()
             (txTraffic < 0.125) ? 
             (int)((y2 - y1) * txTraffic * 2.0) : // Linear
             (int)((y2 - y1) * (1.0 + Utils::Log(txTraffic, 2.0) / 4.0)); // Log
-        Rectangle(_hdcBuf, x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2 - yPos - 1, x1 + colWidth - 4 + colWidth * i, y2);
+        Rectangle(_hdcBuf, 
+            x1 + 4 + colWidth * i + (colWidth - 8) / 2, y2 - yPos - 1, 
+            x1 + colWidth - 4 + colWidth * i, y2);
     }
 
     SetDCBrushColor(_hdcBuf, RGB(0xFF, 0xFF, 0xfF));
@@ -281,7 +287,8 @@ void MonthView::DrawGraph()
 
     if (item.sumRx < 1024 * 1024 && item.sumTx < 1024 * 1024) // KB_KB
     {
-        const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB_KB); // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
+        // Like "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
+        const TCHAR *szFormat = Language::GetString(IDS_MTVIEW_TEXT_KB_KB);
         _stprintf_s(szText, _countof(szText), szFormat, 
             processName, szYearMonth, (int)(item.sumRx >> 10), (int)(item.sumTx >> 10));
     }
@@ -353,7 +360,7 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         if( _hdcBuf == 0 )
         {
             _hdcBuf = CreateCompatibleDC(_hdcTarget);
-            _hbmpBuf = CreateCompatibleBitmap(_hdcTarget, 2000, 1200);  // Suppose 2000 x 1200 is enough for view
+            _hbmpBuf = CreateCompatibleBitmap(_hdcTarget, 2000, 1200);  // Suppose enough
 
             SelectObject(_hdcBuf, _hbmpBuf);
 

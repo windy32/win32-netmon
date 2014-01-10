@@ -36,7 +36,8 @@ public:
     BOOL GetString(const TCHAR *szOption, TCHAR *buf, int cchLen);
 
     // Get int key
-    // If key doesn't exit or is empty or is not numeric, nothing is written to pValue, and return value is FALSE.
+    // If key doesn't exit or is empty or is not numeric, 
+    // nothing is written to pValue, and return value is FALSE.
     BOOL GetInt(const TCHAR *szOption, int *pValue);
 
     // Set string key
@@ -67,14 +68,15 @@ protected:
 public:
     // Netmon calls Load() at startup to get preferences from Netmon.ini.
     // Items in the ini file will be saved to NetmonProfile's member variables.
-    // If the ini file or a certain key doesn't exist, default value will be written to the ini file.
+    // If the ini file or a certain key doesn't exist, 
+    // default value will be written to the ini file.
     BOOL Load(const TCHAR *szDefaultAdapter);
 
     // Netmon may then call GetXXX to get settings and apply settings while running.
     // It will also call GetXXX to get settings when "Preferences" dialog shows up.
     //
-    // Netmon will call SetXXX to save settings when user clicks the "OK" in the "Preferences" dialog, 
-    // some of which may be applied immediately, while some are not.
+    // Netmon will call SetXXX to save settings when user clicks the "OK" 
+    // in the "Preferences" dialog, some of which may be applied immediately, while some are not.
     BOOL GetAdapter(TCHAR *szAdapter, int cchLen);
     BOOL SetAdapter(const TCHAR *szAdapter);
 

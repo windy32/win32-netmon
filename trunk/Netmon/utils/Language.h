@@ -50,12 +50,14 @@ public:
     // Return value is the number of language plugins successfully loaded
     //
     // The number of plugins available is also associated with the language id.
-    // For example, if return value is 2, 2 languages plugins are available, with language id 0 and 1.
+    // For example, if return value is 2, 
+    // two languages plugins are available, with language id 0 and 1.
     static int Load();
 
     // Get the english name & native name for the language
     // The first parameter is the language id.
-    static BOOL GetName(int langId, TCHAR *szEnglish, int cchEnglish, TCHAR *szNative, int cchNative);
+    static BOOL GetName(
+        int langId, TCHAR *szEnglish, int cchEnglish, TCHAR *szNative, int cchNative);
 
     // Select a language as current
     static BOOL Select(int langId);

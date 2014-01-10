@@ -84,7 +84,8 @@ void RealtimeView::DrawGraph()
         (_zoomFactor == ZOOM_1S)  ? 1 :
         (_zoomFactor == ZOOM_10S) ? 10 : 60;
 
-    int startIndex = (graphWidth > (int) rxRate.size() * 2 - 2) ? 0 : rxRate.size() - graphWidth / 2 - 1;
+    int startIndex = 
+        (graphWidth > (int) rxRate.size() * 2 - 2) ? 0 : rxRate.size() - graphWidth / 2 - 1;
     int endIndex = rxRate.size();
 
     // - Calculate the Max Rate
@@ -203,9 +204,9 @@ void RealtimeView::DrawGraph()
     //      For ZOOM_60S, is's 2 hours
     TCHAR xAxisTextArray[3][5][16] = 
     {
-        { TEXT("00:00:00"), TEXT("00:01:00"), TEXT("00:02:00"), TEXT("00:03:00"), TEXT("00:04:00") },
-        { TEXT("00:00:00"), TEXT("00:10:00"), TEXT("00:20:00"), TEXT("00:30:00"), TEXT("00:40:00") },
-        { TEXT("00:00:00"), TEXT("01:00:00"), TEXT("02:00:00"), TEXT("03:00:00"), TEXT("04:00:00") },
+        {TEXT("00:00:00"), TEXT("00:01:00"), TEXT("00:02:00"), TEXT("00:03:00"), TEXT("00:04:00")},
+        {TEXT("00:00:00"), TEXT("00:10:00"), TEXT("00:20:00"), TEXT("00:30:00"), TEXT("00:40:00")},
+        {TEXT("00:00:00"), TEXT("01:00:00"), TEXT("02:00:00"), TEXT("03:00:00"), TEXT("04:00:00")},
     };
     int index = 
         (_zoomFactor == ZOOM_1S) ? 0 : 
@@ -489,7 +490,7 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         if( _hdcBuf == 0 )
         {
             _hdcBuf = CreateCompatibleDC(_hdcTarget);
-            _hbmpBuf = CreateCompatibleBitmap(_hdcTarget, 2000, 1200);  // Suppose 2000 x 1200 is enough for view
+            _hbmpBuf = CreateCompatibleBitmap(_hdcTarget, 2000, 1200);  // Suppose enough
 
             SelectObject(_hdcBuf, _hbmpBuf);
         }
