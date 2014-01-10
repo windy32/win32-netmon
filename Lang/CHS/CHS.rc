@@ -100,6 +100,7 @@ STRINGTABLE
     IDS_PREF_DTVIEW_ENABLE        "记录每个截获报文的参数"
     IDS_PREF_DTVIEW_MAX_SPACE     "报文记录的最大磁盘空间 (10 - 1024MB)"
     IDS_PREF_DTVIEW_DELETE_ALL    "删除所有记录"
+    IDS_PREF_DTVIEW_COMPACT       "释放空间"
     IDS_PREF_OK                   "确定"
     IDS_PREF_CANCEL               "取消"
 	IDS_TRAY_RECONNECT_TITLE      "提示"

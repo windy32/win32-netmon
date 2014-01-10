@@ -83,14 +83,15 @@
 #define IDS_PREF_DTVIEW_ENABLE                  40078
 #define IDS_PREF_DTVIEW_MAX_SPACE               40079
 #define IDS_PREF_DTVIEW_DELETE_ALL              40080
-#define IDS_PREF_OK                             40081
-#define IDS_PREF_CANCEL                         40082
+#define IDS_PREF_DTVIEW_COMPACT                 40081
+#define IDS_PREF_OK                             40082
+#define IDS_PREF_CANCEL                         40083
 
-#define IDS_MENU_PROCESS_SHOW                   40083
-#define IDS_MENU_PROCESS_HIDE                   40084
-#define IDS_MENU_VIEW_SHOW_HIDDEN               40085
+#define IDS_MENU_PROCESS_SHOW                   40084
+#define IDS_MENU_PROCESS_HIDE                   40085
+#define IDS_MENU_VIEW_SHOW_HIDDEN               40086
 
-#define IDS_TRAY_RECONNECT_TITLE                40086
-#define IDS_TRAY_RECONNECT_DESC                 40087
+#define IDS_TRAY_RECONNECT_TITLE                40087
+#define IDS_TRAY_RECONNECT_DESC                 40088
 
 // Remember to update "Language.h"
