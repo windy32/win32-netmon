@@ -5,20 +5,20 @@ const int NetModel::PROCESS_ALL = -1;
 
 NetModel::NetModel()
 {
-	InitializeCriticalSection(&_cs);
+    InitializeCriticalSection(&_cs);
 }
 
 NetModel::~NetModel()
 {
-	DeleteCriticalSection(&_cs);
+    DeleteCriticalSection(&_cs);
 }
 
 void NetModel::Lock()
 {
-	EnterCriticalSection(&_cs);
+    EnterCriticalSection(&_cs);
 }
 
 void NetModel::Unlock()
 {
-	LeaveCriticalSection(&_cs);
+    LeaveCriticalSection(&_cs);
 }

@@ -6,14 +6,14 @@
 class GwLabel : public GdiWidget
 {
 protected:
-	TCHAR _text[1024];
-	HFONT _hFont;
+    TCHAR _text[1024];
+    HFONT _hFont;
 
 public:
-	GwLabel(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR *caption);
-	virtual ~GwLabel();
+    GwLabel(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR *caption);
+    virtual ~GwLabel();
 
-	virtual void Paint();
+    virtual void Paint();
 };
 
 #endif

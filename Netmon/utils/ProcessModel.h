@@ -7,61 +7,61 @@
 class ProcessModel
 {
 public:
-	// The Process class maintains a list of process items
-	typedef struct tagProcessItem
-	{
-		// Static Parameters
-		bool active;
+    // The Process class maintains a list of process items
+    typedef struct tagProcessItem
+    {
+        // Static Parameters
+        bool active;
 
-		int  puid;
-		TCHAR name[MAX_PATH];
-		TCHAR fullPath[MAX_PATH];
+        int  puid;
+        TCHAR name[MAX_PATH];
+        TCHAR fullPath[MAX_PATH];
 
-		bool hidden;
+        bool hidden;
 
-		// Valid Only When Active
-		bool dirty;
+        // Valid Only When Active
+        bool dirty;
 
-		int txRate;
-		int rxRate;
-		int prevTxRate;
-		int prevRxRate;
+        int txRate;
+        int rxRate;
+        int prevTxRate;
+        int prevRxRate;
 
-		int pid; // Note: A "Process" item may corresponds to multiple pids
-	} ProcessItem;
-
-private:
-	static std::vector<ProcessItem> _processes;
-	static CRITICAL_SECTION _cs;
+        int pid; // Note: A "Process" item may corresponds to multiple pids
+    } ProcessItem;
 
 private:
-	static void InitCallback(SQLiteRow *row);
-	static void Lock();
-	static void Unlock();
+    static std::vector<ProcessItem> _processes;
+    static CRITICAL_SECTION _cs;
 
-public:	
-	// Modify the Model
-	static void Init();
-	static void OnPacket(PacketInfoEx *pi);
-	static void OnTimer();
+private:
+    static void InitCallback(SQLiteRow *row);
+    static void Lock();
+    static void Unlock();
 
-	static void ResetDirty(int puid);
-	static void ShowProcess(int puid);
-	static void HideProcess(int puid);
+public:    
+    // Modify the Model
+    static void Init();
+    static void OnPacket(PacketInfoEx *pi);
+    static void OnTimer();
 
-	// Export Model Info
-	static void Export(std::vector<ProcessItem> &items);
-	static void ExportHiddenState(std::vector<bool> &states);
-	static void ExportHiddenProcesses(std::vector<int> &processes);
+    static void ResetDirty(int puid);
+    static void ShowProcess(int puid);
+    static void HideProcess(int puid);
+
+    // Export Model Info
+    static void Export(std::vector<ProcessItem> &items);
+    static void ExportHiddenState(std::vector<bool> &states);
+    static void ExportHiddenProcesses(std::vector<int> &processes);
 
 public:
-	static int  GetProcessUid(int index);
-	static int  GetProcessCount();
-	static int  GetProcessUid(const TCHAR *name);
-	static bool GetProcessName(int puid, TCHAR *buf, int len);
-	static int  GetProcessIndex(int puid);
-	static bool GetProcessRate(int puid, int *txRate, int *rxRate);
-	static bool IsProcessActive(int puid);
+    static int  GetProcessUid(int index);
+    static int  GetProcessCount();
+    static int  GetProcessUid(const TCHAR *name);
+    static bool GetProcessName(int puid, TCHAR *buf, int len);
+    static int  GetProcessIndex(int puid);
+    static bool GetProcessRate(int puid, int *txRate, int *rxRate);
+    static bool IsProcessActive(int puid);
 };
 
 #endif

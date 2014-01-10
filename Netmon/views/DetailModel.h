@@ -6,39 +6,39 @@
 class DetailModel : public NetModel
 {
 private:
-	// Item Definition
-	typedef struct tagDtModelItem
-	{
-		__int64 curPackets;
-		__int64 prevPackets;
+    // Item Definition
+    typedef struct tagDtModelItem
+    {
+        __int64 curPackets;
+        __int64 prevPackets;
 
-		struct tagDtModelItem()
-		{
-			curPackets = 0;
-			prevPackets = 0;
-		}
-	} DtModelItem;
+        struct tagDtModelItem()
+        {
+            curPackets = 0;
+            prevPackets = 0;
+        }
+    } DtModelItem;
 
-	// Items
-	std::map<int, DtModelItem> _items;
+    // Items
+    std::map<int, DtModelItem> _items;
 
 private:
-	void InitDatabase();
+    void InitDatabase();
 
 public:
-	DetailModel();
+    DetailModel();
 
-	// Modify the Model
-	void InsertPacket(PacketInfoEx *pi);
-	void SetPrevPackets(int process, __int64 numPackets);
-	void ClearPackets();
+    // Modify the Model
+    void InsertPacket(PacketInfoEx *pi);
+    void SetPrevPackets(int process, __int64 numPackets);
+    void ClearPackets();
 
-	// Export Model Info
-	__int64 GetCurPackets(int process);
-	__int64 GetPrevPackets(int process);
+    // Export Model Info
+    __int64 GetCurPackets(int process);
+    __int64 GetPrevPackets(int process);
 
-	// Save Model Into to Database
-	void SaveDatabase();
+    // Save Model Into to Database
+    void SaveDatabase();
 };
 
 #endif

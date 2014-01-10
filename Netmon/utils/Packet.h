@@ -16,40 +16,40 @@
 
 typedef struct tagPacketInfo
 {
-	int     networkProtocol;
-	int     trasportProtocol;
+    int     networkProtocol;
+    int     trasportProtocol;
 
-	int     local_port;    // Only for TCP & UDP
-	int     remote_port;
+    int     local_port;    // Only for TCP & UDP
+    int     remote_port;
 
-	int     dir;     
-	int     size;    // In Bytes
+    int     dir;     
+    int     size;    // In Bytes
 
-	int     time_s;  // Time in Secode
-	int     time_us; // Time in Microseconds
+    int     time_s;  // Time in Secode
+    int     time_us; // Time in Microseconds
 } PacketInfo;
 
 typedef struct tagPacketInfoEx
 {
-	// Part 1 -----------------------------------
-	int     networkProtocol;
-	int     trasportProtocol;
+    // Part 1 -----------------------------------
+    int     networkProtocol;
+    int     trasportProtocol;
 
-	int     local_port;    // Only for TCP & UDP
-	int     remote_port;
+    int     local_port;    // Only for TCP & UDP
+    int     remote_port;
 
-	int     dir;     
-	int     size;    // In Bytes
+    int     dir;     
+    int     size;    // In Bytes
 
-	int     time_s;  // Time in Secode
-	int     time_us; // Time in Microseconds
+    int     time_s;  // Time in Secode
+    int     time_us; // Time in Microseconds
 
-	// Part 2 -----------------------------------
-	int     pid;
-	int     puid;    // Process UID
-	int     pauid;   // Process Activity UID
-	TCHAR   name[MAX_PATH];
-	TCHAR   fullPath[MAX_PATH];
+    // Part 2 -----------------------------------
+    int     pid;
+    int     puid;    // Process UID
+    int     pauid;   // Process Activity UID
+    TCHAR   name[MAX_PATH];
+    TCHAR   fullPath[MAX_PATH];
 } PacketInfoEx;
 
 #endif

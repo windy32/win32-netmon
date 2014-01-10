@@ -6,26 +6,26 @@
 class GwGroupbox : public GdiWidget
 {
 protected:
-	const TCHAR *_caption;
-	COLORREF _color;
+    const TCHAR *_caption;
+    COLORREF _color;
 
-	HFONT _hFont;
+    HFONT _hFont;
 
-	int _contentX;
-	int _contentY;
-	int _contentWidth;
-	int _contentHeight;
+    int _contentX;
+    int _contentY;
+    int _contentWidth;
+    int _contentHeight;
 
 protected:
-	void CalcSize();
+    void CalcSize();
 
 public:
-	GwGroupbox(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR *caption, COLORREF color);
-	virtual ~GwGroupbox();
+    GwGroupbox(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR *caption, COLORREF color);
+    virtual ~GwGroupbox();
 
-	virtual void Paint();
+    virtual void Paint();
 
-	virtual void GetContentArea(int *pX, int *pY, int *pWidth, int *pHeight);
+    virtual void GetContentArea(int *pX, int *pY, int *pWidth, int *pHeight);
 };
 
 #endif

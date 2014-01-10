@@ -7,24 +7,24 @@
 class StatisticsView : public NetView
 {
 protected:
-	// GDI Objects
-	static HDC     _hdcTarget;
-	static HDC     _hdcBuf;
-	static HBITMAP _hbmpBuf;
+    // GDI Objects
+    static HDC     _hdcTarget;
+    static HDC     _hdcBuf;
+    static HBITMAP _hbmpBuf;
 
-	// Model Object
-	static StatisticsModel *_model;
+    // Model Object
+    static StatisticsModel *_model;
 
 protected:
-	static void DrawGraph();
-	static void WINAPI TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+    static void DrawGraph();
+    static void WINAPI TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 public:
-	virtual void Init(StatisticsModel *model);
-	virtual void End();
-	virtual void SetProcessUid(int puid);
+    virtual void Init(StatisticsModel *model);
+    virtual void End();
+    virtual void SetProcessUid(int puid);
 
-	virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif
