@@ -3,7 +3,9 @@
 
 #include "../utils/Utils.h"
 
-GwLabel::GwLabel(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR *text) : GdiWidget(hdcTarget, x, y, maxWidth, maxHeight)
+GwLabel::GwLabel(
+    HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+    const TCHAR *text) : GdiWidget(hdcTarget, x, y, maxWidth, maxHeight)
 {
     // Save parameters
     _tcscpy_s(_text, 1024, text);

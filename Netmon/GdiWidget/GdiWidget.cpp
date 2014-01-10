@@ -28,7 +28,9 @@ BOOL GdiWidget::GwEllipse(int left, int top, int right, int bottom)
 
 BOOL GdiWidget::GwPie(int left, int top, int right, int bottom, int xr1, int yr1, int xr2, int yr2)
 {
-    return Pie(_hdcTarget, left + _x, top + _y, right + _x, bottom + _y, xr1 + _x, yr1 + _y, xr2 + _x, yr2 + _y);
+    return Pie(_hdcTarget, 
+        left + _x, top + _y, right + _x, bottom + _y, 
+        xr1 + _x, yr1 + _y, xr2 + _x, yr2 + _y);
 }
 
 BOOL GdiWidget::GwTextOut(int x, int y, LPCTSTR lpString, int c)

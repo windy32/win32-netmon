@@ -63,7 +63,7 @@ static void InitProfile(HWND hWnd)
             {
                 // Build command line
                 TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetSomeFilePathNameInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
 
                 // Start process and update registry
                 int iExitCode;
@@ -71,17 +71,18 @@ static void InitProfile(HWND hWnd)
                 {
                     if( iExitCode == 0 )
                     {
-                        // Update profile
-                        g_profile.SetAutoStart(szNetmon);
+                        g_profile.SetAutoStart(szNetmon); // Update profile
                     }
                     else
                     {
-                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), 
+                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                 }
                 else
                 {
-                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), 
+                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
         }
@@ -178,7 +179,8 @@ static void OnOk(HWND hWnd)
             if( !(bTranslated && iDtViewMaxSpace >= 10 && iDtViewMaxSpace <= 1024 ))
             {
                 bParamOk = FALSE;
-                MessageBox(hWnd, TEXT("Max disk space should be between 10 MB and 1024 MB!"), TEXT("Error"), MB_OK | MB_ICONWARNING);
+                MessageBox(hWnd, TEXT("Max disk space should be between 10 MB and 1024 MB!"), 
+                    TEXT("Error"), MB_OK | MB_ICONWARNING);
             }
 
             if( bParamOk )
@@ -223,7 +225,7 @@ static void OnOk(HWND hWnd)
             {
                 // Build command line
                 TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetSomeFilePathNameInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
 
                 // Start process and update registry
                 int iExitCode;
@@ -231,17 +233,18 @@ static void OnOk(HWND hWnd)
                 {
                     if (iExitCode != 0 )
                     {
-                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), 
+                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                     else
                     {
-                        // Update profile
-                        g_profile.SetAutoStart(szNetmon);
+                        g_profile.SetAutoStart(szNetmon); // Update profile
                     }
                 }
                 else
                 {
-                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), 
+                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
         }
@@ -256,29 +259,31 @@ static void OnOk(HWND hWnd)
             {
                 int iExitCode;
                 TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetSomeFilePathNameInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
 
                 if( Utils::StartProcessAndWait(szRegUpdater, TEXT("-c"), &iExitCode, TRUE))
                 {
                     if (iExitCode != 0 )
                     {
-                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), 
+                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                     else
                     {
-                        // Update profile
-                        g_profile.SetAutoStart(TEXT(""));
+                        g_profile.SetAutoStart(TEXT("")); // Update profile
                     }
                 }
                 else
                 {
-                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), 
+                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
         }
 
         // - Auto capture
-        g_profile.SetAutoCapture(Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE)) == BST_CHECKED);
+        g_profile.SetAutoCapture(
+            Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE)) == BST_CHECKED);
     }
 
     // Close dialog
@@ -297,13 +302,15 @@ static void OnDeleteAll(HWND hWnd)
 {
     if( g_bCapture )
     {
-        MessageBox(hWnd, TEXT("Please stop capture first."), TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+        MessageBox(hWnd, TEXT("Please stop capture first."), 
+            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         Utils::DeleteAllPackets();
         g_pDetailView->OnAllPacketsDeleted();
-        MessageBox(hWnd, TEXT("All packets have been deleted."), TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+        MessageBox(hWnd, TEXT("All packets have been deleted."), 
+            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
 }
 
@@ -311,13 +318,15 @@ static void OnCompact(HWND hWnd)
 {
     if( g_bCapture )
     {
-        MessageBox(hWnd, TEXT("Please stop capture first."), TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+        MessageBox(hWnd, TEXT("Please stop capture first."), 
+            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         SQLite::Flush();
         SQLite::Exec(TEXT("Vacuum;"), false);
-        MessageBox(hWnd, TEXT("Compact finished."), TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+        MessageBox(hWnd, TEXT("Compact finished."), 
+            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
 }
 
@@ -413,13 +422,13 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 ///----------------------------------------------------------------------------------------------//
 INT_PTR CALLBACK ProcDlgPreferences(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    #define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
+#define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
 
     PROCESS_MSG(WM_INITDIALOG, OnInitDialog)
     PROCESS_MSG(WM_CLOSE,      OnClose)
     PROCESS_MSG(WM_COMMAND,    OnCommand)
 
-    #undef PROCESS_MSG
+#undef PROCESS_MSG
 
     return FALSE;
 }

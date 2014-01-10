@@ -30,7 +30,8 @@ protected:
     void CalcSize();
 
 public:
-    GwPieChart(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR **descs, COLORREF *colors, __int64 *values, int count);
+    GwPieChart(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+        const TCHAR **descs, COLORREF *colors, __int64 *values, int count);
     virtual ~GwPieChart();
 
     virtual void Paint();

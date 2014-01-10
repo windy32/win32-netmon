@@ -96,7 +96,8 @@ void RealtimeModel::InsertPacket(PacketInfoEx *pi)
     Unlock();
 }
 
-void RealtimeModel::Export(int process, enum ZoomFactor zoom, std::vector<int> &txRate, std::vector<int> &rxRate)
+void RealtimeModel::Export(
+    int process, enum ZoomFactor zoom, std::vector<int> &txRate, std::vector<int> &rxRate)
 {
     Fill();
     Lock();

@@ -113,7 +113,9 @@ bool SQLite::TableExist(const TCHAR *tableName)
 
     // Build Command
     TCHAR command[512];
-    _stprintf_s(command, _countof(command), TEXT("Select name From sqlite_master Where type In ('table','view') And name == \'%s\'"), tableName);
+    _stprintf_s(command, _countof(command), 
+        TEXT("Select name From sqlite_master Where type In ('table','view') And name == \'%s\'"), 
+        tableName);
 
     // Convert to UTF-8
     char szCommand[512];

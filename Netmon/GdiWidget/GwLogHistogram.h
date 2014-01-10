@@ -10,7 +10,9 @@ protected:
     int _logSegments;
 
 public:
-    GwLogHistogram(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, __int64 *values, int cValue, int *scales, int cScale, const TCHAR *caption, COLORREF color, int logBase, int logSegments);
+    GwLogHistogram(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+        __int64 *values, int cValue, int *scales, int cScale, 
+        const TCHAR *caption, COLORREF color, int logBase, int logSegments);
 
     virtual void Paint();
 };

@@ -3,7 +3,10 @@
 
 #include "../utils/Utils.h"
 
-GwPieChart::GwPieChart(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR **descs, COLORREF *colors, __int64 *values, int count) : GdiWidget(hdcTarget, x, y, maxWidth, maxHeight)
+GwPieChart::GwPieChart(
+    HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+    const TCHAR **descs, COLORREF *colors, 
+    __int64 *values, int count) : GdiWidget(hdcTarget, x, y, maxWidth, maxHeight)
 {
     assert(count > 0 && count < MAX_ITEM);
 
@@ -66,7 +69,8 @@ void GwPieChart::CalcSize()
     _marginDesc = 4;
     _marginValue = 3;
 
-    _pieWidth = _maxWidth - _maxValueWidth - _maxDescWidth - _legendWidth - _marginLegend - _marginDesc - _marginValue;
+    _pieWidth = _maxWidth - _maxValueWidth - _maxDescWidth - 
+        _legendWidth - _marginLegend - _marginDesc - _marginValue;
     _pieHeight = _maxHeight;
 
     if( _pieWidth > _pieHeight )

@@ -63,7 +63,8 @@ void MonthModel::InitDatabase()
 void MonthModel::InitDatabaseCallback(SQLiteRow *row)
 {
     int puid        = row->GetDataInt32(0);
-    int date        = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), lower 16 bit for mday
+    int date        = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), 
+                                            // lower 16 bit for mday
     __int64 txBytes = row->GetDataInt64(2);
     __int64 rxBytes = row->GetDataInt64(3);
 
@@ -113,7 +114,8 @@ void MonthModel::SaveDatabase()
     SQLite::Exec(TEXT("Delete From Traffic;"), true);
 
     // Insert records
-    for(std::map<int, MtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it) // Loop of Process
+    std::map<int, MtModelItem>::iterator it;
+    for(it = _items.begin(); it != _items.end(); ++it) // Loop of Process
     {
         int puid = it->first;
 
@@ -134,7 +136,8 @@ void MonthModel::SaveDatabase()
                 // Build Command
                 TCHAR command[256];
 
-                _stprintf_s(command, _countof(command), TEXT("Insert Into Traffic Values(%d, %d, %I64d, %I64d, 0, 0);"), 
+                _stprintf_s(command, _countof(command), 
+                    TEXT("Insert Into Traffic Values(%d, %d, %I64d, %I64d, 0, 0);"), 
                     puid, date, it->second.months[i].dayTx[j], it->second.months[i].dayRx[j]);
 
                 // Insert

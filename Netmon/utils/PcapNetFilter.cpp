@@ -243,9 +243,12 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
                     continue; // Unknown PPPoE packet
                 }
 
-                ih = (IpHeader  *)(pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader));
-                uh = (UdpHeader *)(pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader) + sizeof(IpHeader));
-                th = (TcpHeader *)(pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader) + sizeof(IpHeader));
+                ih = (IpHeader  *)
+                    (pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader));
+                uh = (UdpHeader *)
+                    (pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader) + sizeof(IpHeader));
+                th = (TcpHeader *)
+                    (pkt_data + sizeof(PppoeHeader) + sizeof(MacHeader) + sizeof(IpHeader));
             }
             else
             {

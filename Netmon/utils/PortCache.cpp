@@ -50,11 +50,13 @@ void PortCache::RebuildTcpTable()
 
     DWORD tableSize = sizeof(table);
 
-    if( GetExtendedTcpTable((void *)&table, &tableSize, FALSE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0) == NO_ERROR )
+    if( GetExtendedTcpTable((void *)&table, &tableSize, 
+        FALSE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0) == NO_ERROR )
     {
         for(unsigned int i = 0; i < table.dwNumEntries; i++)
         {
-            _tcpPortTable[ntohs((unsigned short)table.table[i].dwLocalPort)] = table.table[i].dwOwningPid;
+            _tcpPortTable[ntohs((unsigned short)table.table[i].dwLocalPort)] = 
+                table.table[i].dwOwningPid;
         }
     }
 }
@@ -70,11 +72,13 @@ void PortCache::RebuildUdpTable()
 
     DWORD tableSize = sizeof(table);
 
-    if( GetExtendedUdpTable((void *)&table, &tableSize, FALSE, AF_INET, UDP_TABLE_OWNER_PID, 0) == NO_ERROR)
+    if( GetExtendedUdpTable((void *)&table, &tableSize, 
+        FALSE, AF_INET, UDP_TABLE_OWNER_PID, 0) == NO_ERROR)
     {
         for(unsigned int i = 0; i < table.dwNumEntries; i++)
         {
-            _udpPortTable[ntohs((unsigned short)table.table[i].dwLocalPort)] = table.table[i].dwOwningPid;
+            _udpPortTable[ntohs((unsigned short)table.table[i].dwLocalPort)] = 
+                table.table[i].dwOwningPid;
         }
     }
 }

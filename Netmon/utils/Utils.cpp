@@ -44,7 +44,8 @@ int Utils::GetProcessUid(const TCHAR *name)
     TCHAR command[256];
 
     // Build Command
-    _stprintf_s(command, _countof(command), TEXT("Select UID From Process Where Name = \'%s\';"), name);
+    _stprintf_s(command, _countof(command), 
+        TEXT("Select UID From Process Where Name = \'%s\';"), name);
 
     // Build SQLiteRow Object
     SQLiteRow row;
@@ -64,7 +65,8 @@ int Utils::InsertProcess(const TCHAR *name)
     TCHAR command[256];
 
     // Build Command
-    _stprintf_s(command, _countof(command), TEXT("Insert Into Process(Name) Values(\'%s\');"), name);
+    _stprintf_s(command, _countof(command), 
+        TEXT("Insert Into Process(Name) Values(\'%s\');"), name);
 
     // Insert
     SQLite::Exec(command, false);
@@ -106,7 +108,8 @@ bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
     TCHAR command[256];
 
     // Build Command
-    _stprintf_s(command, _countof(command), TEXT("Select Name From Process Where UID = %d;"), puid);
+    _stprintf_s(command, _countof(command), 
+        TEXT("Select Name From Process Where UID = %d;"), puid);
 
     // Build SQLiteRow Object
     SQLiteRow row;
@@ -133,7 +136,8 @@ void Utils::InsertPacket(PacketInfoEx *pi)
         TEXT("Insert Into Packet(PActivityUid, ProcessUid, AdapterUid, Direction, ")
         TEXT("NetProtocol, TraProtocol, Size, Time, Port) ")
         TEXT("Values(%d, %d, Null, %d, %d, %d, %d, %I64d, %d);"), 
-        pi->pauid, pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, pi->size, i64time, pi->remote_port);
+        pi->pauid, pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, 
+        pi->size, i64time, pi->remote_port);
 
     // Insert
     SQLite::Exec(command, true);
@@ -523,14 +527,18 @@ void Utils::GetVersionString(TCHAR *buf, int cchLen)
 }
 
 // Menu
-void Utils::SetMenuString(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem)
+void Utils::SetMenuString(
+    HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem)
 {
     UINT uMenuState = LOWORD(GetMenuState(hMnu, uPosition, uFlags));
-    ModifyMenu(hMnu, uPosition, (uFlags | uMenuState | MF_STRING) & (~MF_SEPARATOR) & (~MF_USECHECKBITMAPS) & (~MF_OWNERDRAW), uIDNewItem, lpNewItem);
+    ModifyMenu(hMnu, uPosition, 
+        (uFlags | uMenuState | MF_STRING) & 
+        (~MF_SEPARATOR) & (~MF_USECHECKBITMAPS) & (~MF_OWNERDRAW), uIDNewItem, lpNewItem);
 }
 
 // Process
-BOOL Utils::StartProcessAndWait(const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs)
+BOOL Utils::StartProcessAndWait(
+    const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs)
 {
     SHELLEXECUTEINFO sei = { sizeof(SHELLEXECUTEINFO) };
     DWORD dwExitCode;
@@ -562,7 +570,7 @@ BOOL Utils::StartProcessAndWait(const TCHAR *szFile, const TCHAR *szParam, int *
 }
 
 // File & Directory
-void Utils::GetSomeFilePathNameInCurrentDir(TCHAR *buf, int cchLen, const TCHAR *szFileName)
+void Utils::GetFilePathInCurrentDir(TCHAR *buf, int cchLen, const TCHAR *szFileName)
 {
     TCHAR szCurrentExe[MAX_PATH];
     TCHAR szCurrentDir[MAX_PATH];

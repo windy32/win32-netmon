@@ -45,7 +45,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdS
     {
         TCHAR cmd[MAX_PATH];
         _stprintf_s(cmd, MAX_PATH, TEXT("\"%s\" -h"), lpCmdLine);
-        RegSetValueEx(hRunKey, TEXT("Netmon"), 0, REG_SZ, (BYTE *)cmd, _tcslen(cmd) * sizeof(TCHAR) + 1);
+        RegSetValueEx(hRunKey, TEXT("Netmon"), 
+            0, REG_SZ, (BYTE *)cmd, _tcslen(cmd) * sizeof(TCHAR) + 1);
     }
     else // No argument, do nothing
     {

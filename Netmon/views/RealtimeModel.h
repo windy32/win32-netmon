@@ -52,7 +52,8 @@ public:
     void InsertPacket(PacketInfoEx *pi);
 
     // Export Model Info
-    void Export(int process, enum ZoomFactor zoom, std::vector<int> &txRate, std::vector<int> &rxRate);
+    void Export(
+        int process, enum ZoomFactor zoom, std::vector<int> &txRate, std::vector<int> &rxRate);
 };
 
 #endif

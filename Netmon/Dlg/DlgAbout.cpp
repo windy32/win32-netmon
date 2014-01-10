@@ -37,7 +37,8 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SetWindowPos(hWnd, HWND_TOP, 140, 140, 569, 320, 0);
 
     // Init the Read-only Edit Control
-    g_lpOldProcEdit = (WNDPROC)SetWindowLong(GetDlgItem(hWnd, IDE_THIRD_PARTY), GWL_WNDPROC, (LONG)MyProcEdit);
+    g_lpOldProcEdit = 
+        (WNDPROC)SetWindowLong(GetDlgItem(hWnd, IDE_THIRD_PARTY), GWL_WNDPROC, (LONG)MyProcEdit);
 
     // Get Client Rectangle
     RECT stClientRect;
@@ -50,11 +51,14 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     int y2 = stClientRect.bottom;
 
     // Move Controls
-    SetWindowPos(GetDlgItem(hWnd, IDE_THIRD_PARTY), HWND_TOP, x1 + 22, 100, x2 - x1 - 32, y2 - y1 - 144, 0);
-    SetWindowPos(GetDlgItem(hWnd, IDB_CLOSE), HWND_TOP, x2 - 90, y2 - 34, 80, 24, 0);
+    SetWindowPos(GetDlgItem(hWnd, IDE_THIRD_PARTY), 
+        HWND_TOP, x1 + 22, 100, x2 - x1 - 32, y2 - y1 - 144, 0);
+    SetWindowPos(GetDlgItem(hWnd, IDB_CLOSE), 
+        HWND_TOP, x2 - 90, y2 - 34, 80, 24, 0);
 
     // Set Bitmap
-    SendMessage(GetDlgItem(hWnd, IDS_SIDEBAR), STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_ABOUT_SIDEBAR)));
+    SendMessage(GetDlgItem(hWnd, IDS_SIDEBAR), STM_SETIMAGE, 
+        IMAGE_BITMAP, (LPARAM)LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_ABOUT_SIDEBAR)));
 
     // Set close button text
     SetDlgItemText(hWnd, IDB_CLOSE, Language::GetString(IDS_ABOUT_CLOSE));
@@ -159,14 +163,17 @@ static void OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SetTextColor(stPS.hdc, RGB(0x00, 0x00, 0x00));
     SelectObject(stPS.hdc, hFontText);
 
-    TextOut(stPS.hdc, x1 + 22, y1 + 34, Language::GetString(IDS_ABOUT_COPYRIGHT),  _tcslen(Language::GetString(IDS_ABOUT_COPYRIGHT)));
-    TextOut(stPS.hdc, x1 + 22, y1 + 48, Language::GetString(IDS_ABOUT_ALL_RIGHTS), _tcslen(Language::GetString(IDS_ABOUT_ALL_RIGHTS)));
+    TextOut(stPS.hdc, x1 + 22, y1 + 34, Language::GetString(IDS_ABOUT_COPYRIGHT),  
+        _tcslen(Language::GetString(IDS_ABOUT_COPYRIGHT)));
+    TextOut(stPS.hdc, x1 + 22, y1 + 48, Language::GetString(IDS_ABOUT_ALL_RIGHTS), 
+        _tcslen(Language::GetString(IDS_ABOUT_ALL_RIGHTS)));
 
     // - Third parties
     SetTextAlign(stPS.hdc, TA_LEFT | TA_BOTTOM);
     SetTextColor(stPS.hdc, RGB(0x17, 0x14, 0xA3));
     SelectObject(stPS.hdc, hFontTitle2);
-    TextOut(stPS.hdc, x1 + 10, y1 + 87, Language::GetString(IDS_ABOUT_THIRD_PARTIES), _tcslen(Language::GetString(IDS_ABOUT_THIRD_PARTIES)));
+    TextOut(stPS.hdc, x1 + 10, y1 + 87, Language::GetString(IDS_ABOUT_THIRD_PARTIES), 
+        _tcslen(Language::GetString(IDS_ABOUT_THIRD_PARTIES)));
 
     // - Line
     MoveToEx(stPS.hdc, x1 + 10, y1 + 90, 0);
@@ -199,14 +206,14 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 ///----------------------------------------------------------------------------------------------//
 INT_PTR CALLBACK ProcDlgAbout(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    #define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
+#define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
 
     PROCESS_MSG(WM_INITDIALOG, OnInitDialog)
     PROCESS_MSG(WM_CLOSE,      OnClose)
     PROCESS_MSG(WM_COMMAND,    OnCommand)
     PROCESS_MSG(WM_PAINT,      OnPaint)
 
-    #undef PROCESS_MSG
+#undef PROCESS_MSG
 
     return FALSE;
 }

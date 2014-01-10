@@ -3,7 +3,9 @@
 
 #include "../utils/Utils.h"
 
-GwGroupbox::GwGroupbox(HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, const TCHAR *caption, COLORREF color) : GdiWidget(hdcTarget, x, y, maxWidth, maxHeight)
+GwGroupbox::GwGroupbox(
+    HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 
+    const TCHAR *caption, COLORREF color) : GdiWidget(hdcTarget, x, y, maxWidth, maxHeight)
 {
     // Save parameters
     _caption = caption;

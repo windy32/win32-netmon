@@ -26,7 +26,8 @@ protected:
     static void UpdateContent(bool rebuildList);
     static void UpdateContentCallback(SQLiteRow *row);
 
-    static void ListViewInsert(int uid, int puid, int dir, int protocol, int size, __int64 time, int port);
+    static void ListViewInsert(
+        int uid, int puid, int dir, int protocol, int size, __int64 time, int port);
 
     static void OnPageUp();
     static void OnPageDown();
