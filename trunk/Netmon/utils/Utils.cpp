@@ -6,576 +6,576 @@
 // ListView
 void Utils::InnerListViewInsert(HWND hList, int index, int numColumns, va_list argList)
 {
-	const int MAX_ARG = 32;
+    const int MAX_ARG = 32;
 
-	// Get arguments
-	TCHAR *szColumns[MAX_ARG];
+    // Get arguments
+    TCHAR *szColumns[MAX_ARG];
 
-	for(int i = 0; i < numColumns; i++)
-	{
-		szColumns[i] = va_arg(argList, TCHAR *);
-	}
+    for(int i = 0; i < numColumns; i++)
+    {
+        szColumns[i] = va_arg(argList, TCHAR *);
+    }
 
-	// Insert
-	LVITEM stItem;
+    // Insert
+    LVITEM stItem;
 
-	// - Initialize LVITEM
-	stItem.mask = LVIF_TEXT;
-	stItem.iItem = index;
-	stItem.iSubItem = 0;
-	stItem.pszText = szColumns[0];
+    // - Initialize LVITEM
+    stItem.mask = LVIF_TEXT;
+    stItem.iItem = index;
+    stItem.iSubItem = 0;
+    stItem.pszText = szColumns[0];
 
-	// - Insert First Item
-	stItem.iItem = ListView_InsertItem(hList, &stItem);
+    // - Insert First Item
+    stItem.iItem = ListView_InsertItem(hList, &stItem);
 
-	// - Insert Sub Items
-	for(int i = 1; i < numColumns; i++)
-	{
-		stItem.pszText = szColumns[i];
-		stItem.iSubItem = i;
+    // - Insert Sub Items
+    for(int i = 1; i < numColumns; i++)
+    {
+        stItem.pszText = szColumns[i];
+        stItem.iSubItem = i;
 
-		ListView_SetItem(hList, &stItem);
-	}
+        ListView_SetItem(hList, &stItem);
+    }
 }
 
 // Database
 int Utils::GetProcessUid(const TCHAR *name)
 {
-	TCHAR command[256];
+    TCHAR command[256];
 
-	// Build Command
-	_stprintf_s(command, _countof(command), TEXT("Select UID From Process Where Name = \'%s\';"), name);
+    // Build Command
+    _stprintf_s(command, _countof(command), TEXT("Select UID From Process Where Name = \'%s\';"), name);
 
-	// Build SQLiteRow Object
-	SQLiteRow row;
-	row.InsertType(SQLiteRow::TYPE_INT32);
+    // Build SQLiteRow Object
+    SQLiteRow row;
+    row.InsertType(SQLiteRow::TYPE_INT32);
 
-	// Select
-	if( SQLite::Select(command, &row))
-	{
-		return row.GetDataInt32(0);
-	}
+    // Select
+    if( SQLite::Select(command, &row))
+    {
+        return row.GetDataInt32(0);
+    }
 
-	return -1;
+    return -1;
 }
 
 int Utils::InsertProcess(const TCHAR *name)
 {
-	TCHAR command[256];
+    TCHAR command[256];
 
-	// Build Command
-	_stprintf_s(command, _countof(command), TEXT("Insert Into Process(Name) Values(\'%s\');"), name);
+    // Build Command
+    _stprintf_s(command, _countof(command), TEXT("Insert Into Process(Name) Values(\'%s\');"), name);
 
-	// Insert
-	SQLite::Exec(command, false);
+    // Insert
+    SQLite::Exec(command, false);
 
-	// Return the UID of the inserted item
-	return (int)SQLite::GetLastInsertRowId();
+    // Return the UID of the inserted item
+    return (int)SQLite::GetLastInsertRowId();
 }
 
 /*
 int Utils::InsertProcessActivity(int puid, int startTime, int endTime)
 {
-	TCHAR command[256];
+    TCHAR command[256];
 
-	// Build Comamnd
-	_stprintf_s(command, _countof(command), 
-		TEXT("Insert Into PActivity(ProcessUid, StartTime, EndTime) Values(%d, %d, %d);"), 
-		puid, startTime, endTime);
+    // Build Comamnd
+    _stprintf_s(command, _countof(command), 
+        TEXT("Insert Into PActivity(ProcessUid, StartTime, EndTime) Values(%d, %d, %d);"), 
+        puid, startTime, endTime);
 
-	SQLite::Exec(command, false);
+    SQLite::Exec(command, false);
 
-	// Return the UID of the inserted item
-	return (int)SQLite::GetLastInsertRowId();
+    // Return the UID of the inserted item
+    return (int)SQLite::GetLastInsertRowId();
 }
 
 void Utils::UpdateProcessActivity(int pauid, int endTime)
 {
-	TCHAR command[256];
+    TCHAR command[256];
 
-	// Build Comamnd
-	_stprintf_s(command, _countof(command), 
-		TEXT("Update PActivity Set EndTime = %d Where UID = %d;"), endTime, pauid);
+    // Build Comamnd
+    _stprintf_s(command, _countof(command), 
+        TEXT("Update PActivity Set EndTime = %d Where UID = %d;"), endTime, pauid);
 
-	SQLite::Exec(command, false);
+    SQLite::Exec(command, false);
 }
 */
 
 bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
 {
-	TCHAR command[256];
+    TCHAR command[256];
 
-	// Build Command
-	_stprintf_s(command, _countof(command), TEXT("Select Name From Process Where UID = %d;"), puid);
+    // Build Command
+    _stprintf_s(command, _countof(command), TEXT("Select Name From Process Where UID = %d;"), puid);
 
-	// Build SQLiteRow Object
-	SQLiteRow row;
-	row.InsertType(SQLiteRow::TYPE_STRING);
+    // Build SQLiteRow Object
+    SQLiteRow row;
+    row.InsertType(SQLiteRow::TYPE_STRING);
 
-	// Select
-	if( SQLite::Select(command, &row))
-	{
-		_tcscpy_s(buf, len, row.GetDataStr(0));
-		return true;
-	}
+    // Select
+    if( SQLite::Select(command, &row))
+    {
+        _tcscpy_s(buf, len, row.GetDataStr(0));
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 void Utils::InsertPacket(PacketInfoEx *pi)
 {
-	TCHAR command[256];
+    TCHAR command[256];
 
-	// Build Command
-	__int64 i64time = ((__int64)(pi->time_s) << 32) + (__int64)(pi->time_us);
+    // Build Command
+    __int64 i64time = ((__int64)(pi->time_s) << 32) + (__int64)(pi->time_us);
 
-	_stprintf_s(command, _countof(command), 
-		TEXT("Insert Into Packet(PActivityUid, ProcessUid, AdapterUid, Direction, ")
-		TEXT("NetProtocol, TraProtocol, Size, Time, Port) ")
-		TEXT("Values(%d, %d, Null, %d, %d, %d, %d, %I64d, %d);"), 
-		pi->pauid, pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, pi->size, i64time, pi->remote_port);
+    _stprintf_s(command, _countof(command), 
+        TEXT("Insert Into Packet(PActivityUid, ProcessUid, AdapterUid, Direction, ")
+        TEXT("NetProtocol, TraProtocol, Size, Time, Port) ")
+        TEXT("Values(%d, %d, Null, %d, %d, %d, %d, %I64d, %d);"), 
+        pi->pauid, pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, pi->size, i64time, pi->remote_port);
 
-	// Insert
-	SQLite::Exec(command, true);
+    // Insert
+    SQLite::Exec(command, true);
 }
 
 void Utils::DeleteAllPackets()
 {
-	SQLite::Exec(TEXT("Delete From Packet;"), false);
+    SQLite::Exec(TEXT("Delete From Packet;"), false);
 }
 
 // Time
 int Utils::GetNumDays(int exMonth)
 {
-	int iYear  = 1970 + exMonth / 12;
-	int iMonth = exMonth % 12; // 0 to 11;
+    int iYear  = 1970 + exMonth / 12;
+    int iMonth = exMonth % 12; // 0 to 11;
 
-	int iDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int iDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-	// Leap Year
-	if( (iYear % 4 == 0) && (iYear % 100 != 0 || iYear % 400 == 0))
-	{
-		iDays[1] = 29;
-	}
+    // Leap Year
+    if( (iYear % 4 == 0) && (iYear % 100 != 0 || iYear % 400 == 0))
+    {
+        iDays[1] = 29;
+    }
 
-	return iDays[iMonth];
+    return iDays[iMonth];
 }
 
 int Utils::GetExMonth()
 {
-	time_t tTime = time(0);
-	struct tm tmTime;
-	
-	localtime_s(&tmTime, &tTime);
+    time_t tTime = time(0);
+    struct tm tmTime;
+    
+    localtime_s(&tmTime, &tTime);
 
-	return tmTime.tm_mon + (tmTime.tm_year - 70) * 12;
+    return tmTime.tm_mon + (tmTime.tm_year - 70) * 12;
 }
 
 int Utils::GetExMonthByDate(int date)
 {
-	return date >> 16;
+    return date >> 16;
 }
 
 int Utils::GetMdayByDate(int date)
 {
-	return date & 0xFFFF;
+    return date & 0xFFFF;
 }
 
 int Utils::GetExMonth(time_t tTime)
 {
-	struct tm tmTime;
-	
-	localtime_s(&tmTime, &tTime);
+    struct tm tmTime;
+    
+    localtime_s(&tmTime, &tTime);
 
-	return tmTime.tm_mon + (tmTime.tm_year - 70) * 12;
+    return tmTime.tm_mon + (tmTime.tm_year - 70) * 12;
 }
 
 int Utils::GetDay()
 {
-	time_t tTime = time(0);
-	struct tm tmTime;
-	
-	localtime_s(&tmTime, &tTime);
+    time_t tTime = time(0);
+    struct tm tmTime;
+    
+    localtime_s(&tmTime, &tTime);
 
-	return tmTime.tm_mday; // 1 to 31
+    return tmTime.tm_mday; // 1 to 31
 }
 
 int Utils::GetDay(time_t tTime)
 {
-	struct tm tmTime;
-	
-	localtime_s(&tmTime, &tTime);
+    struct tm tmTime;
+    
+    localtime_s(&tmTime, &tTime);
 
-	return tmTime.tm_mday; // 1 to 31
+    return tmTime.tm_mday; // 1 to 31
 }
 
 int Utils::GetWeekDay(int exMonth, int mday)
 {
-	// Build the tm Structure
-	time_t tTime = time(0);
-	struct tm tmTime;
-	
-	localtime_s(&tmTime, &tTime);
+    // Build the tm Structure
+    time_t tTime = time(0);
+    struct tm tmTime;
+    
+    localtime_s(&tmTime, &tTime);
 
-	// Reset it's month and mday
-	tmTime.tm_year = 70 + exMonth / 12;
-	tmTime.tm_mon =  exMonth % 12;
-	tmTime.tm_mday = mday; // 1 to 31
+    // Reset it's month and mday
+    tmTime.tm_year = 70 + exMonth / 12;
+    tmTime.tm_mon =  exMonth % 12;
+    tmTime.tm_mday = mday; // 1 to 31
 
-	// Convert to time_t Again
-	time_t targetTime = mktime(&tmTime);
+    // Convert to time_t Again
+    time_t targetTime = mktime(&tmTime);
 
-	// Convert to tm Structure Again
-	localtime_s(&tmTime, &targetTime);
+    // Convert to tm Structure Again
+    localtime_s(&tmTime, &targetTime);
 
-	return tmTime.tm_wday; // 0 to 6
+    return tmTime.tm_wday; // 0 to 6
 }
 
 // ListView
 void Utils::ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...)
 {
-	const int MAX_ARG = 32;
+    const int MAX_ARG = 32;
 
-	// Get arguments
-	TCHAR *szHeaders[MAX_ARG];
-	int iHeaderWidths[MAX_ARG];
+    // Get arguments
+    TCHAR *szHeaders[MAX_ARG];
+    int iHeaderWidths[MAX_ARG];
 
-	va_list argList;
-	va_start(argList, numColumns);
+    va_list argList;
+    va_start(argList, numColumns);
 
-	for(int i = 0; i < numColumns; i++)
-	{
-		szHeaders[i] = va_arg(argList, TCHAR *);
-	}
+    for(int i = 0; i < numColumns; i++)
+    {
+        szHeaders[i] = va_arg(argList, TCHAR *);
+    }
 
-	for(int i = 0; i < numColumns; i++)
-	{
-		iHeaderWidths[i] = va_arg(argList, int);
-	}
+    for(int i = 0; i < numColumns; i++)
+    {
+        iHeaderWidths[i] = va_arg(argList, int);
+    }
 
-	va_end(argList);
+    va_end(argList);
 
-	// Init ListView
-	if( bCheckBox )
-	{
-		ListView_SetExtendedListViewStyle(hList, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT);
-	}
-	else
-	{
-		ListView_SetExtendedListViewStyle(hList, LVS_EX_FULLROWSELECT);
-	}
+    // Init ListView
+    if( bCheckBox )
+    {
+        ListView_SetExtendedListViewStyle(hList, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT);
+    }
+    else
+    {
+        ListView_SetExtendedListViewStyle(hList, LVS_EX_FULLROWSELECT);
+    }
 
-	// Modern Style is disabled
-	// SetWindowTheme(hList, L"Explorer", NULL);
+    // Modern Style is disabled
+    // SetWindowTheme(hList, L"Explorer", NULL);
 
-	// Initialize the LVCOLUMN structure.
-	LVCOLUMN stLVC;
-	stLVC.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+    // Initialize the LVCOLUMN structure.
+    LVCOLUMN stLVC;
+    stLVC.mask = LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 
-	// Insert Columns
-	for(int i = 0; i < numColumns; i++)
-	{
-		stLVC.cx = iHeaderWidths[i];
-		stLVC.iSubItem = i;
-		stLVC.pszText = szHeaders[i];
+    // Insert Columns
+    for(int i = 0; i < numColumns; i++)
+    {
+        stLVC.cx = iHeaderWidths[i];
+        stLVC.iSubItem = i;
+        stLVC.pszText = szHeaders[i];
 
-		ListView_InsertColumn(hList, i, &stLVC);
-	}
+        ListView_InsertColumn(hList, i, &stLVC);
+    }
 }
 
 void Utils::ListViewSetColumnText(HWND hList, int numColumns, ...)
 {
-	va_list argList;
-	va_start(argList, numColumns);
+    va_list argList;
+    va_start(argList, numColumns);
 
-	// Initialize the LVCOLUMN structure.
-	LVCOLUMN lvc;
-	lvc.mask = LVCF_TEXT;
+    // Initialize the LVCOLUMN structure.
+    LVCOLUMN lvc;
+    lvc.mask = LVCF_TEXT;
 
-	// Set column text
-	for(int i = 0; i < numColumns; i++)
-	{
-		lvc.pszText = va_arg(argList, TCHAR *);
-		ListView_SetColumn(hList, i, &lvc);
-	}
+    // Set column text
+    for(int i = 0; i < numColumns; i++)
+    {
+        lvc.pszText = va_arg(argList, TCHAR *);
+        ListView_SetColumn(hList, i, &lvc);
+    }
 
-	va_end(argList);
+    va_end(argList);
 }
 
 void Utils::ListViewClear(HWND hList)
 {
-	ListView_DeleteAllItems(hList);
+    ListView_DeleteAllItems(hList);
 }
 
 void Utils::ListViewInsert(HWND hList, int index, int numColumns, ...)
 {
-	va_list argList;
-	va_start(argList, numColumns);
+    va_list argList;
+    va_start(argList, numColumns);
 
-	InnerListViewInsert(hList, index, numColumns, argList);
+    InnerListViewInsert(hList, index, numColumns, argList);
 
-	va_end(argList);
+    va_end(argList);
 }
 
 void Utils::ListViewAppend(HWND hList, int numColumns, ...)
 {
-	va_list argList;
-	va_start(argList, numColumns);
+    va_list argList;
+    va_start(argList, numColumns);
 
-	InnerListViewInsert(hList, INT_MAX, numColumns, argList);
+    InnerListViewInsert(hList, INT_MAX, numColumns, argList);
 
-	va_end(argList);
+    va_end(argList);
 }
 
 void Utils::ListViewUpdate(HWND hList, int index, int numColumns, ...)
 {
-	const int MAX_ARG = 32;
+    const int MAX_ARG = 32;
 
-	// Get arguments
-	BOOL bUpdate[MAX_ARG];
-	TCHAR *szColumns[MAX_ARG];
+    // Get arguments
+    BOOL bUpdate[MAX_ARG];
+    TCHAR *szColumns[MAX_ARG];
 
-	va_list argList;
-	va_start(argList, numColumns);
+    va_list argList;
+    va_start(argList, numColumns);
 
-	for(int i = 0; i < numColumns; i++)
-	{
-		bUpdate[i] = va_arg(argList, BOOL);
-	}
+    for(int i = 0; i < numColumns; i++)
+    {
+        bUpdate[i] = va_arg(argList, BOOL);
+    }
 
-	for(int i = 0; i < numColumns; i++)
-	{
-		szColumns[i] = va_arg(argList, TCHAR *);
-	}
+    for(int i = 0; i < numColumns; i++)
+    {
+        szColumns[i] = va_arg(argList, TCHAR *);
+    }
 
-	va_end(argList);
+    va_end(argList);
 
-	// Update
-	LVITEM stItem;
+    // Update
+    LVITEM stItem;
 
-	// - Initialize LVITEM
-	stItem.mask = LVIF_TEXT;
-	stItem.iItem = index;
-	stItem.iSubItem = 0;
-	stItem.pszText = szColumns[0];
+    // - Initialize LVITEM
+    stItem.mask = LVIF_TEXT;
+    stItem.iItem = index;
+    stItem.iSubItem = 0;
+    stItem.pszText = szColumns[0];
 
-	// - Update Sub Items
-	for(int i = 0; i < numColumns; i++)
-	{
-		if( bUpdate[i] )
-		{
-			stItem.pszText = szColumns[i];
-			stItem.iSubItem = i;
+    // - Update Sub Items
+    for(int i = 0; i < numColumns; i++)
+    {
+        if( bUpdate[i] )
+        {
+            stItem.pszText = szColumns[i];
+            stItem.iSubItem = i;
 
-			ListView_SetItem(hList, &stItem);
-		}
-	}
+            ListView_SetItem(hList, &stItem);
+        }
+    }
 }
 
 int Utils::ListViewGetRowCount(HWND hList)
 {
-	return ListView_GetItemCount(hList);
+    return ListView_GetItemCount(hList);
 }
 
 void Utils::ListViewGetText(HWND hList, int row, int column, TCHAR *buf, int cchLen)
 {
-	ListView_GetItemText(hList, row, column, buf, cchLen - 1);
+    ListView_GetItemText(hList, row, column, buf, cchLen - 1);
 }
 
 int Utils::ListViewGetSelectedItemIndex(HWND hList)
 {
-	int count = ListView_GetItemCount(hList);
-	for (int i = 0; i < count; i++)
-	{
-		if (ListView_GetItemState(hList, i, LVIS_SELECTED) == LVIS_SELECTED)
-			return i;
-	}
-	return -1;
+    int count = ListView_GetItemCount(hList);
+    for (int i = 0; i < count; i++)
+    {
+        if (ListView_GetItemState(hList, i, LVIS_SELECTED) == LVIS_SELECTED)
+            return i;
+    }
+    return -1;
 }
 
 // Tab
 void Utils::TabInit(HWND hTab, int numTabs, ...)
 {
-	va_list argList;
-	va_start(argList, numTabs);
+    va_list argList;
+    va_start(argList, numTabs);
 
-	// Initialize the TCITEM Structure
-	TCITEM tci;
+    // Initialize the TCITEM Structure
+    TCITEM tci;
     tci.mask = TCIF_TEXT; 
  
-	// Insert Tabs
+    // Insert Tabs
     for (int i = 0; i < numTabs; i++) 
     {
-	    tci.pszText = va_arg(argList, TCHAR *);
+        tci.pszText = va_arg(argList, TCHAR *);
 
         TabCtrl_InsertItem(hTab, i, &tci); 
     }
 
-	va_end(argList);
+    va_end(argList);
 }
 
 void Utils::TabSetText(HWND hTab, int numTabs, ...)
 {
-	va_list argList;
-	va_start(argList, numTabs);
+    va_list argList;
+    va_start(argList, numTabs);
 
-	// Initialize the TCITEM Structure
-	TCITEM tci;
+    // Initialize the TCITEM Structure
+    TCITEM tci;
     tci.mask = TCIF_TEXT; 
  
-	// Insert Tabs
+    // Insert Tabs
     for (int i = 0; i < numTabs; i++) 
     {
-	    tci.pszText = va_arg(argList, TCHAR *);
+        tci.pszText = va_arg(argList, TCHAR *);
 
         TabCtrl_SetItem(hTab, i, &tci); 
     }
 
-	va_end(argList);
+    va_end(argList);
 }
 
 // GDI
 HFONT Utils::MyCreateFont(const TCHAR *name, int height, int width, bool bold)
 {
-	LOGFONT stLogFont;
-	RtlZeroMemory(&stLogFont, sizeof(stLogFont));
+    LOGFONT stLogFont;
+    RtlZeroMemory(&stLogFont, sizeof(stLogFont));
 
-	stLogFont.lfHeight = height;
-	stLogFont.lfWidth = width;
-	stLogFont.lfEscapement = 0;
-	stLogFont.lfOrientation = 0;
-	stLogFont.lfWeight = (bold ? FW_BOLD : FW_REGULAR);
-	stLogFont.lfItalic = FALSE;
-	stLogFont.lfUnderline = FALSE;
-	stLogFont.lfStrikeOut = FALSE;
-	_tcscpy_s(stLogFont.lfFaceName, _countof(stLogFont.lfFaceName), name);
+    stLogFont.lfHeight = height;
+    stLogFont.lfWidth = width;
+    stLogFont.lfEscapement = 0;
+    stLogFont.lfOrientation = 0;
+    stLogFont.lfWeight = (bold ? FW_BOLD : FW_REGULAR);
+    stLogFont.lfItalic = FALSE;
+    stLogFont.lfUnderline = FALSE;
+    stLogFont.lfStrikeOut = FALSE;
+    _tcscpy_s(stLogFont.lfFaceName, _countof(stLogFont.lfFaceName), name);
 
-	return CreateFontIndirect(&stLogFont); 
+    return CreateFontIndirect(&stLogFont); 
 }
 
 // Math
 double Utils::Log(double value, double base)
 {
-	return log(value) / log(base);
+    return log(value) / log(base);
 }
 
 double Utils::Exp(double value, double base)
 {
-	return exp(value * log(base));
+    return exp(value * log(base));
 }
 
 // Codec
 int Utils::Utf16ToUtf8(const TCHAR *src, char *dst, int len)
 {
-	return WideCharToMultiByte(CP_UTF8, 0, src, -1, dst, len, 0, 0);
+    return WideCharToMultiByte(CP_UTF8, 0, src, -1, dst, len, 0, 0);
 }
 
 int Utils::Utf8ToUtf16(const char *src, TCHAR *dst, int len)
 {
-	return MultiByteToWideChar(CP_UTF8, 0, src, -1, dst, len);
+    return MultiByteToWideChar(CP_UTF8, 0, src, -1, dst, len);
 }
 
 int Utils::AnsiToUtf16(const char *src, TCHAR *dst, int len)
 {
-	return MultiByteToWideChar(CP_ACP, 0, src, -1, dst, len);
+    return MultiByteToWideChar(CP_ACP, 0, src, -1, dst, len);
 }
 
 // Debug
 void Utils::DbgPrint(const TCHAR *format, ...)
 {
-	TCHAR buf[1024];
-	va_list argList;
-	va_start(argList, format);
+    TCHAR buf[1024];
+    va_list argList;
+    va_start(argList, format);
 
-	_vstprintf_s(buf, _countof(buf), format, argList);
-	OutputDebugString(buf);
+    _vstprintf_s(buf, _countof(buf), format, argList);
+    OutputDebugString(buf);
 
-	va_end(argList);
+    va_end(argList);
 }
 
 // Version
 void Utils::GetVersionString(TCHAR *buf, int cchLen)
 {
-	TCHAR szExe[MAX_PATH];
-	BYTE *pVersionInfo = 0;
-	INT iVersionInfoSize;
-	VS_FIXEDFILEINFO *pFixedFileInfo = 0;
-	UINT iFixedFileInfoSize;
+    TCHAR szExe[MAX_PATH];
+    BYTE *pVersionInfo = 0;
+    INT iVersionInfoSize;
+    VS_FIXEDFILEINFO *pFixedFileInfo = 0;
+    UINT iFixedFileInfoSize;
 
-	// Get full path name of "Netmon.exe"
-	GetModuleFileName(0, szExe, MAX_PATH);
+    // Get full path name of "Netmon.exe"
+    GetModuleFileName(0, szExe, MAX_PATH);
 
-	// Get version info size
-	iVersionInfoSize = GetFileVersionInfoSize(szExe, 0);
+    // Get version info size
+    iVersionInfoSize = GetFileVersionInfoSize(szExe, 0);
 
-	// Get version info
-	pVersionInfo = new BYTE[iVersionInfoSize];
-	GetFileVersionInfo(szExe, 0, iVersionInfoSize, pVersionInfo);
+    // Get version info
+    pVersionInfo = new BYTE[iVersionInfoSize];
+    GetFileVersionInfo(szExe, 0, iVersionInfoSize, pVersionInfo);
 
-	// Get fixed file info
-	VerQueryValue(pVersionInfo, TEXT("\\"), (void **)&pFixedFileInfo, &iFixedFileInfoSize);
+    // Get fixed file info
+    VerQueryValue(pVersionInfo, TEXT("\\"), (void **)&pFixedFileInfo, &iFixedFileInfoSize);
 
-	// Set string
-	_stprintf_s(buf, cchLen, TEXT("%d.%d.%d"), 
-		HIWORD(pFixedFileInfo->dwFileVersionMS), 
-		LOWORD(pFixedFileInfo->dwFileVersionMS),
-		HIWORD(pFixedFileInfo->dwFileVersionLS));
+    // Set string
+    _stprintf_s(buf, cchLen, TEXT("%d.%d.%d"), 
+        HIWORD(pFixedFileInfo->dwFileVersionMS), 
+        LOWORD(pFixedFileInfo->dwFileVersionMS),
+        HIWORD(pFixedFileInfo->dwFileVersionLS));
 }
 
 // Menu
 void Utils::SetMenuString(HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem)
 {
-	UINT uMenuState = LOWORD(GetMenuState(hMnu, uPosition, uFlags));
-	ModifyMenu(hMnu, uPosition, (uFlags | uMenuState | MF_STRING) & (~MF_SEPARATOR) & (~MF_USECHECKBITMAPS) & (~MF_OWNERDRAW), uIDNewItem, lpNewItem);
+    UINT uMenuState = LOWORD(GetMenuState(hMnu, uPosition, uFlags));
+    ModifyMenu(hMnu, uPosition, (uFlags | uMenuState | MF_STRING) & (~MF_SEPARATOR) & (~MF_USECHECKBITMAPS) & (~MF_OWNERDRAW), uIDNewItem, lpNewItem);
 }
 
 // Process
 BOOL Utils::StartProcessAndWait(const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs)
 {
     SHELLEXECUTEINFO sei = { sizeof(SHELLEXECUTEINFO) };
-	DWORD dwExitCode;
+    DWORD dwExitCode;
 
     sei.fMask = SEE_MASK_NOCLOSEPROCESS;
     if( bRunAs )
-	{
-		sei.lpVerb = TEXT("runas");
-	}
+    {
+        sei.lpVerb = TEXT("runas");
+    }
     sei.lpFile = szFile;
-	sei.lpParameters = szParam;
+    sei.lpParameters = szParam;
     sei.nShow = SW_SHOWNORMAL;
 
-	if( ShellExecuteEx(&sei) && sei.hProcess != 0 )
-	{
-		// Wait until finish
-		WaitForSingleObject(sei.hProcess, INFINITE);
+    if( ShellExecuteEx(&sei) && sei.hProcess != 0 )
+    {
+        // Wait until finish
+        WaitForSingleObject(sei.hProcess, INFINITE);
 
-		// Get exit code
-		GetExitCodeProcess(sei.hProcess, &dwExitCode);
-		*pExitCode = dwExitCode;
+        // Get exit code
+        GetExitCodeProcess(sei.hProcess, &dwExitCode);
+        *pExitCode = dwExitCode;
 
-		// Exit
-		CloseHandle(sei.hProcess);
-		return TRUE;
-	}
+        // Exit
+        CloseHandle(sei.hProcess);
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 // File & Directory
 void Utils::GetSomeFilePathNameInCurrentDir(TCHAR *buf, int cchLen, const TCHAR *szFileName)
 {
-	TCHAR szCurrentExe[MAX_PATH];
-	TCHAR szCurrentDir[MAX_PATH];
-	TCHAR *pFilePart;
+    TCHAR szCurrentExe[MAX_PATH];
+    TCHAR szCurrentDir[MAX_PATH];
+    TCHAR *pFilePart;
 
-	// Get full path name of Netmon.exe
-	GetModuleFileName(0, szCurrentExe, MAX_PATH);
+    // Get full path name of Netmon.exe
+    GetModuleFileName(0, szCurrentExe, MAX_PATH);
 
-	// Get base directory
-	GetFullPathName(szCurrentExe, MAX_PATH, szCurrentDir, &pFilePart);
-	*pFilePart = TEXT('\0');
+    // Get base directory
+    GetFullPathName(szCurrentExe, MAX_PATH, szCurrentDir, &pFilePart);
+    *pFilePart = TEXT('\0');
 
-	// Get full path name of Netmon.ini
-	_tcscpy_s(buf, cchLen, szCurrentDir);
-	_tcscat_s(buf, cchLen, szFileName);
+    // Get full path name of Netmon.ini
+    _tcscpy_s(buf, cchLen, szCurrentDir);
+    _tcscat_s(buf, cchLen, szFileName);
 }

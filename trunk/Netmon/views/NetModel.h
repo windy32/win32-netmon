@@ -7,18 +7,18 @@
 class NetModel
 {
 private:
-	CRITICAL_SECTION _cs;
+    CRITICAL_SECTION _cs;
 
 public:
-	static const int PROCESS_ALL;
+    static const int PROCESS_ALL;
 
 protected:
-	void Lock();
-	void Unlock();
+    void Lock();
+    void Unlock();
 
 public:
-	NetModel();
-	~NetModel();
+    NetModel();
+    ~NetModel();
 };
 
 #endif
