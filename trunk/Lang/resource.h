@@ -87,11 +87,19 @@
 #define IDS_PREF_OK                             40082
 #define IDS_PREF_CANCEL                         40083
 
-#define IDS_MENU_PROCESS_SHOW                   40084
-#define IDS_MENU_PROCESS_HIDE                   40085
-#define IDS_MENU_VIEW_SHOW_HIDDEN               40086
+#define IDS_PREF_UPDATE_NOW                     40084
+#define IDS_PREF_UPDATE_ERROR                   40085
+#define IDS_PREF_CANNOT_EXECUTE                 40086
+#define IDS_PREF_MAX_SPACE_RANGE                40087
+#define IDS_PREF_STOP_FIRST                     40088
+#define IDS_PREF_ALL_DELETED                    40089
+#define IDS_PREF_COMPACT_FINISHED               40090
 
-#define IDS_TRAY_RECONNECT_TITLE                40087
-#define IDS_TRAY_RECONNECT_DESC                 40088
+#define IDS_MENU_PROCESS_SHOW                   40091
+#define IDS_MENU_PROCESS_HIDE                   40092
+#define IDS_MENU_VIEW_SHOW_HIDDEN               40093
+
+#define IDS_TRAY_RECONNECT_TITLE                40094
+#define IDS_TRAY_RECONNECT_DESC                 40095
 
 // Remember to update "Language.h"

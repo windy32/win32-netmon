@@ -103,6 +103,15 @@ STRINGTABLE
     IDS_PREF_DTVIEW_COMPACT       "Compact"
     IDS_PREF_OK                   "OK"
     IDS_PREF_CANCEL               "Cancel"
+
+    IDS_PREF_UPDATE_NOW           "Netmon has detected that the autorun item in registry\ndoesn't match the running executable file.\n\nWill you update the registry now?"
+    IDS_PREF_UPDATE_ERROR         "An error occurred updating registry!"
+    IDS_PREF_CANNOT_EXECUTE       "Cannot execute RegUpdater!"
+    IDS_PREF_MAX_SPACE_RANGE      "Max disk space should be between 10 MB and 1024 MB!"
+    IDS_PREF_STOP_FIRST           "Please stop capture first."
+    IDS_PREF_ALL_DELETED          "All packets have been deleted."
+    IDS_PREF_COMPACT_FINISHED     "Compact finished"
+
 	IDS_TRAY_RECONNECT_TITLE      "Information"
 	IDS_TRAY_RECONNECT_DESC       "Netmon has been stopped automatically, please click start again"
 }
