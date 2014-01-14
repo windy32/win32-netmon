@@ -103,6 +103,15 @@ STRINGTABLE
     IDS_PREF_DTVIEW_COMPACT       "释放空间"
     IDS_PREF_OK                   "确定"
     IDS_PREF_CANCEL               "取消"
+
+    IDS_PREF_UPDATE_NOW           "Netmon检测到注册表中的启动项与程序当前路径不符，\n是否进行更新？"
+    IDS_PREF_UPDATE_ERROR         "访问注册表的时候发生了一个错误！"
+    IDS_PREF_CANNOT_EXECUTE       "无法启动RegUpdater！"
+    IDS_PREF_MAX_SPACE_RANGE      "最大磁盘空间应该在10MB和1024 MB之间！"
+    IDS_PREF_STOP_FIRST           "请首先停止监视"
+    IDS_PREF_ALL_DELETED          "所有报文都已删除"
+    IDS_PREF_COMPACT_FINISHED     "空间已释放"
+
 	IDS_TRAY_RECONNECT_TITLE      "提示"
 	IDS_TRAY_RECONNECT_DESC       "Netmon已自动停止监视，请重新点击开始按钮"
 }

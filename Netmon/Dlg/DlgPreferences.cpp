@@ -52,11 +52,7 @@ static void InitProfile(HWND hWnd)
         // Sync registry autorun item
         if( _tcscmp(szNetmon, szAutoStart) != 0 )
         {
-            int iResult = MessageBox(hWnd, 
-                TEXT("Netmon has detected that the autorun item in registry\n")
-                TEXT("doesn't match the running executable file.\n")
-                TEXT("\n")
-                TEXT("Will you update the registry now?"), 
+            int iResult = MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_NOW),
                 TEXT("Netmon"), MB_YESNO | MB_ICONQUESTION);
 
             if( iResult == IDYES )
@@ -75,13 +71,13 @@ static void InitProfile(HWND hWnd)
                     }
                     else
                     {
-                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), 
+                        MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
                             TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                 }
                 else
                 {
-                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), 
+                    MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
                         TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
@@ -179,7 +175,7 @@ static void OnOk(HWND hWnd)
             if( !(bTranslated && iDtViewMaxSpace >= 10 && iDtViewMaxSpace <= 1024 ))
             {
                 bParamOk = FALSE;
-                MessageBox(hWnd, TEXT("Max disk space should be between 10 MB and 1024 MB!"), 
+                MessageBox(hWnd, Language::GetString(IDS_PREF_MAX_SPACE_RANGE), 
                     TEXT("Error"), MB_OK | MB_ICONWARNING);
             }
 
@@ -233,7 +229,7 @@ static void OnOk(HWND hWnd)
                 {
                     if (iExitCode != 0 )
                     {
-                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), 
+                        MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
                             TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                     else
@@ -243,7 +239,7 @@ static void OnOk(HWND hWnd)
                 }
                 else
                 {
-                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), 
+                    MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
                         TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
@@ -265,7 +261,7 @@ static void OnOk(HWND hWnd)
                 {
                     if (iExitCode != 0 )
                     {
-                        MessageBox(hWnd, TEXT("An error occurred updating registry!"), 
+                        MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
                             TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                     else
@@ -275,7 +271,7 @@ static void OnOk(HWND hWnd)
                 }
                 else
                 {
-                    MessageBox(hWnd, TEXT("Cannot execute RegUpdater!"), 
+                    MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
                         TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
@@ -302,14 +298,14 @@ static void OnDeleteAll(HWND hWnd)
 {
     if( g_bCapture )
     {
-        MessageBox(hWnd, TEXT("Please stop capture first."), 
+        MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         Utils::DeleteAllPackets();
         g_pDetailView->OnAllPacketsDeleted();
-        MessageBox(hWnd, TEXT("All packets have been deleted."), 
+        MessageBox(hWnd, Language::GetString(IDS_PREF_ALL_DELETED), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
 }
@@ -318,14 +314,14 @@ static void OnCompact(HWND hWnd)
 {
     if( g_bCapture )
     {
-        MessageBox(hWnd, TEXT("Please stop capture first."), 
+        MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         SQLite::Flush();
         SQLite::Exec(TEXT("Vacuum;"), false);
-        MessageBox(hWnd, TEXT("Compact finished."), 
+        MessageBox(hWnd, Language::GetString(IDS_PREF_COMPACT_FINISHED), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
 }
