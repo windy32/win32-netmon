@@ -45,22 +45,42 @@ void RealtimeModel::Fill()
 
     for(std::map<int, RtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
     {
-        while( it->second.rate_tx_1s.size() < size_1s )
+        RtModelItem &item = it->second;
+
+        if( item.rate_tx_1s.size() > 80 * 1024 ) // Remove at least 64 KB one time
         {
-            it->second.rate_tx_1s.push_back(0);
-            it->second.rate_rx_1s.push_back(0);
+            item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 64 * 1024);
+            item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 64 * 1024);
+            item.removed_1s += 64 * 1024;
+        }
+        while( item.rate_tx_1s.size() < size_1s - item.removed_1s )
+        {
+            item.rate_tx_1s.push_back(0);
+            item.rate_rx_1s.push_back(0);
         }
 
-        while( it->second.rate_tx_10s.size() < size_10s )
+        if( item.rate_tx_10s.size() > 80 * 1024 )
         {
-            it->second.rate_tx_10s.push_back(0);
-            it->second.rate_rx_10s.push_back(0);
+            item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 64 * 1024);
+            item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 64 * 1024);
+            item.removed_10s += 64 * 1024;
+        }
+        while( item.rate_tx_10s.size() < size_10s - item.removed_10s )
+        {
+            item.rate_tx_10s.push_back(0);
+            item.rate_rx_10s.push_back(0);
         }
 
-        while( it->second.rate_tx_60s.size() < size_60s )
+        if( item.rate_tx_60s.size() > 80 * 1024 )
         {
-            it->second.rate_tx_60s.push_back(0);
-            it->second.rate_rx_60s.push_back(0);
+            item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 64 * 1024);
+            item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 64 * 1024);
+            item.removed_60s += 64 * 1024;
+        }
+        while( item.rate_tx_60s.size() < size_60s - item.removed_60s )
+        {
+            item.rate_tx_60s.push_back(0);
+            item.rate_rx_60s.push_back(0);
         }
     }
 
