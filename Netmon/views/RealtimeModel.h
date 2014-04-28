@@ -39,6 +39,10 @@ private:
         std::vector<int> rate_rx_10s;
         std::vector<int> rate_rx_60s;
 
+        int removed_1s;
+        int removed_10s;
+        int removed_60s;
+
         struct tagRtModelItem()
         {
             rate_tx_1s.reserve(3600 * 10);
@@ -48,6 +52,10 @@ private:
             rate_rx_1s.reserve(3600 * 10);
             rate_rx_10s.reserve(360 * 10);
             rate_rx_60s.reserve(60 * 10);
+
+            removed_1s = 0;
+            removed_10s = 0;
+            removed_60s = 0;
         }
     } RtModelItem;
 
