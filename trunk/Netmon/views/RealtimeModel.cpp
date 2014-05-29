@@ -47,11 +47,11 @@ void RealtimeModel::Fill()
     {
         RtModelItem &item = it->second;
 
-        if( item.rate_tx_1s.size() > 80 * 1024 ) // Remove at least 64 KB one time
+        if( item.rate_tx_1s.size() > 8 * 1024 ) // Remove at least 4 KB one time
         {
-            item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 64 * 1024);
-            item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 64 * 1024);
-            item.removed_1s += 64 * 1024;
+            item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 4 * 1024);
+            item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 4 * 1024);
+            item.removed_1s += 4 * 1024;
         }
         while( item.rate_tx_1s.size() < size_1s - item.removed_1s )
         {
@@ -59,11 +59,11 @@ void RealtimeModel::Fill()
             item.rate_rx_1s.push_back(0);
         }
 
-        if( item.rate_tx_10s.size() > 80 * 1024 )
+        if( item.rate_tx_10s.size() > 8 * 1024 )
         {
-            item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 64 * 1024);
-            item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 64 * 1024);
-            item.removed_10s += 64 * 1024;
+            item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 4 * 1024);
+            item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 4 * 1024);
+            item.removed_10s += 4 * 1024;
         }
         while( item.rate_tx_10s.size() < size_10s - item.removed_10s )
         {
@@ -71,11 +71,11 @@ void RealtimeModel::Fill()
             item.rate_rx_10s.push_back(0);
         }
 
-        if( item.rate_tx_60s.size() > 80 * 1024 )
+        if( item.rate_tx_60s.size() > 8 * 1024 )
         {
-            item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 64 * 1024);
-            item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 64 * 1024);
-            item.removed_60s += 64 * 1024;
+            item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 4 * 1024);
+            item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 4 * 1024);
+            item.removed_60s += 4 * 1024;
         }
         while( item.rate_tx_60s.size() < size_60s - item.removed_60s )
         {
