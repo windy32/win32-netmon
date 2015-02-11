@@ -69,7 +69,7 @@ void MonthModel::InitDatabase()
     SQLite::Select(command, &row, InitDatabaseCallback);
 
     // Set current month as first month when no data is available
-    if( MtModelItem::firstMonth == -1 )
+    if (MtModelItem::firstMonth == -1 )
     {
         MtModelItem::firstMonth = Utils::GetExMonth();
     }
@@ -87,7 +87,7 @@ void MonthModel::InitDatabaseCallback(SQLiteRow *row)
     int exMonth = Utils::GetExMonthByDate(date);
 
     // Insert an MtViewItem if PUID not Exist
-    if( _this->_items.count(puid) == 0 )
+    if (_this->_items.count(puid) == 0 )
     {
         _this->_items[puid] = MtModelItem();
         MtModelItem::firstMonth = Utils::GetExMonthByDate(date);
@@ -134,7 +134,7 @@ void MonthModel::SaveDatabase()
     {
         int puid = it->first;
 
-        if( puid == PROCESS_ALL )
+        if (puid == PROCESS_ALL )
         {
             continue;
         }
@@ -171,7 +171,7 @@ void MonthModel::InsertPacket(PacketInfoEx *pi)
 {
     // Insert an MtViewItem if PUID not Exist
     Lock();
-    if( _items.count(pi->puid) == 0 )
+    if (_items.count(pi->puid) == 0 )
     {
         _items[pi->puid] = MtModelItem();
     }
@@ -188,7 +188,7 @@ void MonthModel::InsertPacket(PacketInfoEx *pi)
     MonthItem &mItem = _items[pi->puid].months[Utils::GetExMonth() - MtModelItem::firstMonth];
     MonthItem &mItemAll = _items[PROCESS_ALL].months[Utils::GetExMonth() - MtModelItem::firstMonth];
 
-    if( pi->dir == DIR_UP )
+    if (pi->dir == DIR_UP )
     {
         mItem.dayTx[mDay - 1] += pi->size;
         mItem.sumTx += pi->size;
@@ -196,7 +196,7 @@ void MonthModel::InsertPacket(PacketInfoEx *pi)
         mItemAll.dayTx[mDay - 1] += pi->size;
         mItemAll.sumTx += pi->size;
     }
-    else if( pi->dir == DIR_DOWN )
+    else if (pi->dir == DIR_DOWN )
     {
         mItem.dayRx[mDay - 1] += pi->size;
         mItem.sumRx += pi->size;

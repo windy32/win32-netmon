@@ -108,12 +108,12 @@ void RealtimeView::DrawGraph()
 
     for(int i = startIndex; i < endIndex; i++)
     {
-        if( txRate[i] > maxRate )
+        if (txRate[i] > maxRate )
         {
             maxRate = txRate[i];
         }
 
-        if( rxRate[i] > maxRate )
+        if (rxRate[i] > maxRate )
         {
             maxRate = rxRate[i];
         }
@@ -172,7 +172,7 @@ void RealtimeView::DrawGraph()
 
     for(int i = 0; i < 21; i++)
     {
-        if( maxRate <= rates[i] )
+        if (maxRate <= rates[i] )
         {
             scaleRate = rates[i];
             numSegment = segments[i];
@@ -180,7 +180,7 @@ void RealtimeView::DrawGraph()
         }
     }
 
-    if( numSegment == 0 ) // Higher than 5000 KB/s
+    if (numSegment == 0 ) // Higher than 5000 KB/s
     {
         scaleRate = rates[21 - 1];
         numSegment = segments[21 - 1];
@@ -195,7 +195,7 @@ void RealtimeView::DrawGraph()
     SetTextColor(_hdcBuf, RGB(0, 0, 0));
     SetTextAlign(_hdcBuf, TA_RIGHT);
 
-    if( numSegment == 4 )
+    if (numSegment == 4 )
     {
         for(int i = 0; i < 5; i++)
         {
@@ -203,7 +203,7 @@ void RealtimeView::DrawGraph()
             TextOut(_hdcBuf, x1 - 6, y1 + (y2 - y1 - 4) * i / 4 - 3, yAxisText, _tcslen(yAxisText));
         }
     }
-    else if( numSegment == 5 )
+    else if (numSegment == 5 )
     {
         for(int i = 0; i < 6; i++)
         {
@@ -235,7 +235,7 @@ void RealtimeView::DrawGraph()
     // - Scale Line
     SetDCPenColor(_hdcBuf, RGB(0xCC, 0xCC, 0xCC));
 
-    if( numSegment == 4 )
+    if (numSegment == 4 )
     {
         for(int i = 1; i < 5 - 1; i++)
         {
@@ -243,7 +243,7 @@ void RealtimeView::DrawGraph()
             LineTo(_hdcBuf, x2 - 1, y1 + (y2 - y1) * i / 4);
         }
     }
-    else if( numSegment == 5 )
+    else if (numSegment == 5 )
     {
         for(int i = 1; i < 6 - 1; i++)
         {
@@ -264,9 +264,9 @@ void RealtimeView::DrawGraph()
         int yPos1 = ((y2 - y1) * (__int64)rxRate[i]) / (1024 * scaleRate * iFactor);
         int yPos2 = ((y2 - y1) * (__int64)rxRate[i + 1]) / (1024 * scaleRate * iFactor);
 
-        if( _smoothFactor == SMOOTH_2X )
+        if (_smoothFactor == SMOOTH_2X )
         {
-            if( i - startIndex >= 1 ) // One More Point Taken into Consideration
+            if (i - startIndex >= 1 ) // One More Point Taken into Consideration
             {
                 int yPos1_1 = (y2 - y1) * (__int64)rxRate[i - 1] / (1024 * scaleRate * iFactor);
                 int yPos2_1 = (y2 - y1) * (__int64)rxRate[i] / (1024 * scaleRate * iFactor);
@@ -276,9 +276,9 @@ void RealtimeView::DrawGraph()
                 yPos2 = (yPos2 + yPos2_1) / 2;
             }
         }
-        else if( _smoothFactor == SMOOTH_4X )
+        else if (_smoothFactor == SMOOTH_4X )
         {
-            if( i - startIndex >= 3 ) // Three More Points
+            if (i - startIndex >= 3 ) // Three More Points
             {
                 int yPos1_1 = (y2 - y1) * (__int64)rxRate[i - 1] / (1024 * scaleRate * iFactor);
                 int yPos2_1 = (y2 - y1) * (__int64)rxRate[i] / (1024 * scaleRate * iFactor);
@@ -310,9 +310,9 @@ void RealtimeView::DrawGraph()
         int yPos1 = ((y2 - y1) * (__int64)txRate[i]) / (1024 * scaleRate * iFactor);
         int yPos2 = ((y2 - y1) * (__int64)txRate[i + 1]) / (1024 * scaleRate * iFactor);
 
-        if( _smoothFactor == SMOOTH_2X )
+        if (_smoothFactor == SMOOTH_2X )
         {
-            if( i - startIndex >= 1 ) // One More Point Taken into Consideration
+            if (i - startIndex >= 1 ) // One More Point Taken into Consideration
             {
                 int yPos1_1 = (y2 - y1) * (__int64)txRate[i - 1] / (1024 * scaleRate * iFactor);
                 int yPos2_1 = (y2 - y1) * (__int64)txRate[i] / (1024 * scaleRate * iFactor);
@@ -322,9 +322,9 @@ void RealtimeView::DrawGraph()
                 yPos2 = (yPos2 + yPos2_1) / 2;
             }
         }
-        else if( _smoothFactor == SMOOTH_4X )
+        else if (_smoothFactor == SMOOTH_4X )
         {
-            if( i - startIndex >= 3 ) // Three More Points
+            if (i - startIndex >= 3 ) // Three More Points
             {
                 int yPos1_1 = (y2 - y1) * (__int64)txRate[i - 1] / (1024 * scaleRate * iFactor);
                 int yPos2_1 = (y2 - y1) * (__int64)txRate[i] / (1024 * scaleRate * iFactor);
@@ -426,15 +426,15 @@ void RealtimeView::DrawGraph()
 
     SetBkColor(_hdcBuf, RGB(0xDD, 0xDD, 0xDD));
 
-    if( _smoothFactor == SMOOTH_1X )
+    if (_smoothFactor == SMOOTH_1X )
     {
         TextOut(_hdcBuf, smoothX, smoothY + 0 * smoothD, TEXT("1X"), 2);
     }
-    else if( _smoothFactor == SMOOTH_2X )
+    else if (_smoothFactor == SMOOTH_2X )
     {
         TextOut(_hdcBuf, smoothX, smoothY + 1 * smoothD, TEXT("2X"), 2);
     }
-    else if( _smoothFactor == SMOOTH_4X )
+    else if (_smoothFactor == SMOOTH_4X )
     {
         TextOut(_hdcBuf, smoothX, smoothY + 2 * smoothD, TEXT("4X"), 2);
     }
@@ -451,15 +451,15 @@ void RealtimeView::DrawGraph()
 
     SetBkColor(_hdcBuf, RGB(0xDD, 0xDD, 0xDD));
 
-    if( _zoomFactor == ZOOM_1S )
+    if (_zoomFactor == ZOOM_1S )
     {
         TextOut(_hdcBuf, zoomX + 0, zoomY, TEXT("1X"), 2);
     }
-    else if( _zoomFactor == ZOOM_10S )
+    else if (_zoomFactor == ZOOM_10S )
     {
         TextOut(_hdcBuf, zoomX + 16, zoomY, TEXT("10X"), 3);
     }
-    else if( _zoomFactor == ZOOM_60S )
+    else if (_zoomFactor == ZOOM_60S )
     {
         TextOut(_hdcBuf, zoomX + 37, zoomY, TEXT("60X"), 3);
     }
@@ -469,7 +469,7 @@ void RealtimeView::DrawGraph()
     // Process Name
     SelectObject(_hdcBuf, _hProcessFont);
     SetTextColor(_hdcBuf, RGB(128, 128, 128));
-    if( _process == -1 )
+    if (_process == -1 )
     {
         TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, 
             Language::GetString(IDS_ALL_PROCESS), _tcslen(Language::GetString(IDS_ALL_PROCESS)));
@@ -487,7 +487,7 @@ void RealtimeView::DrawGraph()
 
 LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if( uMsg == WM_INITDIALOG )
+    if (uMsg == WM_INITDIALOG )
     {
         // Size Window
         RECT stRect = *(RECT *)lParam;
@@ -502,7 +502,7 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         // - Device Context & Bitmap
         _hdcTarget = GetDC(hWnd);
 
-        if( _hdcBuf == 0 )
+        if (_hdcBuf == 0 )
         {
             _hdcBuf = CreateCompatibleDC(_hdcTarget);
             _hbmpBuf = CreateCompatibleBitmap(_hdcTarget, 2000, 1200);  // Suppose enough
@@ -526,7 +526,7 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         // Start Timer
         SetTimer(hWnd, 0, 1000, RealtimeView::TimerProc);
     }
-    else if( uMsg == WM_CLOSE )
+    else if (uMsg == WM_CLOSE )
     {
         KillTimer(hWnd, 0);
 
@@ -540,7 +540,7 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
         DestroyWindow(hWnd);
     }
-    else if( uMsg == WM_PAINT )
+    else if (uMsg == WM_PAINT )
     {
         PAINTSTRUCT stPS;
         BeginPaint(hWnd, &stPS);
@@ -549,25 +549,25 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
         EndPaint(hWnd, &stPS);
     }
-    else if( uMsg == WM_LBUTTONDOWN )
+    else if (uMsg == WM_LBUTTONDOWN )
     {
         int x = (lParam & 0xFFFF);
         int y = (lParam & 0xFFFF0000) >> 16;
 
         // Smooth Factor
-        if( x >= 127 && x <= 140 )
+        if (x >= 127 && x <= 140 )
         {
-            if( y >= 19 && y < 32 )
+            if (y >= 19 && y < 32 )
             {
                 _smoothFactor = SMOOTH_1X;
                 DrawGraph();
             }
-            else if( y >= 32 && y < 45 )
+            else if (y >= 32 && y < 45 )
             {
                 _smoothFactor = SMOOTH_2X;
                 DrawGraph();
             }
-            else if( y >= 45 && y < 58 )
+            else if (y >= 45 && y < 58 )
             {
                 _smoothFactor = SMOOTH_4X;
                 DrawGraph();
@@ -583,26 +583,26 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         int zoomX = x1 + 1;
         int zoomY = y2 + 0;
 
-        if( y >= zoomY && y <= zoomY + 12 )
+        if (y >= zoomY && y <= zoomY + 12 )
         {
-            if( x >= zoomX && x <= zoomX + 12 )
+            if (x >= zoomX && x <= zoomX + 12 )
             {
                 _zoomFactor = ZOOM_1S;
                 DrawGraph();
             }
-            else if( x >= zoomX + 16 && x <= zoomX + 33 )
+            else if (x >= zoomX + 16 && x <= zoomX + 33 )
             {
                 _zoomFactor = ZOOM_10S;
                 DrawGraph();
             }
-            else if( x >= zoomX + 37 && x <= zoomX + 54 )
+            else if (x >= zoomX + 37 && x <= zoomX + 54 )
             {
                 _zoomFactor = ZOOM_60S;
                 DrawGraph();
             }
         }
     }
-    else if( uMsg == WM_SIZE )
+    else if (uMsg == WM_SIZE )
     {
         RECT stRect;
 

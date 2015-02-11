@@ -41,7 +41,7 @@ LRESULT CALLBACK DetailView::MyProcEdit(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 {
     if(uMsg == WM_KEYDOWN && wParam == VK_RETURN )
     {
-        if( _model->GetCurPackets(_process) > 0 )
+        if (_model->GetCurPackets(_process) > 0 )
         {
             OnGoto();
         }
@@ -103,7 +103,7 @@ void DetailView::ListViewInsert(
     _stprintf_s(szColumn[4], MAX_PATH, TEXT("%d"), size);
     _stprintf_s(szColumn[5], MAX_PATH, szDateTime);
 
-    if( protocol == TRA_TCP || protocol == TRA_UDP )
+    if (protocol == TRA_TCP || protocol == TRA_UDP )
     {
         _stprintf_s(szColumn[6], MAX_PATH, TEXT("%d"), port);
     }
@@ -180,7 +180,7 @@ void DetailView::UpdateContent(bool rebuildList)
         TCHAR command[256];
         SQLiteRow row;
 
-        if( _process == PROCESS_ALL )
+        if (_process == PROCESS_ALL )
         {
             _stprintf_s(command, _countof(command), 
                 TEXT("Select * From Packet Limit 100 Offset %I64d;"), firstRow);
@@ -254,11 +254,11 @@ void DetailView::OnGoto()
     int page = GetDlgItemInt(_hWnd, IDE_GOTO, &translated, TRUE);
     __int64 curPackets  = _model->GetCurPackets(_process);
 
-    if( !translated ) 
+    if (!translated ) 
     {
         MessageBox(_hWnd, TEXT("Page number incorrect!"), TEXT("Error"), MB_ICONWARNING | MB_OK);
     }
-    else if( page <= 0 || page > (curPackets - 1) / 100 + 1 )
+    else if (page <= 0 || page > (curPackets - 1) / 100 + 1 )
     {
         MessageBox(_hWnd, TEXT("Page number out of range!"), TEXT("Error"), MB_ICONWARNING | MB_OK);
     }
@@ -295,7 +295,7 @@ void DetailView::SwitchLanguage(HWND hWnd)
 // Dialog Procedure
 LRESULT DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if( uMsg == WM_INITDIALOG )
+    if (uMsg == WM_INITDIALOG )
     {
         _hWnd = hWnd;
         _hList = GetDlgItem(hWnd, IDL_DETAIL);
@@ -333,26 +333,26 @@ LRESULT DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         // Start Timer
         SetTimer(hWnd, 0, 1000, DetailView::TimerProc);
     }
-    else if( uMsg == WM_PAINT )
+    else if (uMsg == WM_PAINT )
     {
-        if( Language::GetLangId() != _iLanguageId )
+        if (Language::GetLangId() != _iLanguageId )
         {
             SwitchLanguage(hWnd);
             _iLanguageId = Language::GetLangId();
         }
         return FALSE;
     }
-    else if( uMsg == WM_COMMAND )
+    else if (uMsg == WM_COMMAND )
     {
-        if( wParam == IDB_PAGEUP )
+        if (wParam == IDB_PAGEUP )
         {
             OnPageUp();
         }
-        else if( wParam == IDB_PAGEDOWN )
+        else if (wParam == IDB_PAGEDOWN )
         {
             OnPageDown();
         }
-        else if( wParam == IDB_GOTO )
+        else if (wParam == IDB_GOTO )
         {
             OnGoto();
         }
@@ -365,13 +365,13 @@ LRESULT DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         return (INT_PTR)GetStockObject(WHITE_BRUSH);
     }
-    else if( uMsg == WM_CLOSE )
+    else if (uMsg == WM_CLOSE )
     {
         KillTimer(hWnd, 0);
         DestroyWindow(hWnd);
         _hWnd = 0;
     }
-    else if( uMsg == WM_SIZE )
+    else if (uMsg == WM_SIZE )
     {
         UpdateSize(hWnd);
     }
@@ -393,7 +393,7 @@ void DetailView::OnAllPacketsDeleted()
     _model->ClearPackets();
     _curPage = 0;
 
-    if( _hWnd != 0 )
+    if (_hWnd != 0 )
     {
         UpdateContent(true);
     }

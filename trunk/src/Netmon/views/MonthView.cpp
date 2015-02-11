@@ -108,12 +108,12 @@ void MonthView::DrawGraph()
 
     for(int i = 0; i < numDays; i++)
     {
-        if( item.dayTx[i] > maxTraffic )
+        if (item.dayTx[i] > maxTraffic )
         {
             maxTraffic = item.dayTx[i];
         }
 
-        if( item.dayRx[i] > maxTraffic )
+        if (item.dayRx[i] > maxTraffic )
         {
             maxTraffic = item.dayRx[i];
         }
@@ -148,7 +148,7 @@ void MonthView::DrawGraph()
 
     for(int i = 0; i < 12; i++)
     {
-        if( maxTraffic < traffic[i] )
+        if (maxTraffic < traffic[i] )
         {
             scaleTraffic = traffic[i];
             scalePrecision[0] = precision[i][0];
@@ -159,7 +159,7 @@ void MonthView::DrawGraph()
         }
     }
 
-    if( scaleTraffic == 0 ) // More than 50000 MB
+    if (scaleTraffic == 0 ) // More than 50000 MB
     {
         scaleTraffic = traffic[12 - 1];
         scalePrecision[0] = precision[12 - 1][0];
@@ -220,7 +220,7 @@ void MonthView::DrawGraph()
         _stprintf_s(szDay, _countof(szDay), TEXT("%d"), i + 1);
 
         // Set Color, Sundays are Red
-        if( Utils::GetWeekDay(_curMonth, i + 1) == 0 )
+        if (Utils::GetWeekDay(_curMonth, i + 1) == 0 )
         {
             SetTextColor(_hdcBuf, RGB(0xDF, 0x00, 0x24));
         }
@@ -329,7 +329,7 @@ void MonthView::DrawGraph()
     TextOut(_hdcBuf, x1 + 1, y2 + 2, szText, _tcslen(szText));
 
     // Draw PageUp / PageDown Icon
-    if( _curMonth == _model->GetFirstMonth() ) // No previous month
+    if (_curMonth == _model->GetFirstMonth() ) // No previous month
     {
         SelectObject(_hdcPage, _hbmpPageUpLight);
     }
@@ -340,7 +340,7 @@ void MonthView::DrawGraph()
 
     BitBlt(_hdcBuf, x2 - 21, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
-    if( _curMonth == _model->GetLastMonth() ) // No next month
+    if (_curMonth == _model->GetLastMonth() ) // No next month
     {
         SelectObject(_hdcPage, _hbmpPageDownLight);
     }
@@ -357,7 +357,7 @@ void MonthView::DrawGraph()
 
 LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if( uMsg == WM_INITDIALOG )
+    if (uMsg == WM_INITDIALOG )
     {
         // Size Window
         RECT stRect = *(RECT *)lParam;
@@ -372,7 +372,7 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         // - Device Context & Bitmap
         _hdcTarget = GetDC(hWnd);
 
-        if( _hdcBuf == 0 )
+        if (_hdcBuf == 0 )
         {
             _hdcBuf = CreateCompatibleDC(_hdcTarget);
             _hbmpBuf = CreateCompatibleBitmap(_hdcTarget, 2000, 1200);  // Suppose enough
@@ -403,7 +403,7 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         // Start Timer
         SetTimer(hWnd, 0, 1000, MonthView::TimerProc);
     }
-    else if( uMsg == WM_CLOSE )
+    else if (uMsg == WM_CLOSE )
     {
         KillTimer(hWnd, 0);
 
@@ -412,7 +412,7 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         DestroyWindow(hWnd);
     }
-    else if( uMsg == WM_LBUTTONDOWN )
+    else if (uMsg == WM_LBUTTONDOWN )
     {
         // Rectangle for Graph
         int numDays = Utils::GetNumDays(_curMonth);
@@ -431,26 +431,26 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         int xPos = GET_X_LPARAM(lParam); 
         int yPos = GET_Y_LPARAM(lParam);
 
-        if( xPos >= x2 - 21 && xPos <= x2 - 21 + 7 &&
+        if (xPos >= x2 - 21 && xPos <= x2 - 21 + 7 &&
             yPos >= y2 + 4  && yPos <= y2 + 4  + 7 )
         {
-            if( _curMonth > _model->GetFirstMonth()) // Previous month
+            if (_curMonth > _model->GetFirstMonth()) // Previous month
             {
                 _curMonth -= 1;
                 DrawGraph();
             }
         }
-        else if( xPos >= x2 - 9 && xPos <= x2 - 9 + 7 &&
+        else if (xPos >= x2 - 9 && xPos <= x2 - 9 + 7 &&
                  yPos >= y2 + 4 && yPos <= y2 + 4 + 7 )
         {
-            if( _curMonth < _model->GetLastMonth()) // Next month
+            if (_curMonth < _model->GetLastMonth()) // Next month
             {
                 _curMonth += 1;
                 DrawGraph();
             }
         }
     }
-    else if( uMsg == WM_PAINT )
+    else if (uMsg == WM_PAINT )
     {
         PAINTSTRUCT stPS;
         BeginPaint(hWnd, &stPS);
@@ -459,7 +459,7 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         EndPaint(hWnd, &stPS);
     }
-    else if( uMsg == WM_SIZE )
+    else if (uMsg == WM_SIZE )
     {
         RECT stRect;
 

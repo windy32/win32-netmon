@@ -88,7 +88,7 @@ void GwPieChart::CalcSize()
         _legendWidth - _marginLegend - _marginDesc - _marginValue;
     _pieHeight = _maxHeight;
 
-    if( _pieWidth > _pieHeight )
+    if (_pieWidth > _pieHeight )
     {
         _pieRadius = _pieHeight / 2;
 
@@ -137,14 +137,14 @@ void GwPieChart::Paint()
         double percentage = (sum == 0) ? 0 : (double)_values[i] / sum;
         angleEnd += percentage * (2 * PI);
 
-        if( angleStart != angleEnd )
+        if (angleStart != angleEnd )
         {
             int xr1 = (int)(_pieRadius - _pieRadius * sin(angleStart));
             int yr1 = (int)(_pieRadius - _pieRadius * cos(angleStart));
             int xr2 = (int)(_pieRadius - _pieRadius * sin(angleEnd));
             int yr2 = (int)(_pieRadius - _pieRadius * cos(angleEnd));
 
-            if( xr1 != xr2 || yr1 != yr2 || (angleEnd - angleStart > PI) )
+            if (xr1 != xr2 || yr1 != yr2 || (angleEnd - angleStart > PI) )
             {
                 GwPie(0, 0, _pieRadius * 2, _pieRadius * 2, xr1, yr1, xr2, yr2);
             }

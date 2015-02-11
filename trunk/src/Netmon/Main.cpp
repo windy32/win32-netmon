@@ -218,7 +218,7 @@ static void InitDatabase()
     #pragma endregion
 
     // V1
-    if( !SQLite::TableExist(TEXT("Adapter")))
+    if (!SQLite::TableExist(TEXT("Adapter")))
     {
         SQLite::Exec(TEXT("Create Table Adapter(")
                      TEXT("    UID            Integer,")
@@ -230,7 +230,7 @@ static void InitDatabase()
                      TEXT(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Process")))
+    if (!SQLite::TableExist(TEXT("Process")))
     {
         SQLite::Exec(TEXT("Create Table Process(")
                      TEXT("    UID            Integer,")
@@ -245,7 +245,7 @@ static void InitDatabase()
         Utils::InsertProcess(TEXT("svchost.exe"));
     }
 
-    if( !SQLite::TableExist(TEXT("PActivity")))
+    if (!SQLite::TableExist(TEXT("PActivity")))
     {
         SQLite::Exec(TEXT("Create Table PActivity(")
                      TEXT("    UID            Integer,")
@@ -258,7 +258,7 @@ static void InitDatabase()
                      TEXT(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Packet")))
+    if (!SQLite::TableExist(TEXT("Packet")))
     {
         SQLite::Exec(TEXT("Create Table Packet(")
                      TEXT("    UID            Integer,")
@@ -281,7 +281,7 @@ static void InitDatabase()
     }
 
     // V2
-    if( !SQLite::TableExist(TEXT("PacketCount")))
+    if (!SQLite::TableExist(TEXT("PacketCount")))
     {
         SQLite::Exec(TEXT("Create Table PacketCount(")
                      TEXT("    ProcessUid     Integer,")
@@ -292,7 +292,7 @@ static void InitDatabase()
                      TEXT(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("PacketSize")))
+    if (!SQLite::TableExist(TEXT("PacketSize")))
     {
         SQLite::Exec(TEXT("Create Table PacketSize(")
                      TEXT("    ProcessUid     Integer,")
@@ -307,7 +307,7 @@ static void InitDatabase()
                      TEXT(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Protocol")))
+    if (!SQLite::TableExist(TEXT("Protocol")))
     {
         SQLite::Exec(TEXT("Create Table Protocol(")
                      TEXT("    ProcessUid     Integer,")
@@ -322,7 +322,7 @@ static void InitDatabase()
                      TEXT(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Rate")))
+    if (!SQLite::TableExist(TEXT("Rate")))
     {
         SQLite::Exec(TEXT("Create Table Rate(")
                      TEXT("    ProcessUid     Integer,")
@@ -335,7 +335,7 @@ static void InitDatabase()
                      TEXT(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Traffic")))
+    if (!SQLite::TableExist(TEXT("Traffic")))
     {
         SQLite::Exec(TEXT("Create Table Traffic(")
                      TEXT("    ProcessUid     Integer,")
@@ -366,19 +366,19 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
     PortCache pc;
 
     // Init Filter ------------------------------------------------------------
-    if( !filter.Init())
+    if (!filter.Init())
     {
         return 1;
     }
 
     // Find Devices -----------------------------------------------------------
-    if( !filter.FindDevices())
+    if (!filter.FindDevices())
     {
         return 2;
     }
 
     // Select a Device --------------------------------------------------------
-    if( !filter.Select(g_iAdapter))
+    if (!filter.Select(g_iAdapter))
     {
         return 3;
     }
@@ -399,25 +399,25 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         }
 
         // - Stop is Clicked
-        if( !g_bCapture )
+        if (!g_bCapture )
         {
             break;
         }
 
         // - Get PID
-        if( pi.trasportProtocol == TRA_TCP )
+        if (pi.trasportProtocol == TRA_TCP )
         {
             pid = pc.GetTcpPortPid(pi.local_port);
             pid = ( pid == 0 ) ? -1 : pid;
         }
-        else if( pi.trasportProtocol == TRA_UDP )
+        else if (pi.trasportProtocol == TRA_UDP )
         {
             pid = pc.GetUdpPortPid(pi.local_port);
             pid = ( pid == 0 ) ? -1 : pid;
         }
 
         // - Get Process Name & Full Path
-        if( pid != -1 )
+        if (pid != -1 )
         {
             ProcessCache::instance()->GetName(pid, processName, MAX_PATH);
             ProcessCache::instance()->GetFullPath(pid, processFullPath, MAX_PATH);
@@ -447,7 +447,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         processUID = ProcessModel::GetProcessUid(processName);
 
         // - Insert Into Process Table
-        if( processUID == -1 )
+        if (processUID == -1 )
         {
             processUID = Utils::InsertProcess(processName);
         }
@@ -489,13 +489,13 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         BOOL bDtViewEnable;
         int iDtViewMaxSpace;
 
-        if( g_profile.GetDtViewEnable(&bDtViewEnable) && bDtViewEnable == TRUE ) // Condition 1
+        if (g_profile.GetDtViewEnable(&bDtViewEnable) && bDtViewEnable == TRUE ) // Condition 1
         {
             // Get database size
             __int64 curPackets = g_dtView.GetPacketCount();
             int sizeInMb = (int)((curPackets * 445 / 10000 + 236) / 1024);
 
-            if( g_profile.GetDtViewMaxSpace(&iDtViewMaxSpace) && 
+            if (g_profile.GetDtViewMaxSpace(&iDtViewMaxSpace) && 
                 ( iDtViewMaxSpace == 0 || iDtViewMaxSpace > sizeInMb )) // Condition 2
             {
                 bUpdateDtView = TRUE;
@@ -509,12 +509,12 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         g_mtModel->InsertPacket(&pie);
         g_stModel->InsertPacket(&pie);
 
-        if( bUpdateDtView )
+        if (bUpdateDtView )
         {
             g_dtModel->InsertPacket(&pie);
         }
 #endif
-        if( g_bCapture ) // If the user hasn't clicked Stop
+        if (g_bCapture ) // If the user hasn't clicked Stop
         {
             // DebugPrint
             /*
@@ -671,7 +671,7 @@ static void CreateLanguageMenuItems()
         TCHAR szMenuItem[256];
         Language::GetName(i, szEnglishName, 256, szNativeName, 256);
 
-        if( _tcscmp(szEnglishName, szNativeName) == 0 )
+        if (_tcscmp(szEnglishName, szNativeName) == 0 )
         {
             _stprintf_s(szMenuItem, 256, szEnglishName);
         }
@@ -681,7 +681,7 @@ static void CreateLanguageMenuItems()
         }
 
         // Create menu item
-        if( i == 0 )
+        if (i == 0 )
         {
             ModifyMenu(hMenuLanguage, 
                 0, MF_BYPOSITION | MF_STRING, IDM_OPTIONS_LANGUAGE_FIRST + 0, szMenuItem);
@@ -732,7 +732,7 @@ static void EnumDevices()
     PcapNetFilter filter;
 
     // Init Filter
-    if( !filter.Init())
+    if (!filter.Init())
     {
         MessageBox(g_hDlgMain, 
             TEXT("Cannot initizlize WinPcap library.\n")
@@ -747,7 +747,7 @@ static void EnumDevices()
     // Find Devices
     g_nAdapters = filter.FindDevices();
 
-    if( g_nAdapters <= 0 )
+    if (g_nAdapters <= 0 )
     {
         MessageBox(g_hDlgMain, 
             TEXT("No network adapters has been found on this machine."), 
@@ -766,13 +766,13 @@ static void EnumDevices()
         TCHAR *name = filter.GetName(i);
 
         // Save device name
-        if( i < _countof(g_szAdapterNames))
+        if (i < _countof(g_szAdapterNames))
         {
             _tcscpy_s(g_szAdapterNames[i], 256, name);
         }
 
         // Update menu
-        if( i == 0 )
+        if (i == 0 )
         {
             ModifyMenu(hMenuAdapter, 0, MF_BYPOSITION | MF_STRING, IDM_VIEW_ADAPTER_FIRST, name);
         }
@@ -833,7 +833,7 @@ static void ProfileInit(HWND hWnd)
 
     for(int i =  0; i < g_nAdapters; i++)
     {
-        if( _tcscmp(szAdapter, g_szAdapterNames[i]) == 0 )
+        if (_tcscmp(szAdapter, g_szAdapterNames[i]) == 0 )
         {
             g_iAdapter = i;
             break;
@@ -847,9 +847,9 @@ static void ProfileInit(HWND hWnd)
 
     // If AutoCaptue = 1, start capture immediately
     BOOL bAutoCapture;
-    if( g_profile.GetAutoCapture(&bAutoCapture))
+    if (g_profile.GetAutoCapture(&bAutoCapture))
     {
-        if( bAutoCapture )
+        if (bAutoCapture )
         {
             SendMessage(hWnd, WM_COMMAND, IDM_FILE_CAPTURE, 0);
         }
@@ -906,22 +906,22 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
     };
 
     // Check MenuItem
-    if( i == 0 )
+    if (i == 0 )
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
     }
-    else if( i == 1 )
+    else if (i == 1 )
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
     }
-    else if( i == 2 )
+    else if (i == 2 )
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
     }
-    else if( i == 3 )
+    else if (i == 3 )
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
@@ -953,25 +953,25 @@ static void OnViewSwitch(HWND hWnd, WPARAM wParam)
 {
     HWND hTab = GetDlgItem(hWnd, IDT_VIEW);
 
-    if( wParam == IDM_VIEW_REALTIME )
+    if (wParam == IDM_VIEW_REALTIME )
     {
         TabCtrl_SetCurSel(hTab, 0);
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
     }
-    else if( wParam == IDM_VIEW_MONTH )
+    else if (wParam == IDM_VIEW_MONTH )
     {
         TabCtrl_SetCurSel(hTab, 1);
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
     }
-    else if( wParam == IDM_VIEW_STATISTICS )
+    else if (wParam == IDM_VIEW_STATISTICS )
     {
         TabCtrl_SetCurSel(hTab, 2);
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
     }
-    else if( wParam == IDM_VIEW_DETAIL )
+    else if (wParam == IDM_VIEW_DETAIL )
     {
         TabCtrl_SetCurSel(hTab, 3);
         CheckMenuRadioItem(GetMenu(hWnd), 
@@ -983,7 +983,7 @@ static void OnViewSwitch(HWND hWnd, WPARAM wParam)
 
 static void OnAdapterSelected(HWND hWnd, WPARAM wParam)
 {
-    if( g_bCapture == true )
+    if (g_bCapture == true )
     {
     }
     else
@@ -1021,7 +1021,7 @@ static void OnHiddenStateChanged(HWND hWnd)
 
 static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
 {
-    if( wParam - IDM_OPTIONS_LANGUAGE_FIRST != g_iCurLanguage )
+    if (wParam - IDM_OPTIONS_LANGUAGE_FIRST != g_iCurLanguage )
     {
         // Update language
         g_iCurLanguage = wParam - IDM_OPTIONS_LANGUAGE_FIRST;
@@ -1054,7 +1054,7 @@ static void OnProcessChanged(HWND hWnd, LPARAM lParam)
         NMLISTVIEW *lpstListView = (NMLISTVIEW *)lParam;
 
         // Selection Changed
-        if( lpstListView->iSubItem == 0 &&
+        if (lpstListView->iSubItem == 0 &&
             lpstListView->uNewState == (LVIS_FOCUSED | LVIS_SELECTED) &&
             lpstListView->uChanged == LVIF_STATE )
         {
@@ -1073,7 +1073,7 @@ static void OnProcessChanged(HWND hWnd, LPARAM lParam)
     {
         int index = ((NMITEMACTIVATE *)lParam)->iItem;
 
-        if( index == -1 )
+        if (index == -1 )
         {
             g_rtView.SetProcessUid(-1);
             g_mtView.SetProcessUid(-1);
@@ -1115,7 +1115,7 @@ static void OnRightClick(HWND hWnd, LPARAM lParam)
 {
     NMITEMACTIVATE *ia = (NMITEMACTIVATE *)lParam;
     int index = ia->iItem;
-    if( index != -1 ) 
+    if (index != -1 ) 
     {
         if (!ProcessView::IsHidden())
         {
@@ -1209,7 +1209,7 @@ static void OnStop(HWND hWnd)
 static void OnExit(HWND hWnd)
 {
     // Stop
-    if( g_bCapture == true )
+    if (g_bCapture == true )
     {
         OnStop(hWnd);
     }
@@ -1403,7 +1403,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SetTimer(hWnd, 1, 1000, OnTimer);
 
     // Check Data for MonthView
-    if( Utils::GetExMonth() < g_mtModel->GetFirstMonth())
+    if (Utils::GetExMonth() < g_mtModel->GetFirstMonth())
     {
         MessageBox(g_hDlgMain, 
             TEXT("An invalid date is detected.\n")
@@ -1443,62 +1443,62 @@ static void OnEndSession(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    if( wParam == IDM_FILE_EXIT || wParam == IDM_TRAY_EXIT)
+    if (wParam == IDM_FILE_EXIT || wParam == IDM_TRAY_EXIT)
     {
         OnExit(hWnd);
     }
-    else if( wParam == IDM_TRAY_SHOW_WINDOW )
+    else if (wParam == IDM_TRAY_SHOW_WINDOW )
     {
         OnShowWindow(hWnd);
     }
-    else if( wParam == IDM_FILE_CAPTURE )
+    else if (wParam == IDM_FILE_CAPTURE )
     {
         OnCapture(hWnd);
     }
-    else if( wParam == IDM_FILE_STOP )
+    else if (wParam == IDM_FILE_STOP )
     {
         OnStop(hWnd);
     }
-    else if( wParam == IDM_VIEW_REALTIME   ||
+    else if (wParam == IDM_VIEW_REALTIME   ||
              wParam == IDM_VIEW_MONTH      ||
              wParam == IDM_VIEW_STATISTICS ||
              wParam == IDM_VIEW_DETAIL )
     {
         OnViewSwitch(hWnd, wParam);
     }
-    else if( wParam >= IDM_VIEW_ADAPTER_FIRST && wParam < IDM_OPTIONS_LANGUAGE_FIRST )
+    else if (wParam >= IDM_VIEW_ADAPTER_FIRST && wParam < IDM_OPTIONS_LANGUAGE_FIRST )
     {
         OnAdapterSelected(hWnd, wParam);
     }
-    else if( wParam == IDM_VIEW_SHOW_HIDDEN )
+    else if (wParam == IDM_VIEW_SHOW_HIDDEN )
     {
         OnHiddenStateChanged(hWnd);
     }
-    else if( wParam >= IDM_OPTIONS_LANGUAGE_FIRST )
+    else if (wParam >= IDM_OPTIONS_LANGUAGE_FIRST )
     {
         OnLanguageSelected(hWnd, wParam);
     }
-    else if( wParam == IDM_OPTIONS_PREFERENCES )
+    else if (wParam == IDM_OPTIONS_PREFERENCES )
     {
         OnPreferences(hWnd);
     }
-    else if( wParam == IDM_HELP_HOMEPAGE )
+    else if (wParam == IDM_HELP_HOMEPAGE )
     {
         OnHomepage();
     }
-    else if( wParam == IDM_HELP_TOPIC )
+    else if (wParam == IDM_HELP_TOPIC )
     {
         OnHelp();
     }
-    else if( wParam == IDM_HELP_ABOUT || wParam == IDM_TRAY_ABOUT )
+    else if (wParam == IDM_HELP_ABOUT || wParam == IDM_TRAY_ABOUT )
     {
         OnAbout(hWnd);
     }
-    else if( wParam == IDM_PROCESS_SHOW)
+    else if (wParam == IDM_PROCESS_SHOW)
     {
         OnShowProcess(GetDlgItem(hWnd, IDL_PROCESS));
     }
-    else if( wParam == IDM_PROCESS_HIDE)
+    else if (wParam == IDM_PROCESS_HIDE)
     {
         OnHideProcess(GetDlgItem(hWnd, IDL_PROCESS));
     }
@@ -1506,11 +1506,11 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnUserTray(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    if( lParam == WM_LBUTTONDBLCLK ) 
+    if (lParam == WM_LBUTTONDBLCLK ) 
     {
         OnShowWindow(hWnd);
     }
-    else if( lParam == WM_RBUTTONDOWN ) 
+    else if (lParam == WM_RBUTTONDOWN ) 
     {
         // Show Tray Icon Popup Menu
         POINT point;
@@ -1822,7 +1822,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     // Single Instance (Create a Named-Pipe)
     HANDLE hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), 
         PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, 0, 4, 1024, 1024, 1000, NULL);
-    if( hPipe == INVALID_HANDLE_VALUE )
+    if (hPipe == INVALID_HANDLE_VALUE )
     {
         MessageBox(0, TEXT("Netmon is still running.\nOnly one instance is allowed for Netmon!"), 
             TEXT("Error"), MB_OK | MB_ICONWARNING);
@@ -1831,7 +1831,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 
     // Load languages
     g_nLanguage = Language::Load();
-    if( g_nLanguage == 0 )
+    if (g_nLanguage == 0 )
     {
         MessageBox(0, TEXT("Failed to load languages."), TEXT("Error"), MB_OK | MB_ICONWARNING);
         CloseHandle(hPipe);

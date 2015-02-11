@@ -46,7 +46,7 @@ void ProcessView::ListViewInsert(const ProcessModel::ProcessItem &item)
     _stprintf_s(szColumn[0], MAX_PATH, TEXT("%d"), item.puid);
     _stprintf_s(szColumn[1], MAX_PATH, TEXT("%s"), item.name);
 
-    if( item.active )
+    if (item.active )
     {
         _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), 
             item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
@@ -70,7 +70,7 @@ void ProcessView::ListViewUpdate(int index, const ProcessModel::ProcessItem &ite
     // Prepare Columns
     TCHAR szColumn[5][MAX_PATH];
 
-    if( item.active )
+    if (item.active )
     {
         _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), 
             item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);

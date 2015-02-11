@@ -42,7 +42,7 @@ void DetailModel::InitDatabase()
 
         SQLiteRow row;
         row.InsertType(SQLiteRow::TYPE_INT64); // 0 Count(*)
-        if( SQLite::Select(command, &row))
+        if (SQLite::Select(command, &row))
         {
             packetCount = row.GetDataInt64(0);
         }
@@ -73,7 +73,7 @@ void DetailModel::SaveDatabase()
         int puid = it->first;
         __int64 count = it->second.curPackets;
 
-        if( puid == PROCESS_ALL )
+        if (puid == PROCESS_ALL )
         {
             continue;
         }
@@ -99,7 +99,7 @@ void DetailModel::InsertPacket(PacketInfoEx *pi)
     Lock();
 
     // Insert an DtViewItem if PUID not Exist
-    if( _items.count(pi->puid) == 0 )
+    if (_items.count(pi->puid) == 0 )
     {
         _items[pi->puid] = DtModelItem();
     }

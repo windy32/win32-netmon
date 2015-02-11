@@ -28,7 +28,7 @@
 //
 // A typical usage is as shown below
 //
-//     else if( uMsg == WM_PAINT )
+//     else if (uMsg == WM_PAINT )
 //     {
 //         PAINTSTRUCT stPS;
 //         BeginPaint(hWnd, &stPS);

@@ -71,7 +71,7 @@ void GwLogHistogram::Paint()
         GwSetPixel(1 + (_scales[i] - 1) * (_width - 2) / _cValue, _boxHeight + 2, RGB(0, 0, 0));
 
         // Text
-        if( _scales[i] > _cValue / 2 )
+        if (_scales[i] > _cValue / 2 )
         {
             SetTextAlign(_hdcTarget, TA_RIGHT);
         }
@@ -110,7 +110,7 @@ void GwLogHistogram::Paint()
     GwMoveToEx(1, _boxHeight - 2, 0);
     GwLineTo(_width - 1, _boxHeight - 2);
 
-    if( maxAvr > 0 )
+    if (maxAvr > 0 )
     {
         for(int i = 0; i < _width - 2; i++)
         {
@@ -129,7 +129,7 @@ void GwLogHistogram::Paint()
 
             // Calc y value of the histogram
             double logVal;
-            if( avr / maxAvr < 1.0 / Utils::Exp(_logSegments - 1, _logBase))
+            if (avr / maxAvr < 1.0 / Utils::Exp(_logSegments - 1, _logBase))
             {
                 logVal = (avr / maxAvr) * Utils::Exp(_logSegments - 1, _logBase) / _logSegments;
             }

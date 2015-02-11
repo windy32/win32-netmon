@@ -307,7 +307,7 @@ void StatisticsView::DrawGraph()
 
 LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if( uMsg == WM_INITDIALOG )
+    if (uMsg == WM_INITDIALOG )
     {
         // Size Window
         RECT stRect = *(RECT *)lParam;
@@ -322,7 +322,7 @@ LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         // - Device Context & Bitmap
         _hdcTarget = GetDC(hWnd);
 
-        if( _hdcBuf == 0 )
+        if (_hdcBuf == 0 )
         {
             _hdcBuf = CreateCompatibleDC(_hdcTarget);
             _hbmpBuf = CreateCompatibleBitmap(_hdcTarget, 2000, 1200);  // Suppose enough
@@ -345,7 +345,7 @@ LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         // Start Timer
         SetTimer(hWnd, 0, 1000, StatisticsView::TimerProc);
     }
-    else if( uMsg == WM_CLOSE )
+    else if (uMsg == WM_CLOSE )
     {
         KillTimer(hWnd, 0);
 
@@ -354,7 +354,7 @@ LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
         DestroyWindow(hWnd);
     }
-    else if( uMsg == WM_PAINT )
+    else if (uMsg == WM_PAINT )
     {
         PAINTSTRUCT stPS;
         BeginPaint(hWnd, &stPS);
@@ -363,7 +363,7 @@ LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
         EndPaint(hWnd, &stPS);
     }
-    else if( uMsg == WM_SIZE )
+    else if (uMsg == WM_SIZE )
     {
         RECT stRect;
 

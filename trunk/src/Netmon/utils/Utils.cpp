@@ -67,7 +67,7 @@ int Utils::GetProcessUid(const TCHAR *name)
     row.InsertType(SQLiteRow::TYPE_INT32);
 
     // Select
-    if( SQLite::Select(command, &row))
+    if (SQLite::Select(command, &row))
     {
         return row.GetDataInt32(0);
     }
@@ -131,7 +131,7 @@ bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
     row.InsertType(SQLiteRow::TYPE_STRING);
 
     // Select
-    if( SQLite::Select(command, &row))
+    if (SQLite::Select(command, &row))
     {
         _tcscpy_s(buf, len, row.GetDataStr(0));
         return true;
@@ -172,7 +172,7 @@ int Utils::GetNumDays(int exMonth)
     int iDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     // Leap Year
-    if( (iYear % 4 == 0) && (iYear % 100 != 0 || iYear % 400 == 0))
+    if ((iYear % 4 == 0) && (iYear % 100 != 0 || iYear % 400 == 0))
     {
         iDays[1] = 29;
     }
@@ -275,7 +275,7 @@ void Utils::ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...)
     va_end(argList);
 
     // Init ListView
-    if( bCheckBox )
+    if (bCheckBox )
     {
         ListView_SetExtendedListViewStyle(hList, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT);
     }
@@ -381,7 +381,7 @@ void Utils::ListViewUpdate(HWND hList, int index, int numColumns, ...)
     // - Update Sub Items
     for(int i = 0; i < numColumns; i++)
     {
-        if( bUpdate[i] )
+        if (bUpdate[i] )
         {
             stItem.pszText = szColumns[i];
             stItem.iSubItem = i;
@@ -559,7 +559,7 @@ BOOL Utils::StartProcessAndWait(
     DWORD dwExitCode;
 
     sei.fMask = SEE_MASK_NOCLOSEPROCESS;
-    if( bRunAs )
+    if (bRunAs )
     {
         sei.lpVerb = TEXT("runas");
     }
@@ -567,7 +567,7 @@ BOOL Utils::StartProcessAndWait(
     sei.lpParameters = szParam;
     sei.nShow = SW_SHOWNORMAL;
 
-    if( ShellExecuteEx(&sei) && sei.hProcess != 0 )
+    if (ShellExecuteEx(&sei) && sei.hProcess != 0 )
     {
         // Wait until finish
         WaitForSingleObject(sei.hProcess, INFINITE);

@@ -56,7 +56,7 @@ static void InitProfile(HWND hWnd)
     ComboBox_SelectString(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), -1, szAdapter);
 
     // - AutoStart
-    if( szAutoStart[0] != 0 ) // Not empty string
+    if (szAutoStart[0] != 0 ) // Not empty string
     {
         Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START), BST_CHECKED);
 
@@ -65,12 +65,12 @@ static void InitProfile(HWND hWnd)
         GetModuleFileName(0, szNetmon, MAX_PATH);
 
         // Sync registry autorun item
-        if( _tcscmp(szNetmon, szAutoStart) != 0 )
+        if (_tcscmp(szNetmon, szAutoStart) != 0 )
         {
             int iResult = MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_NOW),
                 TEXT("Netmon"), MB_YESNO | MB_ICONQUESTION);
 
-            if( iResult == IDYES )
+            if (iResult == IDYES )
             {
                 // Build command line
                 TCHAR szRegUpdater[MAX_PATH];
@@ -78,9 +78,9 @@ static void InitProfile(HWND hWnd)
 
                 // Start process and update registry
                 int iExitCode;
-                if( Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
+                if (Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
                 {
-                    if( iExitCode == 0 )
+                    if (iExitCode == 0 )
                     {
                         g_profile.SetAutoStart(szNetmon); // Update profile
                     }
@@ -100,19 +100,19 @@ static void InitProfile(HWND hWnd)
     }
 
     // - AutoCapture
-    if( bAutoCapture )
+    if (bAutoCapture )
     {
         Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE), BST_CHECKED);
     }
 
     // - DtViewEnable
-    if( bDtViewEnable )
+    if (bDtViewEnable )
     {
         Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE), BST_CHECKED);
     }
 
     // - DtViewMaxSpace
-    if( iDtViewMaxSpace == 0 )
+    if (iDtViewMaxSpace == 0 )
     {
         EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), FALSE);
     }
@@ -142,10 +142,10 @@ static void InitLanguage(HWND hWnd)
 ///----------------------------------------------------------------------------------------------//
 static void OnCheckDtViewEnable(HWND hWnd)
 {
-    if( Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE)) == BST_CHECKED )
+    if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE)) == BST_CHECKED )
     {
         EnableWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW), TRUE);
-        if( Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
+        if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
         {
             EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), TRUE);
         }
@@ -160,7 +160,7 @@ static void OnCheckDtViewEnable(HWND hWnd)
 
 static void OnCheckDtViewMaxSpace(HWND hWnd)
 {
-    if( Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
+    if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
     {
         EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), TRUE);
     }
@@ -180,21 +180,21 @@ static void OnOk(HWND hWnd)
     ComboBox_GetText(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), szAdapter, 256);
 
     // - Detail view max space
-    if( Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE)) == BST_CHECKED )
+    if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE)) == BST_CHECKED )
     {
-        if( Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
+        if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
         {
             BOOL bTranslated = FALSE;
             int iDtViewMaxSpace = GetDlgItemInt(hWnd, IDE_PREF_MAX_DTVIEW, &bTranslated, FALSE);
 
-            if( !(bTranslated && iDtViewMaxSpace >= 10 && iDtViewMaxSpace <= 1024 ))
+            if (!(bTranslated && iDtViewMaxSpace >= 10 && iDtViewMaxSpace <= 1024 ))
             {
                 bParamOk = FALSE;
                 MessageBox(hWnd, Language::GetString(IDS_PREF_MAX_SPACE_RANGE), 
                     TEXT("Error"), MB_OK | MB_ICONWARNING);
             }
 
-            if( bParamOk )
+            if (bParamOk )
             {
                 g_profile.SetDtViewMaxSpace(iDtViewMaxSpace);
             }
@@ -204,7 +204,7 @@ static void OnOk(HWND hWnd)
             g_profile.SetDtViewMaxSpace(0);
         }
 
-        if( bParamOk )
+        if (bParamOk )
         {
             g_profile.SetDtViewEnable(TRUE);
         }
@@ -215,13 +215,13 @@ static void OnOk(HWND hWnd)
         g_profile.SetDtViewMaxSpace(0);
     }
 
-    if( bParamOk )
+    if (bParamOk )
     {
         // - Adapter
         g_profile.SetAdapter(szAdapter);
 
         // - Auto start
-        if( Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START)) == BST_CHECKED )
+        if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START)) == BST_CHECKED )
         {
             // Get Netmon's auto start item in registry
             TCHAR szAutoStart[MAX_PATH];
@@ -232,7 +232,7 @@ static void OnOk(HWND hWnd)
             GetModuleFileName(0, szNetmon, MAX_PATH);
 
             // Update registry if necessary
-            if( _tcscmp(szAutoStart, szNetmon) != 0 )
+            if (_tcscmp(szAutoStart, szNetmon) != 0 )
             {
                 // Build command line
                 TCHAR szRegUpdater[MAX_PATH];
@@ -240,7 +240,7 @@ static void OnOk(HWND hWnd)
 
                 // Start process and update registry
                 int iExitCode;
-                if( Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
+                if (Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
                 {
                     if (iExitCode != 0 )
                     {
@@ -266,13 +266,13 @@ static void OnOk(HWND hWnd)
             g_profile.GetAutoStart(szAutoStart, MAX_PATH);
 
             // Delete the auto start item in registry if necessary
-            if( szAutoStart[0] != 0 )
+            if (szAutoStart[0] != 0 )
             {
                 int iExitCode;
                 TCHAR szRegUpdater[MAX_PATH];
                 Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
 
-                if( Utils::StartProcessAndWait(szRegUpdater, TEXT("-c"), &iExitCode, TRUE))
+                if (Utils::StartProcessAndWait(szRegUpdater, TEXT("-c"), &iExitCode, TRUE))
                 {
                     if (iExitCode != 0 )
                     {
@@ -298,7 +298,7 @@ static void OnOk(HWND hWnd)
     }
 
     // Close dialog
-    if( bParamOk )
+    if (bParamOk )
     {
         EndDialog(hWnd, 0);
     }
@@ -311,7 +311,7 @@ static void OnCancel(HWND hWnd)
 
 static void OnDeleteAll(HWND hWnd)
 {
-    if( g_bCapture )
+    if (g_bCapture )
     {
         MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
@@ -327,7 +327,7 @@ static void OnDeleteAll(HWND hWnd)
 
 static void OnCompact(HWND hWnd)
 {
-    if( g_bCapture )
+    if (g_bCapture )
     {
         MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
@@ -385,7 +385,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     // Get Device Names
     for(int i = 0; i < g_nAdapters; i++)
     {
-        if( i < _countof(g_szAdapterNames))
+        if (i < _countof(g_szAdapterNames))
         {
             ComboBox_AddString(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), g_szAdapterNames[i]);
         }
@@ -402,27 +402,27 @@ static void OnClose(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    if( wParam == IDC_PREF_ENABLE )
+    if (wParam == IDC_PREF_ENABLE )
     {
         OnCheckDtViewEnable(hWnd);
     }
-    else if( wParam == IDC_PREF_MAX_DTVIEW )
+    else if (wParam == IDC_PREF_MAX_DTVIEW )
     {
         OnCheckDtViewMaxSpace(hWnd);
     }
-    else if( wParam == IDB_PREF_OK )
+    else if (wParam == IDB_PREF_OK )
     {
         OnOk(hWnd);
     }
-    else if( wParam == IDB_PREF_CANCEL )
+    else if (wParam == IDB_PREF_CANCEL )
     {
         OnCancel(hWnd);
     }
-    else if( wParam == IDB_PREF_DELETE_ALL )
+    else if (wParam == IDB_PREF_DELETE_ALL )
     {
         OnDeleteAll(hWnd);
     }
-    else if( wParam == IDB_PREF_COMPACT )
+    else if (wParam == IDB_PREF_COMPACT )
     {
         OnCompact(hWnd);
     }

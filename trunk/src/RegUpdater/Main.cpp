@@ -31,24 +31,24 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdS
     BOOL bAutoRunExist = FALSE;
 
     // Open registry key
-    if( RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run"), 
         0, KEY_QUERY_VALUE | KEY_SET_VALUE, &hRunKey) != 0 )
     {
         return 1;
     }
 
     // See if an autorun item exists
-    if( RegGetValue(hRunKey, 0, TEXT("Netmon"), RRF_RT_REG_SZ, 0, 0, 0) == 0 )
+    if (RegGetValue(hRunKey, 0, TEXT("Netmon"), RRF_RT_REG_SZ, 0, 0, 0) == 0 )
     {
         bAutoRunExist = TRUE;
     }
 
     // Update key value
-    if( lpCmdLine[0] == TEXT('-') && 
+    if (lpCmdLine[0] == TEXT('-') && 
         lpCmdLine[1] == TEXT('c') && 
         lpCmdLine[2] == 0 ) // Disable AutoRun
     {
-        if( bAutoRunExist )
+        if (bAutoRunExist )
         {
             RegDeleteValue(hRunKey, TEXT("Netmon"));
         }
@@ -56,7 +56,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdS
         {
         }
     }
-    else if( lpCmdLine[0] != 0 )// Enable AutoRun
+    else if (lpCmdLine[0] != 0 )// Enable AutoRun
     {
         TCHAR cmd[MAX_PATH];
         _stprintf_s(cmd, MAX_PATH, TEXT("\"%s\" -h"), lpCmdLine);

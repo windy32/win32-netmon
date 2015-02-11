@@ -24,7 +24,7 @@ PortCache::PortCache()
 
 int PortCache::GetTcpPortPid(int port)
 {
-    if( _tcpPortTable[port] != 0 )
+    if (_tcpPortTable[port] != 0 )
     {
         return _tcpPortTable[port];
     }
@@ -40,7 +40,7 @@ int PortCache::GetTcpPortPid(int port)
 
 int PortCache::GetUdpPortPid(int port)
 {
-    if( _udpPortTable[port] != 0 )
+    if (_udpPortTable[port] != 0 )
     {
         return _udpPortTable[port];
     }
@@ -65,7 +65,7 @@ void PortCache::RebuildTcpTable()
 
     DWORD tableSize = sizeof(table);
 
-    if( GetExtendedTcpTable((void *)&table, &tableSize, 
+    if (GetExtendedTcpTable((void *)&table, &tableSize, 
         FALSE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0) == NO_ERROR )
     {
         for(unsigned int i = 0; i < table.dwNumEntries; i++)
@@ -87,7 +87,7 @@ void PortCache::RebuildUdpTable()
 
     DWORD tableSize = sizeof(table);
 
-    if( GetExtendedUdpTable((void *)&table, &tableSize, 
+    if (GetExtendedUdpTable((void *)&table, &tableSize, 
         FALSE, AF_INET, UDP_TABLE_OWNER_PID, 0) == NO_ERROR)
     {
         for(unsigned int i = 0; i < table.dwNumEntries; i++)

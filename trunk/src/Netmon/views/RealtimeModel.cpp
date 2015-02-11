@@ -47,7 +47,7 @@ void RealtimeModel::Fill()
     {
         RtModelItem &item = it->second;
 
-        if( item.rate_tx_1s.size() > 8 * 1024 ) // Remove at least 4 KB one time
+        if (item.rate_tx_1s.size() > 8 * 1024 ) // Remove at least 4 KB one time
         {
             item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 4 * 1024);
             item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 4 * 1024);
@@ -59,7 +59,7 @@ void RealtimeModel::Fill()
             item.rate_rx_1s.push_back(0);
         }
 
-        if( item.rate_tx_10s.size() > 8 * 1024 )
+        if (item.rate_tx_10s.size() > 8 * 1024 )
         {
             item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 4 * 1024);
             item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 4 * 1024);
@@ -71,7 +71,7 @@ void RealtimeModel::Fill()
             item.rate_rx_10s.push_back(0);
         }
 
-        if( item.rate_tx_60s.size() > 8 * 1024 )
+        if (item.rate_tx_60s.size() > 8 * 1024 )
         {
             item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 4 * 1024);
             item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 4 * 1024);
@@ -94,7 +94,7 @@ void RealtimeModel::InsertPacket(PacketInfoEx *pi)
 
     // Insert a RtModelItem if PUID not Exist
     Lock();
-    if( _items.count(pi->puid) == 0 )
+    if (_items.count(pi->puid) == 0 )
     {
         _items[pi->puid] = RtModelItem();
     }
@@ -108,7 +108,7 @@ void RealtimeModel::InsertPacket(PacketInfoEx *pi)
     RtModelItem &item = _items[pi->puid];
     RtModelItem &itemAll = _items[PROCESS_ALL];
 
-    if( pi->dir == DIR_UP )
+    if (pi->dir == DIR_UP )
     {
         item.rate_tx_1s.back()  += pi->size;
         item.rate_tx_10s.back() += pi->size;
@@ -118,7 +118,7 @@ void RealtimeModel::InsertPacket(PacketInfoEx *pi)
         itemAll.rate_tx_10s.back() += pi->size;
         itemAll.rate_tx_60s.back() += pi->size;
     }
-    else if( pi->dir == DIR_DOWN )
+    else if (pi->dir == DIR_DOWN )
     {
         item.rate_rx_1s.back()  += pi->size;
         item.rate_rx_10s.back() += pi->size;
