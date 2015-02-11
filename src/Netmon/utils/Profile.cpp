@@ -30,13 +30,13 @@ BOOL Profile::GetString(const TCHAR *szOption, TCHAR *buf, int cchLen)
 BOOL Profile::GetInt(const TCHAR *szOption, int *pValue)
 {
     TCHAR buf[256];
-    if( GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0 )
+    if (GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0 )
     {
         return FALSE; // Key empty or not exist
     }
     else // Key not empty
     {
-        if( _stscanf_s(buf, TEXT("%d"), pValue) == 1) // Numeric
+        if (_stscanf_s(buf, TEXT("%d"), pValue) == 1) // Numeric
         {
             return TRUE;
         }
@@ -80,32 +80,32 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 
     // Load preferences
     // If the key doesn't exist, a default value is written to the ini file
-    if( _pf.GetString(TEXT("Adapter"), _szAdapter, 256) == FALSE )
+    if (_pf.GetString(TEXT("Adapter"), _szAdapter, 256) == FALSE )
     {
         SetAdapter(szDefaultAdapter);
     }
 
-    if( _pf.GetString(TEXT("AutoStart"), _szAutoStart, MAX_PATH) == FALSE )
+    if (_pf.GetString(TEXT("AutoStart"), _szAutoStart, MAX_PATH) == FALSE )
     {
         SetAutoStart(TEXT(""));
     }
 
-    if( _pf.GetInt(TEXT("AutoCapture"), &_bAutoCapture) == FALSE )
+    if (_pf.GetInt(TEXT("AutoCapture"), &_bAutoCapture) == FALSE )
     {
         SetAutoCapture(FALSE);
     }
 
-    if( _pf.GetInt(TEXT("DtViewEnable"), &_bDtViewEnable) == FALSE )
+    if (_pf.GetInt(TEXT("DtViewEnable"), &_bDtViewEnable) == FALSE )
     {
         SetDtViewEnable(FALSE);
     }
 
-    if( _pf.GetInt(TEXT("DtViewMaxSpace"), &_iDtViewMaxSpace) == FALSE )
+    if (_pf.GetInt(TEXT("DtViewMaxSpace"), &_iDtViewMaxSpace) == FALSE )
     {
         SetDtViewMaxSpace(0); // No limit
     }
 
-    if( _pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 1000) == FALSE)
+    if (_pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 1000) == FALSE)
     {
         SetHiddenProcesses(std::vector<int>());
     }
@@ -124,12 +124,12 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
         }
     }
 
-    if( _pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE )
+    if (_pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE )
     {
         SetLanguage(TEXT("English"));
     }
 
-    if( _pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE )
+    if (_pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE )
     {
         SetShowHidden(TRUE);
     }
@@ -145,7 +145,7 @@ BOOL NetmonProfile::GetAdapter(TCHAR *szAdapter, int cchLen)
 
 BOOL NetmonProfile::SetAdapter(const TCHAR *szAdapter)
 {
-    if( _pf.SetString(TEXT("Adapter"), szAdapter) == TRUE )
+    if (_pf.SetString(TEXT("Adapter"), szAdapter) == TRUE )
     {
         _tcscpy_s(_szAdapter, 256, szAdapter);
         return TRUE;
@@ -161,7 +161,7 @@ BOOL NetmonProfile::GetAutoStart(TCHAR *szAutoStart, int cchLen)
 
 BOOL NetmonProfile::SetAutoStart(const TCHAR *szAutoStart)
 {
-    if( _pf.SetString(TEXT("AutoStart"), szAutoStart) == TRUE )
+    if (_pf.SetString(TEXT("AutoStart"), szAutoStart) == TRUE )
     {
         _tcscpy_s(_szAutoStart, MAX_PATH, szAutoStart);
         return TRUE;
@@ -177,7 +177,7 @@ BOOL NetmonProfile::GetAutoCapture(BOOL *pAutoCapture)
 
 BOOL NetmonProfile::SetAutoCapture(BOOL bAutoCapture)
 {
-    if( _pf.SetInt(TEXT("AutoCapture"), (int)bAutoCapture) == TRUE )
+    if (_pf.SetInt(TEXT("AutoCapture"), (int)bAutoCapture) == TRUE )
     {
         _bAutoCapture = bAutoCapture;
         return TRUE;
@@ -193,7 +193,7 @@ BOOL NetmonProfile::GetDtViewEnable(BOOL *pEnable)
 
 BOOL NetmonProfile::SetDtViewEnable(BOOL bEnable)
 {
-    if( _pf.SetInt(TEXT("DtViewEnable"), (int)bEnable) == TRUE )
+    if (_pf.SetInt(TEXT("DtViewEnable"), (int)bEnable) == TRUE )
     {
         _bDtViewEnable = bEnable;
         return TRUE;
@@ -209,7 +209,7 @@ BOOL NetmonProfile::GetDtViewMaxSpace(int *pMaxSpace)
 
 BOOL NetmonProfile::SetDtViewMaxSpace(int iMaxSpace)
 {
-    if( _pf.SetInt(TEXT("DtViewMaxSpace"), (int)iMaxSpace) == TRUE )
+    if (_pf.SetInt(TEXT("DtViewMaxSpace"), (int)iMaxSpace) == TRUE )
     {
         _iDtViewMaxSpace = iMaxSpace;
         return TRUE;
@@ -244,7 +244,7 @@ BOOL NetmonProfile::SetHiddenProcesses(const std::vector<int> &processes)
     }
 
     // Write to File
-    if( _pf.SetString(TEXT("HiddenProcess"), buf) == TRUE )
+    if (_pf.SetString(TEXT("HiddenProcess"), buf) == TRUE )
     {
         _hiddenProcesses = processes;
         return TRUE;

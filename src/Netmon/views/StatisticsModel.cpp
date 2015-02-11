@@ -42,7 +42,7 @@ void StatisticsModel::SaveDatabase()
     {
         int puid = it->first;
 
-        if( puid == PROCESS_ALL )
+        if (puid == PROCESS_ALL )
         {
             continue;
         }
@@ -93,12 +93,12 @@ void StatisticsModel::SaveDatabase()
     {
         int puid = it->first;
 
-        if( puid == PROCESS_ALL )
+        if (puid == PROCESS_ALL )
         {
             continue;
         }
 
-        if( it->second.newItem == true ) // Insert
+        if (it->second.newItem == true ) // Insert
         {
             for(int i = 0; i < 1501; i++)
             {
@@ -113,7 +113,7 @@ void StatisticsModel::SaveDatabase()
         {
             for(int i = 0; i < 1501; i++)
             {
-                if( it->second.txPacketSize[i] > it->second.txPrevPacketSize[i] ||
+                if (it->second.txPacketSize[i] > it->second.txPrevPacketSize[i] ||
                     it->second.rxPacketSize[i] > it->second.rxPrevPacketSize[i] )
                 {
                     _stprintf_s(command, _countof(command), 
@@ -132,12 +132,12 @@ void StatisticsModel::SaveDatabase()
     {
         int puid = it->first;
 
-        if( puid == PROCESS_ALL )
+        if (puid == PROCESS_ALL )
         {
             continue;
         }
 
-        if( it->second.newItem == true ) // Insert
+        if (it->second.newItem == true ) // Insert
         {
             for(int i = 0; i < 1025; i++)
             {
@@ -152,7 +152,7 @@ void StatisticsModel::SaveDatabase()
         {
             for(int i = 0; i < 1025; i++)
             {
-                if( it->second.txRate[i] > it->second.txPrevRate[i] ||
+                if (it->second.txRate[i] > it->second.txPrevRate[i] ||
                     it->second.rxRate[i] > it->second.rxPrevRate[i] )
                 {
                     _stprintf_s(command, _countof(command), 
@@ -227,7 +227,7 @@ void StatisticsModel::InitDatabaseProtocolCallback(SQLiteRow *row)
     __int64 rxPackets = row->GetDataInt64(5);
 
     // Insert an StViewItem if PUID not Exist
-    if( _this->_items.count(puid) == 0 )
+    if (_this->_items.count(puid) == 0 )
     {
         _this->_items[puid] = StModelItem();
     }
@@ -301,7 +301,7 @@ void StatisticsModel::InitDatabasePacketSizeCallback(SQLiteRow *row)
     __int64 rxPackets = row->GetDataInt64(5);
 
     // Insert an StViewItem if PUID not Exist
-    if( _this->_items.count(puid) == 0 )
+    if (_this->_items.count(puid) == 0 )
     {
         _this->_items[puid] = StModelItem();
     }
@@ -329,7 +329,7 @@ void StatisticsModel::InitDatabaseRateCallback(SQLiteRow *row)
     __int64 rxSeconds = row->GetDataInt64(3);
 
     // Insert an StViewItem if PUID not Exist
-    if( _this->_items.count(puid) == 0 )
+    if (_this->_items.count(puid) == 0 )
     {
         _this->_items[puid] = StModelItem();
     }
@@ -354,7 +354,7 @@ void StatisticsModel::InsertPacket(PacketInfoEx *pi)
     Lock();
 
     // Insert a StViewItem if PUID not Exist
-    if( _items.count(pi->puid) == 0 )
+    if (_items.count(pi->puid) == 0 )
     {
         _items[pi->puid] = StModelItem();
         _items[pi->puid].newItem = true;
@@ -365,7 +365,7 @@ void StatisticsModel::InsertPacket(PacketInfoEx *pi)
     StModelItem &itemAll = _items[PROCESS_ALL];
 
     // Update Statistics
-    if( pi->dir == DIR_UP )
+    if (pi->dir == DIR_UP )
     {
         switch ( pi->trasportProtocol )
         {
@@ -402,7 +402,7 @@ void StatisticsModel::InsertPacket(PacketInfoEx *pi)
         item.txPacketSize[size - 1] += 1;
         itemAll.txPacketSize[size - 1] += 1;
     }
-    else if( pi->dir == DIR_DOWN )
+    else if (pi->dir == DIR_DOWN )
     {
         switch ( pi->trasportProtocol )
         {
@@ -452,7 +452,7 @@ void StatisticsModel::UpdateRate()
     {
         int puid = it->first;
 
-        if( puid == PROCESS_ALL )
+        if (puid == PROCESS_ALL )
         {
             continue;
         }
@@ -462,7 +462,7 @@ void StatisticsModel::UpdateRate()
         int txRate;
         int rxRate;
 
-        if( ProcessModel::IsProcessActive(puid))
+        if (ProcessModel::IsProcessActive(puid))
         {
             ProcessModel::GetProcessRate(puid, &txRate, &rxRate);
 

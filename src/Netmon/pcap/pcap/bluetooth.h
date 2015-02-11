@@ -41,7 +41,7 @@
  * fields are in network byte order
  */
 typedef struct _pcap_bluetooth_h4_header {
-	u_int32_t direction; /* if first bit is set direction is incoming */
+    u_int32_t direction; /* if first bit is set direction is incoming */
 } pcap_bluetooth_h4_header;
 
 

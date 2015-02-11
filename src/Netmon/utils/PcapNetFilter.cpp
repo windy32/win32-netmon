@@ -22,7 +22,7 @@ bool PcapNetFilter::Init()
     // Load wpcap.dll
     _hWinPcap = LoadLibrary(TEXT("wpcap.dll"));
 
-    if( _hWinPcap != NULL )
+    if (_hWinPcap != NULL )
     {
         pcap_open_live   = (pcap_open_live_proc)   GetProcAddress(_hWinPcap, "pcap_open_live");
         pcap_close       = (pcap_close_proc)       GetProcAddress(_hWinPcap, "pcap_close");
@@ -30,7 +30,7 @@ bool PcapNetFilter::Init()
         pcap_freealldevs = (pcap_freealldevs_proc) GetProcAddress(_hWinPcap, "pcap_freealldevs");
         pcap_next_ex     = (pcap_next_ex_proc)     GetProcAddress(_hWinPcap, "pcap_next_ex");
 
-        if( pcap_open_live == NULL ||
+        if (pcap_open_live == NULL ||
             pcap_close == NULL ||
             pcap_findalldevs == NULL ||
             pcap_freealldevs == NULL ||
@@ -53,7 +53,7 @@ bool PcapNetFilter::Init()
 }
 void PcapNetFilter::End()
 {
-    if( _fp != 0 )
+    if (_fp != 0 )
     {
         pcap_close(_fp);
     }
@@ -120,7 +120,7 @@ TCHAR *PcapNetFilter::GetName(int i) // Return ANSI string
         char *adapterName = pAdapter->AdapterName;
 
         // Optimize result if possible
-        if( strstr(name, adapterName) != NULL )
+        if (strstr(name, adapterName) != NULL )
         {
             strcpy_s(name, sizeof(name), pAdapter->Description);
             Utils::AnsiToUtf16(name, tName, 256);
@@ -145,7 +145,7 @@ bool PcapNetFilter::Select(int i)
     // Open Device
     _fp = pcap_open_live(dev->name, 64, 0, 20, errbuf);
 
-    if( _fp == NULL )
+    if (_fp == NULL )
     {
         return false;
     }
@@ -171,7 +171,7 @@ bool PcapNetFilter::Select(int i)
     {
         char *adapterName = pAdapter->AdapterName;
 
-        if( strstr(dev->name, adapterName) != NULL )
+        if (strstr(dev->name, adapterName) != NULL )
         {
             memcpy(_macAddr, pAdapter->Address, 6);
         }
@@ -227,9 +227,9 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
         res = pcap_next_ex(_fp, &header, &pkt_data);
 
         //Timeout
-        if( res == 0 ) 
+        if (res == 0 ) 
         {
-            if( * capture )
+            if (* capture )
             {
                 continue; 
             }
@@ -246,7 +246,7 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
         }
 
         // Filter Group Packets
-        if( res > 0 )
+        if (res > 0 )
         {
             mh = (MacHeader *)(pkt_data);
 
@@ -272,7 +272,7 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
                 th = (TcpHeader *)(pkt_data + sizeof(MacHeader) + sizeof(IpHeader));
             }
 
-            if( memcmp(_macAddr, mh->dst, 6) == 0 || 
+            if (memcmp(_macAddr, mh->dst, 6) == 0 || 
                 memcmp(_macAddr, mh->src, 6) == 0 )
             {
                 break;
@@ -302,24 +302,24 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
     {
         pi->networkProtocol = NET_IPv4;
 
-        if( ih->protocol == 6 )
+        if (ih->protocol == 6 )
         {
             pi->trasportProtocol = TRA_TCP;
         }
-        else if( ih->protocol == 17 )
+        else if (ih->protocol == 17 )
         {
             pi->trasportProtocol = TRA_UDP;
         }
-        else if( ih->protocol == 1 )
+        else if (ih->protocol == 1 )
         {
             pi->trasportProtocol = TRA_ICMP;
         }
     }
-    else if( mh->protocol == htons(0x0806))
+    else if (mh->protocol == htons(0x0806))
     {
         pi->networkProtocol = NET_ARP;
     }
-    else if( mh->protocol == htons(0x86DD))
+    else if (mh->protocol == htons(0x86DD))
     {
         pi->networkProtocol = NET_IPv6;
     }
@@ -329,31 +329,31 @@ bool PcapNetFilter::Capture(PacketInfo *pi, bool *capture)
     pi->local_port = 0;
     pi->remote_port = 0;
 
-    if( memcmp(_macAddr, mh->dst, 6) == 0 )
+    if (memcmp(_macAddr, mh->dst, 6) == 0 )
     {
         pi->dir = DIR_DOWN;
 
-        if( pi->trasportProtocol == TRA_UDP )
+        if (pi->trasportProtocol == TRA_UDP )
         {
             pi->remote_port = ntohs(uh->src_port);
             pi->local_port  = ntohs(uh->dst_port);
         }
-        else if( pi->trasportProtocol == TRA_TCP )
+        else if (pi->trasportProtocol == TRA_TCP )
         {
             pi->remote_port = ntohs(th->src_port);
             pi->local_port  = ntohs(th->dst_port);
         }
     }
-    else if( memcmp(_macAddr, mh->src, 6) == 0 )
+    else if (memcmp(_macAddr, mh->src, 6) == 0 )
     {
         pi->dir = DIR_UP;
 
-        if( pi->trasportProtocol == TRA_UDP )
+        if (pi->trasportProtocol == TRA_UDP )
         {
             pi->remote_port = ntohs(uh->dst_port);
             pi->local_port  = ntohs(uh->src_port);
         }
-        else if( pi->trasportProtocol == TRA_TCP )
+        else if (pi->trasportProtocol == TRA_TCP )
         {
             pi->remote_port = ntohs(th->dst_port);
             pi->local_port  = ntohs(th->src_port);

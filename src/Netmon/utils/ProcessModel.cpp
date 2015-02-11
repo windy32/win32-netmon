@@ -81,7 +81,7 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
 {
     int index = GetProcessIndex(pi->puid);
 
-    if( index == -1 ) // A new process
+    if (index == -1 ) // A new process
     {
         // Insert a ProcessItem
         ProcessItem item;
@@ -115,7 +115,7 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
         // Update the ProcessItem that already Exists
         ProcessItem &item = _processes[index];
 
-        if( !item.active )
+        if (!item.active )
         {
             item.active = true;
             item.pid = pi->pid; // The first pid is logged
@@ -128,11 +128,11 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
             item.prevRxRate = 0;
         }
 
-        if( pi->dir == DIR_UP )
+        if (pi->dir == DIR_UP )
         {
             item.txRate += pi->size;
         }
-        else if( pi->dir == DIR_DOWN )
+        else if (pi->dir == DIR_DOWN )
         {
             item.rxRate += pi->size;
         }
@@ -151,9 +151,9 @@ void ProcessModel::OnTimer()
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
         ProcessItem &item = _processes[i];
-        if( item.active && item.pid != -1 ) // Skip the "Unknown" process
+        if (item.active && item.pid != -1 ) // Skip the "Unknown" process
         {
-            if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name, !rebuilt))
+            if (!ProcessCache::instance()->IsProcessAlive(item.pid, item.name, !rebuilt))
             {
                 item.active = false;
             }
@@ -294,7 +294,7 @@ int ProcessModel::GetProcessUid(const TCHAR *name)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if( _tcscmp(_processes[i].name, name) == 0 )
+        if (_tcscmp(_processes[i].name, name) == 0 )
         {
             puid = _processes[i].puid;
             break;
@@ -310,7 +310,7 @@ bool ProcessModel::GetProcessName(int puid, TCHAR *buf, int len)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if( _processes[i].puid == puid )
+        if (_processes[i].puid == puid )
         {
             _tcscpy_s(buf, len, _processes[i].name);
             result = true;
@@ -327,7 +327,7 @@ int ProcessModel::GetProcessIndex(int puid)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if( _processes[i].puid == puid )
+        if (_processes[i].puid == puid )
         {
             index = i;
             break;
@@ -341,7 +341,7 @@ bool ProcessModel::GetProcessRate(int puid, int *txRate, int *rxRate)
 {
     int index = GetProcessIndex(puid);
 
-    if( index == -1 )
+    if (index == -1 )
     {
         return false;
     }
@@ -361,7 +361,7 @@ bool ProcessModel::IsProcessActive(int puid)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if( _processes[i].puid == puid )
+        if (_processes[i].puid == puid )
         {
             active = _processes[i].active;
             break;

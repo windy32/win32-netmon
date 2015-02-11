@@ -210,7 +210,7 @@ static void OnClose(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    if( wParam == IDB_CLOSE )
+    if (wParam == IDB_CLOSE )
     {
         EndDialog(hWnd, 0);
     }

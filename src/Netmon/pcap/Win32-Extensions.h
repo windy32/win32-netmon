@@ -45,9 +45,9 @@ extern "C" {
 */
 struct pcap_send_queue
 {
-	u_int maxlen;		///< Maximum size of the the queue, in bytes. This variable contains the size of the buffer field.
-	u_int len;			///< Current size of the queue, in bytes.
-	char *buffer;		///< Buffer containing the packets to be sent.
+    u_int maxlen;        ///< Maximum size of the the queue, in bytes. This variable contains the size of the buffer field.
+    u_int len;            ///< Current size of the queue, in bytes.
+    char *buffer;        ///< Buffer containing the packets to be sent.
 };
 
 typedef struct pcap_send_queue pcap_send_queue;
@@ -60,26 +60,26 @@ typedef struct pcap_send_queue pcap_send_queue;
 typedef struct _AirpcapHandle *PAirpcapHandle;
 #endif
 
-#define		BPF_MEM_EX_IMM	0xc0
-#define		BPF_MEM_EX_IND	0xe0
+#define        BPF_MEM_EX_IMM    0xc0
+#define        BPF_MEM_EX_IND    0xe0
 
 /*used for ST*/
-#define		BPF_MEM_EX		0xc0
-#define		BPF_TME					0x08
+#define        BPF_MEM_EX        0xc0
+#define        BPF_TME                    0x08
 
-#define		BPF_LOOKUP				0x90   
-#define		BPF_EXECUTE				0xa0
-#define		BPF_INIT				0xb0
-#define		BPF_VALIDATE			0xc0
-#define		BPF_SET_ACTIVE			0xd0
-#define		BPF_RESET				0xe0
-#define		BPF_SET_MEMORY			0x80
-#define		BPF_GET_REGISTER_VALUE	0x70
-#define		BPF_SET_REGISTER_VALUE	0x60
-#define		BPF_SET_WORKING			0x50
-#define		BPF_SET_ACTIVE_READ		0x40
-#define		BPF_SET_AUTODELETION	0x30
-#define		BPF_SEPARATION			0xff
+#define        BPF_LOOKUP                0x90   
+#define        BPF_EXECUTE                0xa0
+#define        BPF_INIT                0xb0
+#define        BPF_VALIDATE            0xc0
+#define        BPF_SET_ACTIVE            0xd0
+#define        BPF_RESET                0xe0
+#define        BPF_SET_MEMORY            0x80
+#define        BPF_GET_REGISTER_VALUE    0x70
+#define        BPF_SET_REGISTER_VALUE    0x60
+#define        BPF_SET_WORKING            0x50
+#define        BPF_SET_ACTIVE_READ        0x40
+#define        BPF_SET_AUTODELETION    0x30
+#define        BPF_SEPARATION            0xff
 
 /* Prototypes */
 pcap_send_queue* pcap_sendqueue_alloc(u_int memsize);
