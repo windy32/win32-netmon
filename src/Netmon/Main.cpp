@@ -146,7 +146,7 @@ static void InitDatabase()
     //
     // Note:
     //     In SQLite 3.x, the "Integer" storage class may refer to data type:
-    //     int8, int16, int24, int32, int48 or int 64.
+    //     int8, int16, int24, int32, int48 or int64.
     
     #pragma region Datebase Structure
 
@@ -871,6 +871,22 @@ static void ProfileInit(HWND hWnd)
     }
 }
 
+static void ResizeChildWindow(HWND hWnd)
+{
+    RECT stRect;
+    GetWindowRect(GetDlgItem(hWnd, IDT_VIEW), &stRect);
+
+    stRect.bottom -= stRect.top;
+    stRect.right -= stRect.left;
+    stRect.left = 0;
+    stRect.top = 0;
+
+    TabCtrl_AdjustRect(GetDlgItem(hWnd, IDT_VIEW), FALSE, &stRect);
+
+    SetWindowPos(g_hCurPage, HWND_TOP, 
+        stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, 
+        SWP_SHOWWINDOW);
+}
 ///----------------------------------------------------------------------------------------------// 
 ///                                    L2 Message Handlers                                       //
 ///----------------------------------------------------------------------------------------------//
@@ -895,7 +911,6 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
 
     // Get the Index of the Selected Tab.
     int i = TabCtrl_GetCurSel(hTab); 
-    RECT stRect;
 
     DLGPROC lpProc[C_PAGES] = { ProcDlgRealtime, ProcDlgMonth, ProcDlgStatistics, ProcDlgDetail };
     LPCTSTR lpName[C_PAGES] = { 
@@ -906,22 +921,22 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
     };
 
     // Check MenuItem
-    if (i == 0 )
+    if (i == 0)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
     }
-    else if (i == 1 )
+    else if (i == 1)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
     }
-    else if (i == 2 )
+    else if (i == 2)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
     }
-    else if (i == 3 )
+    else if (i == 3)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
@@ -933,18 +948,11 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
         SendMessage(g_hCurPage, WM_CLOSE, 0, 0);
     }
 
-    // Calc the Dialog's Position and Size
-    GetWindowRect(hTab, &stRect);
-    
-    stRect.bottom -= stRect.top;
-    stRect.right -= stRect.left;
-    stRect.left = 0;
-    stRect.top = 0;
-
-    TabCtrl_AdjustRect(hTab, FALSE, &stRect);
-
     // Create New Dialog
-    g_hCurPage = CreateDialogParam(g_hInstance, lpName[i], hTab, lpProc[i], (LPARAM)&stRect);
+    g_hCurPage = CreateDialogParam(g_hInstance, lpName[i], hTab, lpProc[i], NULL);
+
+    // Initialize the size of the new window
+    ResizeChildWindow(hWnd);
 
     return;
 }
@@ -1566,19 +1574,7 @@ static void OnSize(HWND hWnd, WPARAM wParam, LPARAM lParam)
     g_iSidebarHeight = clientHeight;
 
     // Resize the Child Window in Tab Control
-    RECT stRect;
-    GetWindowRect(GetDlgItem(hWnd, IDT_VIEW), &stRect);
-
-    stRect.bottom -= stRect.top;
-    stRect.right -= stRect.left;
-    stRect.left = 0;
-    stRect.top = 0;
-
-    TabCtrl_AdjustRect(GetDlgItem(hWnd, IDT_VIEW), FALSE, &stRect);
-
-    SetWindowPos(g_hCurPage, HWND_TOP, 
-        stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, 
-        SWP_SHOWWINDOW);
+    ResizeChildWindow(hWnd);
 
     // Draw Sidebar
     DrawSidebar();

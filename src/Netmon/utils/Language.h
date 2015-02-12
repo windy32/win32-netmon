@@ -32,8 +32,8 @@ protected:
     class StringTable
     {
     protected:
-        enum 
-        { 
+        enum
+        {
             MAX_LEN = 256 // Max length of a string
         };
         TCHAR _table[STRING_TABLE_SIZE][MAX_LEN];
