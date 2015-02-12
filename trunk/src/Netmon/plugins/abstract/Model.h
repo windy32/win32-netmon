@@ -13,27 +13,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 
-#include "stdafx.h"
-#include "NetModel.h"
+#ifndef MODEL_H
+#define MODEL_H
 
-const int NetModel::PROCESS_ALL = -1;
-
-NetModel::NetModel()
+// Base class of all concrete views
+class Model
 {
-    InitializeCriticalSection(&_cs);
-}
+protected:
+    static const int PROCESS_ALL;
+};
 
-NetModel::~NetModel()
-{
-    DeleteCriticalSection(&_cs);
-}
-
-void NetModel::Lock()
-{
-    EnterCriticalSection(&_cs);
-}
-
-void NetModel::Unlock()
-{
-    LeaveCriticalSection(&_cs);
-}
+#endif

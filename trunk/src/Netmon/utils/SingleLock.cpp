@@ -13,27 +13,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 
-#ifndef NET_MODEL_H
-#define NET_MODEL_H
+#include "stdafx.h"
+#include "SingleLock.h"
 
-#include "../utils/Packet.h"
-
-// Base class of all concrete models
-class NetModel
+SingleLock::SingleLock()
 {
-private:
-    CRITICAL_SECTION _cs;
+    InitializeCriticalSection(&_cs);
+}
 
-public:
-    static const int PROCESS_ALL;
+SingleLock::~SingleLock()
+{
+    DeleteCriticalSection(&_cs);
+}
 
-protected:
-    void Lock();
-    void Unlock();
+void SingleLock::Lock()
+{
+    EnterCriticalSection(&_cs);
+}
 
-public:
-    NetModel();
-    ~NetModel();
-};
-
-#endif
+void SingleLock::Unlock()
+{
+    LeaveCriticalSection(&_cs);
+}
