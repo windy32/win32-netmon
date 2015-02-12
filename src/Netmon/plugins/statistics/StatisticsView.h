@@ -16,16 +16,19 @@
 #ifndef STATISTICS_VIEW_H
 #define STATISTICS_VIEW_H
 
-#include "NetView.h"
+#include "../abstract/View.h"
 #include "StatisticsModel.h"
 
-class StatisticsView : public NetView
+class StatisticsView : public View
 {
 protected:
     // GDI Objects
     static HDC     _hdcTarget;
     static HDC     _hdcBuf;
     static HBITMAP _hbmpBuf;
+
+    // Window Handle
+    static HWND _hWnd;
 
     // Model Object
     static StatisticsModel *_model;

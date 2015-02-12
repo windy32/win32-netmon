@@ -15,8 +15,8 @@
 
 #include "stdafx.h"
 #include "DetailModel.h"
-#include "../Utils/ProcessModel.h"
-#include "../Utils/Utils.h"
+#include "../../Utils/ProcessModel.h"
+#include "../../Utils/Utils.h"
 
 DetailModel::DetailModel()
 {

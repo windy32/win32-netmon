@@ -16,10 +16,10 @@
 #ifndef STATISTICS_MODEL_H
 #define STATISTICS_MODEL_H
 
-#include "NetModel.h"
-#include "../Utils/SQLite.h"
+#include "../abstract/Model.h"
+#include "../../Utils/SQLite.h"
 
-class StatisticsModel : public NetModel
+class StatisticsModel : public Model
 {
 public:
     // Item Definition

@@ -16,15 +16,18 @@
 #ifndef REALTIME_PLUGIN_H
 #define REALTIME_PLUGIN_H
 
+#include "../Plugin.h"
+
 class RealtimePlugin : public Plugin
 {
 public:
     RealtimePlugin();
-    ~RealtimePlugin();
+    virtual ~RealtimePlugin();
 
     virtual void InsertPacket(PacketInfoEx *pi);
     virtual void SetProcess(int puid);
-    
+    virtual void SaveDatabase();
+
     virtual DLGPROC GetDialogProc();
     virtual TCHAR * GetTemplateName();
 };

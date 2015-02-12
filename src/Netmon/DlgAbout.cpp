@@ -16,10 +16,10 @@
 #include "stdafx.h"
 #include "DlgAbout.h"
 
-#include "../res/resource.h"
+#include "res/resource.h"
 
-#include "../utils/Utils.h"
-#include "../utils/Language.h"
+#include "utils/Utils.h"
+#include "utils/Language.h"
 
 ///----------------------------------------------------------------------------------------------//
 ///                                    Global Variables                                          //

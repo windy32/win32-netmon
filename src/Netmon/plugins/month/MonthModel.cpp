@@ -15,8 +15,8 @@
 
 #include "stdafx.h"
 #include "MonthModel.h"
-#include "../Utils/Utils.h"
-#include "../Utils/ProcessModel.h"
+#include "../../Utils/Utils.h"
+#include "../../Utils/ProcessModel.h"
 
 int MonthModel::MtModelItem::firstMonth = -1;
 MonthModel *MonthModel::_this;

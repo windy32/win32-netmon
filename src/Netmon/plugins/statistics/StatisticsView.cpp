@@ -16,13 +16,12 @@
 #include "stdafx.h"
 #include "StatisticsView.h"
 
-#include "../utils/Utils.h"
-#include "../utils/ProcessModel.h"
-#include "../GdiWidget/GwPieChart.h"
-#include "../GdiWidget/GwHistogram.h"
-#include "../GdiWidget/GwLogHistogram.h"
-#include "../GdiWidget/GwGroupbox.h"
-#include "../GdiWidget/GwLabel.h"
+#include "../../utils/Utils.h"
+#include "GdiWidget/GwPieChart.h"
+#include "GdiWidget/GwHistogram.h"
+#include "GdiWidget/GwLogHistogram.h"
+#include "GdiWidget/GwGroupbox.h"
+#include "GdiWidget/GwLabel.h"
 
 #pragma region Members of StatisticsView
 
@@ -67,6 +66,12 @@ void StatisticsView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 
 void StatisticsView::DrawGraph()
 {
+    RECT stRect;
+    GetClientRect(_hWnd, &stRect);
+
+    int _width  = stRect.right - stRect.left;
+    int _height = stRect.bottom - stRect.top;
+
     //  -------------------   -------------------    -------------------    -------------------
     // Summary             | Protocol            |  PacketSize          |  Rate                |
     // |                   | |                   |  |                   |  |                   |
@@ -309,6 +314,8 @@ LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 {
     if (uMsg == WM_INITDIALOG )
     {
+        _hWnd = hWnd;
+
         // Init GDI Objects
 
         // - Device Context & Bitmap
@@ -322,17 +329,11 @@ LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             SelectObject(_hdcBuf, _hbmpBuf);
         }
 
-        // - Clear Background
-        Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
-
         // - Pen
         SelectObject(_hdcBuf, GetStockObject(DC_PEN));
 
         // - Brush
         SelectObject(_hdcBuf, GetStockObject(DC_BRUSH));
-
-        // - Background Mode
-        //SetBkMode(_hdcBuf, TRANSPARENT);
 
         // Start Timer
         SetTimer(hWnd, 0, 1000, StatisticsView::TimerProc);
@@ -357,13 +358,6 @@ LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
     else if (uMsg == WM_SIZE )
     {
-        RECT stRect;
-
-        GetClientRect(hWnd, &stRect);
-
-        _width  = stRect.right - stRect.left;
-        _height = stRect.bottom - stRect.top;
-
         DrawGraph();
     }
     else

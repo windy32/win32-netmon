@@ -16,9 +16,9 @@
 #ifndef DETAIL_MODEL_H
 #define DETAIL_MODEL_H
 
-#include "NetModel.h"
+#include "../abstract/Model.h"
 
-class DetailModel : public NetModel
+class DetailModel : public Model
 {
 private:
     // Item Definition

@@ -16,7 +16,7 @@
 #include "stdafx.h"
 #include "GwGroupbox.h"
 
-#include "../utils/Utils.h"
+#include "../../../utils/Utils.h"
 
 GwGroupbox::GwGroupbox(
     HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 

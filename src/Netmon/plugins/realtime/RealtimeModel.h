@@ -16,7 +16,7 @@
 #ifndef REALTIME_MODEL_H
 #define REALTIME_MODEL_H
 
-#include "NetModel.h"
+#include "../abstract/Model.h"
 
 enum ZoomFactor
 {
@@ -25,7 +25,7 @@ enum ZoomFactor
     ZOOM_60S
 };
 
-class RealtimeModel : public NetModel
+class RealtimeModel : public Model
 {
 private:
     // Item Definition

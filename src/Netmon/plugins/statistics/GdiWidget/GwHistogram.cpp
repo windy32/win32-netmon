@@ -16,7 +16,7 @@
 #include "stdafx.h"
 #include "GwHistogram.h"
 
-#include "../utils/Utils.h"
+#include "../../../utils/Utils.h"
 
 GwHistogram::GwHistogram(
     HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 

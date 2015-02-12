@@ -16,6 +16,8 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include "../../utils/Language.h"
+
 // Base class of all concrete views
 class View
 {
