@@ -13,26 +13,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 
-#ifndef NET_VIEW_H
-#define NET_VIEW_H
+#ifndef STATISTICS_PLUGIN_H
+#define STATISTICS_PLUGIN_H
 
-#include "../utils/Packet.h"
-#include "../utils/SQLite.h"
-#include "../utils/Language.h"
-
-// Base class of all concrete views
-class NetView
+class StatisticsPlugin : public Plugin
 {
-protected:
-    static int      _process;
-    static const int PROCESS_ALL;
-
-    static int     _width;
-    static int     _height;
-
 public:
-    virtual void SetProcessUid(int puid) = 0;
-    virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+    StatisticsPlugin();
+    ~StatisticsPlugin();
+
+    virtual void InsertPacket(PacketInfoEx *pi);
+    virtual void SetProcess(int puid);
+    
+    virtual DLGPROC GetDialogProc();
+    virtual TCHAR * GetTemplateName();
 };
 
 #endif
