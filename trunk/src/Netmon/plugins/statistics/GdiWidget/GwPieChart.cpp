@@ -16,7 +16,7 @@
 #include "stdafx.h"
 #include "GwPieChart.h"
 
-#include "../utils/Utils.h"
+#include "../../../utils/Utils.h"
 
 GwPieChart::GwPieChart(
     HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 

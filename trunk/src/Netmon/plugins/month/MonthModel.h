@@ -16,10 +16,10 @@
 #ifndef MONTH_MODEL_H
 #define MONTH_MODEL_H
 
-#include "NetModel.h"
-#include "../Utils/SQLite.h"
+#include "../abstract/Model.h"
+#include "../../Utils/SQLite.h"
 
-class MonthModel : public NetModel
+class MonthModel : public Model
 {
 public:
     // Item Definition

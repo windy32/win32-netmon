@@ -16,15 +16,18 @@
 #ifndef MONTH_PLUGIN_H
 #define MONTH_PLUGIN_H
 
+#include "../Plugin.h"
+
 class MonthPlugin : public Plugin
 {
 public:
     MonthPlugin();
-    ~MonthPlugin();
+    virtual ~MonthPlugin();
 
     virtual void InsertPacket(PacketInfoEx *pi);
     virtual void SetProcess(int puid);
-    
+    virtual void SaveDatabase();
+
     virtual DLGPROC GetDialogProc();
     virtual TCHAR * GetTemplateName();
 };

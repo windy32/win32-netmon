@@ -16,10 +16,10 @@
 #ifndef MONTH_VIEW_H
 #define MONTH_VIEW_H
 
-#include "NetView.h"
+#include "../abstract/View.h"
 #include "MonthModel.h"
 
-class MonthView : public NetView
+class MonthView : public View
 {
 protected:
     // Settings
@@ -38,6 +38,9 @@ protected:
     static HBITMAP _hbmpPageUpDark;
     static HBITMAP _hbmpPageDownLight;
     static HBITMAP _hbmpPageDownDark;
+
+    // Window Handle
+    static HWND _hWnd;
 
     // Model Object
     static MonthModel *_model;

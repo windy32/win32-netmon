@@ -19,11 +19,25 @@
 class Plugin
 {
 public:
+    virtual ~Plugin();
     virtual void InsertPacket(PacketInfoEx *pi) = 0;
     virtual void SetProcess(int puid) = 0;
+    virtual void SaveDatabase();
     
     virtual DLGPROC GetDialogProc() = 0;
     virtual TCHAR * GetTemplateName() = 0;
+};
+
+// A place holder plugin which is not associated with a child window
+class NullPlugin : public Plugin
+{
+public:
+    virtual void InsertPacket(PacketInfoEx *pi) {}
+    virtual void SetProcess(int puid) {}
+    virtual void SaveDatabase() {}
+
+    virtual DLGPROC GetDialogProc() { return NULL; }
+    virtual TCHAR * GetTemplateName() { return NULL; }
 };
 
 #endif

@@ -16,13 +16,14 @@
 #include "stdafx.h"
 #include "DlgPreferences.h"
 
-#include "../res/resource.h"
+#include "res/resource.h"
 
-#include "../utils/Utils.h"
-#include "../utils/Language.h"
-#include "../utils/Profile.h"
+#include "utils/Utils.h"
+#include "utils/SQLite.h"
+#include "utils/Profile.h"
+#include "utils/Language.h"
 
-#include "../views/DetailView.h"
+#include "plugins/Detail/Detail.h"
 
 ///----------------------------------------------------------------------------------------------//
 ///                                    Global Variables                                          //
@@ -33,7 +34,7 @@ extern int           g_nAdapters;
 extern TCHAR         g_szAdapterNames[16][256];
 
 extern bool          g_bCapture;
-static DetailView   *g_pDetailView;
+static DetailPlugin *g_pDetailPlugin;
 
 ///----------------------------------------------------------------------------------------------// 
 ///                                    Called by Message Handlers                                //
@@ -318,8 +319,7 @@ static void OnDeleteAll(HWND hWnd)
     }
     else
     {
-        Utils::DeleteAllPackets();
-        g_pDetailView->OnAllPacketsDeleted();
+        g_pDetailPlugin->DeleteAllPackets();
         MessageBox(hWnd, Language::GetString(IDS_PREF_ALL_DELETED), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
@@ -347,7 +347,7 @@ static void OnCompact(HWND hWnd)
 static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     // Save pointer to detail view
-    g_pDetailView = (DetailView *)lParam;
+    g_pDetailPlugin = (DetailPlugin *)lParam;
 
     // Load Icon
     HICON hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN));

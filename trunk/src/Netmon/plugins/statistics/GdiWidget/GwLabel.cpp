@@ -16,7 +16,7 @@
 #include "stdafx.h"
 #include "GwLabel.h"
 
-#include "../utils/Utils.h"
+#include "../../../utils/Utils.h"
 
 GwLabel::GwLabel(
     HDC hdcTarget, int x, int y, int maxWidth, int maxHeight, 

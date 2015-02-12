@@ -16,10 +16,10 @@
 #ifndef REALTIME_VIEW_H
 #define REALTIME_VIEW_H
 
-#include "NetView.h"
+#include "../abstract/View.h"
 #include "RealtimeModel.h"
 
-class RealtimeView : public NetView
+class RealtimeView : public View
 {
 protected:
     // Settings
@@ -41,6 +41,9 @@ protected:
     static HFONT   _hEnglishFont;
     static HFONT   _hShellDlgFont;
     static HFONT   _hProcessFont;
+
+    // Window Handle
+    static HWND _hWnd;
 
     // Model object
     static RealtimeModel *_model;

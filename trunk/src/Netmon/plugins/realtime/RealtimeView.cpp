@@ -16,8 +16,8 @@
 #include "stdafx.h"
 #include "RealtimeView.h"
 
-#include "../Utils/Utils.h"
-#include "../Utils/ProcessModel.h"
+#include "../../Utils/Utils.h"
+#include "../../Utils/ProcessModel.h"
 
 #pragma region Members of RealtimeView
 
@@ -71,6 +71,12 @@ void RealtimeView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 
 void RealtimeView::DrawGraph()
 {
+    RECT stRect;
+    GetClientRect(_hWnd, &stRect);
+
+    int _width  = stRect.right - stRect.left;
+    int _height = stRect.bottom - stRect.top;
+
     // - Rectangle for Graph
     int x1 = 34;
     int y1 = 10;
@@ -469,7 +475,7 @@ void RealtimeView::DrawGraph()
     // Process Name
     SelectObject(_hdcBuf, _hProcessFont);
     SetTextColor(_hdcBuf, RGB(128, 128, 128));
-    if (_process == -1 )
+    if (_process == -1)
     {
         TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, 
             Language::GetString(IDS_ALL_PROCESS), _tcslen(Language::GetString(IDS_ALL_PROCESS)));
@@ -489,6 +495,8 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 {
     if (uMsg == WM_INITDIALOG )
     {
+        _hWnd = hWnd;
+
         // Init GDI Objects
 
         // - Device Context & Bitmap
@@ -501,9 +509,6 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
             SelectObject(_hdcBuf, _hbmpBuf);
         }
-
-        // - Clear Background
-        Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
 
         // - Font
         _hEnglishFont  = Utils::MyCreateFont(TEXT("Arial"), 12, 0, false);
@@ -566,6 +571,13 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
             }
         }
 
+        // Get Width and Height
+        RECT stRect;
+        GetClientRect(_hWnd, &stRect);
+
+        int _width  = stRect.right - stRect.left;
+        int _height = stRect.bottom - stRect.top;
+
         // Zoom Factor
         int x1 = 34;
         int y1 = 10;
@@ -596,13 +608,6 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
     }
     else if (uMsg == WM_SIZE )
     {
-        RECT stRect;
-
-        GetClientRect(hWnd, &stRect);
-
-        _width  = stRect.right - stRect.left;
-        _height = stRect.bottom - stRect.top;
-
         DrawGraph();
     }
     else

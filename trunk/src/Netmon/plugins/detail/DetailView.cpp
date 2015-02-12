@@ -16,11 +16,11 @@
 #include "stdafx.h"
 #include "DetailView.h"
 
-#include "../utils/Utils.h"
-#include "../utils/ProcessModel.h"
-#include "../utils//Language.h"
+#include "../../utils/Utils.h"
+#include "../../utils/ProcessModel.h"
+#include "../../utils//Language.h"
 
-#include "../res/resource.h"
+#include "../../res/resource.h"
 
 #pragma region Members of DetailView
 
@@ -121,11 +121,10 @@ void DetailView::UpdateSize(HWND hWnd)
 {
     // Resize
     RECT stRect;
-
     GetClientRect(_hWnd, &stRect);
 
-    _width  = stRect.right - stRect.left;
-    _height = stRect.bottom - stRect.top;
+    int _width  = stRect.right - stRect.left;
+    int _height = stRect.bottom - stRect.top;
 
     MoveWindow(GetDlgItem(hWnd, IDL_DETAIL),   10, 10, _width - 20, _height - 50, TRUE);
     MoveWindow(GetDlgItem(hWnd, IDB_PAGEUP),   10,  _height - 34,  50, 24, TRUE);
@@ -136,7 +135,7 @@ void DetailView::UpdateSize(HWND hWnd)
 }
 
 void DetailView::UpdateContent(bool rebuildList)
-{    
+{
     // Get Number of Packets
     __int64 prevPackets = _model->GetPrevPackets(_process);
     __int64 curPackets  = _model->GetCurPackets(_process);

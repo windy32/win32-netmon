@@ -15,7 +15,7 @@
 
 #include "stdafx.h"
 #include "StatisticsModel.h"
-#include "../Utils/ProcessModel.h"
+#include "../../Utils/ProcessModel.h"
 
 StatisticsModel *StatisticsModel::_this;
 

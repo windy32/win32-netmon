@@ -16,10 +16,11 @@
 #ifndef DETAIL_VIEW_H
 #define DETAIL_VIEW_H
 
-#include "NetView.h"
+#include "../abstract/View.h"
 #include "DetailModel.h"
+#include "../../utils/SQLite.h"
 
-class DetailView : public NetView
+class DetailView : public View
 {
 protected:
     // UI Elements & States

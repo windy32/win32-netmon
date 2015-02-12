@@ -16,15 +16,18 @@
 #ifndef STATISTICS_PLUGIN_H
 #define STATISTICS_PLUGIN_H
 
+#include "../Plugin.h"
+
 class StatisticsPlugin : public Plugin
 {
 public:
     StatisticsPlugin();
-    ~StatisticsPlugin();
+    virtual ~StatisticsPlugin();
 
     virtual void InsertPacket(PacketInfoEx *pi);
     virtual void SetProcess(int puid);
-    
+    virtual void SaveDatabase();
+
     virtual DLGPROC GetDialogProc();
     virtual TCHAR * GetTemplateName();
 };

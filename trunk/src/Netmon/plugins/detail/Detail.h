@@ -16,17 +16,22 @@
 #ifndef DETAIL_PLUGIN_H
 #define DETAIL_PLUGIN_H
 
+#include "../Plugin.h"
+
 class DetailPlugin : public Plugin
 {
 public:
     DetailPlugin();
-    ~DetailPlugin();
+    virtual ~DetailPlugin();
 
     virtual void InsertPacket(PacketInfoEx *pi);
     virtual void SetProcess(int puid);
+    virtual void SaveDatabase();
 
     virtual DLGPROC GetDialogProc();
     virtual TCHAR * GetTemplateName();
+
+    void DeleteAllPackets();
 };
 
 #endif

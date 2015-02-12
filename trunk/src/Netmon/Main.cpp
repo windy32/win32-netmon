@@ -28,13 +28,13 @@
 #include "utils/Language.h"
 #include "utils/Profile.h"
 
-#include "Dlg/DlgPreferences.h"
-#include "Dlg/DlgAbout.h"
+#include "DlgPreferences.h"
+#include "DlgAbout.h"
 
-#include "views/RealtimeView.h"
-#include "views/MonthView.h"
-#include "views/StatisticsView.h"
-#include "views/DetailView.h"
+#include "plugins/realtime/Realtime.h"
+#include "plugins/month/Month.h"
+#include "plugins/statistics/Statistics.h"
+#include "plugins/detail/Detail.h"
 
 #define WM_USER_TRAY (WM_USER + 1)
 #define WM_RECONNECT (WM_USER + 2)
@@ -46,59 +46,51 @@
 
 HINSTANCE g_hInstance;
 
-static HWND      g_hDlgMain;
-static HWND      g_hCurPage;   // Current Child Dialog Box 
-static HMENU     g_hTrayMenu;
-static HMENU     g_hProcessMenu;
+static HWND    g_hDlgMain;
+static HWND    g_hCurPage;   // Current Child Dialog Box 
+static HMENU   g_hTrayMenu;
+static HMENU   g_hProcessMenu;
 
 // Sidebar GDI objects
-static HDC       g_hDcSidebarBg;
-static HDC       g_hDcSidebarBuf;
-static HBITMAP   g_hBmpSidebarBg;
-static HBITMAP   g_hBmpSidebarBuf;
+static HDC     g_hDcSidebarBg;
+static HDC     g_hDcSidebarBuf;
+static HBITMAP g_hBmpSidebarBg;
+static HBITMAP g_hBmpSidebarBuf;
 
-static HDC       g_hDcStart;
-static HDC       g_hDcStartHover;
-static HDC       g_hDcStop;
-static HDC       g_hDcStopHover;
+static HDC     g_hDcStart;
+static HDC     g_hDcStartHover;
+static HDC     g_hDcStop;
+static HDC     g_hDcStopHover;
 
-static HBITMAP   g_hBmpStart;
-static HBITMAP   g_hBmpStartHover;
-static HBITMAP   g_hBmpStop;
-static HBITMAP   g_hBmpStopHover;
+static HBITMAP g_hBmpStart;
+static HBITMAP g_hBmpStartHover;
+static HBITMAP g_hBmpStop;
+static HBITMAP g_hBmpStopHover;
 
 static enum enumHoverState
 {
     Start, Stop, Neither
 } g_enumHoverState = Neither;
 
-static int g_iSidebarWidth;
-static int g_iSidebarHeight;
+static int     g_iSidebarWidth;
+static int     g_iSidebarHeight;
 
 // Capture thread
-HANDLE g_hCaptureThread;
-bool   g_bCapture = false;
+HANDLE         g_hCaptureThread;
+bool           g_bCapture = false;
 
 // Adapter
-int    g_nAdapters = 0;
-int    g_iAdapter = 0;
-TCHAR  g_szAdapterNames[16][256];
+int            g_nAdapters = 0;
+int            g_iAdapter = 0;
+TCHAR          g_szAdapterNames[16][256];
 
-// Model
-static RealtimeModel   *g_rtModel;
-static MonthModel      *g_mtModel;
-static StatisticsModel *g_stModel;
-static DetailModel     *g_dtModel;
-
-// View
-static RealtimeView   g_rtView;
-static MonthView      g_mtView;
-static StatisticsView g_stView;
-static DetailView     g_dtView;
+// Plugins
+static std::vector<Plugin *> g_plugins;
+static Plugin *g_detailPlugin;
 
 // Language
-static int            g_nLanguage;
-static int            g_iCurLanguage;
+static int     g_nLanguage;
+static int     g_iCurLanguage;
 
 // Profile
 NetmonProfile  g_profile;
@@ -113,29 +105,6 @@ static bool    g_bDragging = false;
 static bool    g_bHideWindow = false;
 
 #pragma endregion
-
-///----------------------------------------------------------------------------------------------//
-///                                    Child Dialog Proc                                         //
-///----------------------------------------------------------------------------------------------//
-static INT_PTR CALLBACK ProcDlgRealtime(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    return g_rtView.DlgProc(hWnd, uMsg, wParam, lParam);
-}
-
-static INT_PTR CALLBACK ProcDlgMonth(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    return g_mtView.DlgProc(hWnd, uMsg, wParam, lParam);
-}
-
-static INT_PTR CALLBACK ProcDlgStatistics(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    return g_stView.DlgProc(hWnd, uMsg, wParam, lParam);
-}
-
-static INT_PTR CALLBACK ProcDlgDetail(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    return g_dtView.DlgProc(hWnd, uMsg, wParam, lParam);
-}
 
 ///----------------------------------------------------------------------------------------------// 
 ///                                    Database Operations                                       //
@@ -384,7 +353,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
     }
 
     // Capture Packets --------------------------------------------------------
-    while( g_bCapture )
+    while (g_bCapture)
     {
         int pid = -1;
         int processUID = -1;
@@ -464,60 +433,15 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         // - Update Process List
         ProcessModel::OnPacket(&pie);
 
-        // - Save to Database
-
-        // The packet item is inserted into the database only when:
-        // 1. DtViewEnable = TRUE, 
-        // 2. Current size of database is smaller than DtViewMaxSpace MB
-        // 
-        // How to get the size of database then?
-        // The current method is to estimate.
-        //
-        // When there are 3 processes, I get the following result.
-        //
-        // Packet Count     Database size(KB)
-        // ----------------------------------
-        // 4111             433
-        // 11045            729
-        // 22233            1215
-        // 40305            2017
-        // 67001            3217
-        // 86804            4106
-        //
-        // So, dbsize = 0.0445 * pcount + 236.21 (KB)
-        BOOL bUpdateDtView = FALSE;
-        BOOL bDtViewEnable;
-        int iDtViewMaxSpace;
-
-        if (g_profile.GetDtViewEnable(&bDtViewEnable) && bDtViewEnable == TRUE ) // Condition 1
-        {
-            // Get database size
-            __int64 curPackets = g_dtView.GetPacketCount();
-            int sizeInMb = (int)((curPackets * 445 / 10000 + 236) / 1024);
-
-            if (g_profile.GetDtViewMaxSpace(&iDtViewMaxSpace) && 
-                ( iDtViewMaxSpace == 0 || iDtViewMaxSpace > sizeInMb )) // Condition 2
-            {
-                bUpdateDtView = TRUE;
-                Utils::InsertPacket(&pie);
-            }
-        }
-
         // - Update Views
-#if 1
-        g_rtModel->InsertPacket(&pie);
-        g_mtModel->InsertPacket(&pie);
-        g_stModel->InsertPacket(&pie);
-
-        if (bUpdateDtView )
+        for (unsigned int i = 0; i < g_plugins.size(); i++)
         {
-            g_dtModel->InsertPacket(&pie);
+            g_plugins[i]->InsertPacket(&pie);
         }
-#endif
-        if (g_bCapture ) // If the user hasn't clicked Stop
+
+        // - Dump
+#ifdef DUMP_PACKET
         {
-            // DebugPrint
-            /*
             TCHAR msg[128];
             TCHAR *protocol = (pi.networkProtocol == NET_ARP) ? TEXT("ARP") : 
                               (pi.trasportProtocol == TRA_TCP) ? TEXT("TCP") :
@@ -531,8 +455,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
                 pi.time_s, pi.time_us, pi.size, pi.remote_port, pi.local_port, dir, protocol);
 
             OutputDebugString(msg);
-            */
         }
+#endif
     }
 
     // End --------------------------------------------------------------------
@@ -907,18 +831,12 @@ static void OnAbout(HWND hWnd)
 
 static void OnSelChanged(HWND hWnd, HWND hTab) 
 { 
-    const int C_PAGES = 4;
-
     // Get the Index of the Selected Tab.
     int i = TabCtrl_GetCurSel(hTab); 
 
-    DLGPROC lpProc[C_PAGES] = { ProcDlgRealtime, ProcDlgMonth, ProcDlgStatistics, ProcDlgDetail };
-    LPCTSTR lpName[C_PAGES] = { 
-        TEXT("DLG_REALTIME"), 
-        TEXT("DLG_MONTH"), 
-        TEXT("DLG_STATISTICS"), 
-        TEXT("DLG_DETAIL") 
-    };
+    // Get dialog procedure ptr and template name
+    DLGPROC proc = g_plugins[i]->GetDialogProc();
+    const TCHAR *name = g_plugins[i]->GetTemplateName();
 
     // Check MenuItem
     if (i == 0)
@@ -949,7 +867,7 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
     }
 
     // Create New Dialog
-    g_hCurPage = CreateDialogParam(g_hInstance, lpName[i], hTab, lpProc[i], NULL);
+    g_hCurPage = CreateDialogParam(g_hInstance, name, hTab, proc, NULL);
 
     // Initialize the size of the new window
     ResizeChildWindow(hWnd);
@@ -1052,7 +970,7 @@ static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
 static void OnPreferences(HWND hWnd)
 {
     DialogBoxParam(g_hInstance, 
-        TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_dtView);
+        TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_detailPlugin);
 }
 
 static void OnProcessChanged(HWND hWnd, LPARAM lParam)
@@ -1071,10 +989,10 @@ static void OnProcessChanged(HWND hWnd, LPARAM lParam)
                 GetDlgItem(hWnd, IDL_PROCESS), lpstListView->iItem, 0, szPUID, 16);
             int puid = _tstoi(szPUID);
 
-            g_rtView.SetProcessUid(puid);
-            g_mtView.SetProcessUid(puid);
-            g_stView.SetProcessUid(puid);
-            g_dtView.SetProcessUid(puid);
+            for (unsigned int i = 0; i < g_plugins.size(); i++)
+            {
+                g_plugins[i]->SetProcess(puid);
+            }
         }
     }
     else if(((NMHDR *)lParam)->code == NM_CLICK )
@@ -1083,10 +1001,10 @@ static void OnProcessChanged(HWND hWnd, LPARAM lParam)
 
         if (index == -1 )
         {
-            g_rtView.SetProcessUid(-1);
-            g_mtView.SetProcessUid(-1);
-            g_stView.SetProcessUid(-1);
-            g_dtView.SetProcessUid(-1);
+            for (unsigned int i = 0; i < g_plugins.size(); i++)
+            {
+                g_plugins[i]->SetProcess(-1);
+            }
         }
     }
 }
@@ -1182,10 +1100,10 @@ static void OnHideProcess(HWND hList)
     ProcessModel::HideProcess(_tstoi(buf));
     if (ProcessView::IsHidden())
     {
-        g_rtView.SetProcessUid(-1);
-        g_mtView.SetProcessUid(-1);
-        g_stView.SetProcessUid(-1);
-        g_dtView.SetProcessUid(-1);
+        for (unsigned int i = 0; i < g_plugins.size(); i++)
+        {
+            g_plugins[i]->SetProcess(-1);
+        }
     }
 }
 
@@ -1251,11 +1169,13 @@ static void OnExit(HWND hWnd)
     DeleteObject(g_hBmpStop);
     DeleteObject(g_hBmpStopHover);
 
-    // End Views
-    g_rtView.End();
-    g_mtView.End();
-    g_stView.End();
-    g_dtView.End();
+    // Close Plugins
+    for (unsigned int i = 0; i < g_plugins.size(); i++)
+    {
+        delete g_plugins[i];
+    }
+    g_plugins.clear();
+    g_detailPlugin = NULL;
 
     // End SQLite
     SQLite::Close();
@@ -1278,9 +1198,10 @@ static void WINAPI OnTimer(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
     if (time.wSecond == 0 && (time.wMinute == 0 || time.wMinute == 30))
     {
-        g_mtModel->SaveDatabase();
-        g_stModel->SaveDatabase();
-        g_dtModel->SaveDatabase();
+        for (unsigned int i = 0; i < g_plugins.size(); i++)
+        {
+            g_plugins[i]->SaveDatabase();
+        }
         SQLite::Flush();
     }
 }
@@ -1392,34 +1313,18 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     // Enum Devices
     EnumDevices();
 
-    // Init Models
-    g_rtModel = new RealtimeModel();
-    g_mtModel = new MonthModel();
-    g_stModel = new StatisticsModel();
-    g_dtModel = new DetailModel();
-
-    // Init Views
-    g_rtView.Init(g_rtModel);
-    g_mtView.Init(g_mtModel);
-    g_stView.Init(g_stModel);
-    g_dtView.Init(g_dtModel);
+    // Init Plugins
+    g_plugins.push_back(new RealtimePlugin());
+    g_plugins.push_back(new MonthPlugin());
+    g_plugins.push_back(new StatisticsPlugin());
+    g_plugins.push_back(
+        g_detailPlugin = new DetailPlugin());
 
     // Simulate Selection of the First Item. 
     OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
 
     // Start the Timer that Updates Process List
     SetTimer(hWnd, 1, 1000, OnTimer);
-
-    // Check Data for MonthView
-    if (Utils::GetExMonth() < g_mtModel->GetFirstMonth())
-    {
-        MessageBox(g_hDlgMain, 
-            TEXT("An invalid date is detected.\n")
-            TEXT("Please check system date settings."), TEXT("Error"), MB_OK | MB_ICONWARNING);
-
-        EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
-        return;
-    }
 
     // Init profile
     ProfileInit(hWnd);

@@ -16,10 +16,10 @@
 #include "stdafx.h"
 #include "MonthView.h"
 
-#include "../utils/Utils.h"
-#include "../utils/ProcessModel.h"
+#include "../../utils/Utils.h"
+#include "../../utils/ProcessModel.h"
 
-#include "../res/resource.h"
+#include "../../res/resource.h"
 
 #pragma region Members of MonthView
 
@@ -86,6 +86,12 @@ void MonthView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 void MonthView::DrawGraph()
 {
+    RECT stRect;
+    GetClientRect(_hWnd, &stRect);
+
+    int _width  = stRect.right - stRect.left;
+    int _height = stRect.bottom - stRect.top;
+
     // Export Model Info
     MonthModel::MonthItem item;
     _model->Export(_process, _curMonth, item);
@@ -359,6 +365,8 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_INITDIALOG )
     {
+        _hWnd = hWnd;
+
         // Init GDI Objects
 
         // - Device Context & Bitmap
@@ -373,9 +381,6 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
             _hdcPage = CreateCompatibleDC(_hdcTarget);
         }
-
-        // - Clear Background
-        Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
 
         // - Font
         _hFontDays = Utils::MyCreateFont(TEXT("Arial"), 12, 5, false);
@@ -406,6 +411,13 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     else if (uMsg == WM_LBUTTONDOWN )
     {
+        // Get Width and Height
+        RECT stRect;
+        GetClientRect(_hWnd, &stRect);
+
+        int _width  = stRect.right - stRect.left;
+        int _height = stRect.bottom - stRect.top;
+
         // Rectangle for Graph
         int numDays = Utils::GetNumDays(_curMonth);
 
@@ -453,13 +465,6 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     else if (uMsg == WM_SIZE )
     {
-        RECT stRect;
-
-        GetClientRect(hWnd, &stRect);
-
-        _width  = stRect.right - stRect.left;
-        _height = stRect.bottom - stRect.top;
-
         DrawGraph();
     }
     else
