@@ -359,14 +359,6 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_INITDIALOG )
     {
-        // Size Window
-        RECT stRect = *(RECT *)lParam;
-
-        _width  = stRect.right - stRect.left;
-        _height = stRect.bottom - stRect.top;
-
-        MoveWindow(hWnd, stRect.left, stRect.top, _width, _height, TRUE);
-
         // Init GDI Objects
 
         // - Device Context & Bitmap
