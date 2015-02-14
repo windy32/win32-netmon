@@ -41,34 +41,38 @@ HBITMAP MonthView::_hbmpPageUpDark;
 HBITMAP MonthView::_hbmpPageDownLight;
 HBITMAP MonthView::_hbmpPageDownDark;
 
+// Window Handle
+HWND    MonthView::_hWnd;
+
 // Model Object
 MonthModel *MonthView::_model;
 
 #pragma endregion
 
-void MonthView::Init(MonthModel *model)
+MonthView::MonthView(MonthModel *model)
 {
     _process = PROCESS_ALL;
     _model = model;
-    _curMonth = model->GetLastMonth();
 
-    _hdcBuf = 0;
-    _hbmpBuf = 0;
-    _hbmpPageUpLight   = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEUP_LT));
-    _hbmpPageUpDark    = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEUP_DK));
-    _hbmpPageDownLight = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEDN_LT));
-    _hbmpPageDownDark  = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEDN_DK));
+    _hdcBuf = 0;  // the device context
+    _hbmpBuf = 0; // and the bitmap are not deleted when user goes to another tab
+
+    _curMonth = model->GetLastMonth();
 }
 
-void MonthView::End()
+MonthView::~MonthView()
 {
     DeleteDC(_hdcBuf);
     DeleteObject(_hbmpBuf);
 
-    _model->SaveDatabase();
+    DeleteDC(_hdcPage);
+    DeleteObject(_hbmpPageUpLight);
+    DeleteObject(_hbmpPageUpDark);
+    DeleteObject(_hbmpPageDownLight);
+    DeleteObject(_hbmpPageDownDark);
 }
 
-void MonthView::SetProcessUid(int puid)
+void MonthView::SetProcess(int puid)
 {
     _process = puid;
 
@@ -361,7 +365,7 @@ void MonthView::DrawGraph()
     BitBlt(_hdcTarget, 0, 0, _width, _height, _hdcBuf, 0, 0, SRCCOPY);
 }
 
-LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_INITDIALOG )
     {
@@ -380,6 +384,11 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             SelectObject(_hdcBuf, _hbmpBuf);
 
             _hdcPage = CreateCompatibleDC(_hdcTarget);
+
+            _hbmpPageUpLight   = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEUP_LT));
+            _hbmpPageUpDark    = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEUP_DK));
+            _hbmpPageDownLight = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEDN_LT));
+            _hbmpPageDownDark  = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_PAGEDN_DK));
         }
 
         // - Font

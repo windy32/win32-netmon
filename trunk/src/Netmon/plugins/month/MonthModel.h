@@ -23,7 +23,7 @@ class MonthModel : public Model
 {
 public:
     // Item Definition
-    // 1. The Item of a Process for a Month, 496 Bytes -------
+    // 1. The Item of a Process for a Month, 512 Bytes -------
     typedef struct tagMonthItem
     {
         __int64 dayTx[31]; // In Bytes
@@ -42,7 +42,6 @@ public:
         }
     } MonthItem;
 
-private:
     // 2. The Item of a Process ------------------------------
     typedef struct tagMtModelItem
     {
@@ -50,19 +49,18 @@ private:
         std::vector<MonthItem> months;
     } MtModelItem;
 
-    // Items
+private:
     std::map<int, MtModelItem> _items;
-
-    // Others
-    static MonthModel *_this;
 
 private:
     void Fill();
     void InitDatabase();
-    static void InitDatabaseCallback(SQLiteRow *row);
+    void ReadDatabase();
+    static void ReadDatabaseCallback(SQLiteRow *row, void *context);
 
 public:
     MonthModel();
+    ~MonthModel();
 
     // Modify the Model
     void InsertPacket(PacketInfoEx *pi);
@@ -70,11 +68,11 @@ public:
     // Export Model Info
     void Export(int process, int curMonth, MonthItem &item);
 
+    // Save Database (in case of crash)
+    void SaveDatabase();
+
     int GetFirstMonth();
     int GetLastMonth();
-
-    // Save Model Info to Database
-    void SaveDatabase();
 };
 
 #endif

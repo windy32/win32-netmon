@@ -20,21 +20,59 @@
 
 DetailModel::DetailModel()
 {
-    _items[PROCESS_ALL] = DtModelItem();
+    _packetCounts[PROCESS_ALL] = 0;
+
     InitDatabase();
+    ReadDatabase();
+}
+
+DetailModel::~DetailModel()
+{
+    SaveDatabase();
 }
 
 void DetailModel::InitDatabase()
 {
-    int puid;
+    if (!SQLite::TableExist(TEXT("Packet")))
+    {
+        SQLite::Exec(TEXT("Create Table Packet(")
+                     TEXT("    UID            Integer,")
+                     TEXT("    ProcessUID     Integer,")
+                     TEXT("    Direction      Integer,")
+                     TEXT("    NetProtocol    Integer,")
+                     TEXT("    TraProtocol    Integer,")
+                     TEXT("    Size           Integer,")
+                     TEXT("    Time           Integer,")
+                     TEXT("    Port           Integer,")
+                     TEXT("    ")
+                     TEXT("    Primary Key (UID),")
+                     TEXT("    Foreign Key (ProcessUID) References Process(UID)")
+                     TEXT(");"), true);
+
+        SQLite::Exec(TEXT("Create Index PUID On Packet(ProcessUID);"), true);
+    }
+
+    if (!SQLite::TableExist(TEXT("PacketCount")))
+    {
+        SQLite::Exec(TEXT("Create Table PacketCount(")
+                     TEXT("    ProcessUID     Integer,")
+                     TEXT("    Count          Integer,")
+                     TEXT("    ")
+                     TEXT("    Primary Key (ProcessUID),")
+                     TEXT("    Foreign Key (ProcessUID) References Process(UID)")
+                     TEXT(");"), true);
+    }
+}
+
+void DetailModel::ReadDatabase()
+{
     TCHAR name[256];
-    __int64 packetCount;
     TCHAR command[256];
 
     for(int i = 0; i < ProcessModel::GetProcessCount(); i++)
     {
         // Get puid, name and packetCount
-        puid = ProcessModel::GetProcessUid(i);
+        int puid = ProcessModel::GetProcessUid(i);
         ProcessModel::GetProcessName(puid, name, _countof(name));
 
         _stprintf_s(command, _countof(command), 
@@ -42,21 +80,14 @@ void DetailModel::InitDatabase()
 
         SQLiteRow row;
         row.InsertType(SQLiteRow::TYPE_INT64); // 0 Count(*)
-        if (SQLite::Select(command, &row))
-        {
-            packetCount = row.GetDataInt64(0);
-        }
-        else
-        {
-            packetCount = 0;
-        }
+        __int64 packetCount = 
+            SQLite::Select(command, &row) ? row.GetDataInt64(0) : 0;
 
-        // Insert DtViewItem
-        _items[puid] = DtModelItem();
-        _items[puid].curPackets = packetCount;
+        // Insert Packet Count
+        _packetCounts[puid] = packetCount;
 
         // Update corresponding PROCESS_ALL item
-        _items[PROCESS_ALL].curPackets += packetCount;
+        _packetCounts[PROCESS_ALL] += packetCount;
     }
 }
 
@@ -68,10 +99,10 @@ void DetailModel::SaveDatabase()
     SQLite::Exec(TEXT("Delete From PacketCount;"), true);
 
     // Insert records
-    for(std::map<int, DtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
+    for(std::map<int, int>::iterator it = _packetCounts.begin(); it != _packetCounts.end(); ++it)
     {
         int puid = it->first;
-        __int64 count = it->second.curPackets;
+        __int64 count = it->second;
 
         if (puid == PROCESS_ALL )
         {
@@ -93,50 +124,90 @@ void DetailModel::SaveDatabase()
     SQLite::Flush();
 }
 
-
 void DetailModel::InsertPacket(PacketInfoEx *pi)
 {
     Lock();
 
-    // Insert an DtViewItem if PUID not Exist
-    if (_items.count(pi->puid) == 0 )
+    // Add to database
+    Utils::InsertPacket(pi);
+
+    // Insert a value if PUID not Exist
+    if (_packetCounts.count(pi->puid) == 0)
     {
-        _items[pi->puid] = DtModelItem();
+        _packetCounts[pi->puid] = 0;
     }
 
     // Update packet count
-    _items[pi->puid].curPackets += 1;
-    _items[PROCESS_ALL].curPackets += 1;
+    _packetCounts[pi->puid] += 1;
+    _packetCounts[PROCESS_ALL] += 1;
 
     Unlock();
 }
 
-void DetailModel::SetPrevPackets(int process, __int64 numPackets)
+void DetailModel::Export(int process, __int64 page, std::vector<PacketItem> &packets)
 {
-    if (_items.count(process) != 0)
-        _items[process].prevPackets = numPackets;
-}
-
-void DetailModel::ClearPackets()
-{
-    for(std::map<int, DtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
+    TCHAR command[256];
+    if (process == PROCESS_ALL)
     {
-        it->second.curPackets = 0;
+        _stprintf_s(command, _countof(command), 
+            TEXT("Select * From Packet Limit 100 Offset %I64d;"), page * 100);
     }
+    else
+    {
+        _stprintf_s(command, _countof(command), 
+            TEXT("Select * From Packet Where ProcessUID = %d Limit 100 Offset %I64d;"), 
+            process, page * 100);
+    }
+
+    SQLiteRow row;
+    row.InsertType(SQLiteRow::TYPE_INT32); // 0 UID
+    row.InsertType(SQLiteRow::TYPE_INT32); // 1 ProcessUID
+    row.InsertType(SQLiteRow::TYPE_INT32); // 2 Direction
+    row.InsertType(SQLiteRow::TYPE_INT32); // 3 NetProtocol
+    row.InsertType(SQLiteRow::TYPE_INT32); // 4 TraProtocol
+    row.InsertType(SQLiteRow::TYPE_INT32); // 5 Size
+    row.InsertType(SQLiteRow::TYPE_INT64); // 6 Time
+    row.InsertType(SQLiteRow::TYPE_INT32); // 7 Port
+
+    SQLite::Select(command, &row, ExportCallback, &packets);
 }
 
-__int64 DetailModel::GetCurPackets(int process)
+void DetailModel::ExportCallback(SQLiteRow *row, void *context)
 {
-    if (_items.count(process) != 0)
-        return _items[process].curPackets;
-    else
-        return 0;
+    std::vector<PacketItem> *packets = (std::vector<PacketItem> *)context;
+
+    PacketItem p;
+
+    p.uid      = row->GetDataInt32(0);
+    p.puid     = row->GetDataInt32(1);
+    p.dir      = row->GetDataInt32(2);
+    p.protocol = row->GetDataInt32(4);
+    p.size     = row->GetDataInt32(5);
+    p.time     = row->GetDataInt64(6);
+    p.port     = row->GetDataInt32(7);
+
+    packets->push_back(p);
 }
 
-__int64 DetailModel::GetPrevPackets(int process)
+__int64 DetailModel::GetFirstPageIndex(int puid)
 {
-    if (_items.count(process) != 0)
-        return _items[process].prevPackets;
-    else
+    return 0;
+}
+
+__int64 DetailModel::GetLastPageIndex(int puid)
+{
+    if (_packetCounts.count(puid) == 0)
+    {
         return 0;
+    }
+    return (_packetCounts[puid] - 1) / 100;
+}
+
+__int64 DetailModel::GetPacketCount(int puid)
+{
+    if (_packetCounts.count(puid) == 0)
+    {
+        return 0;
+    }
+    return _packetCounts[puid];
 }

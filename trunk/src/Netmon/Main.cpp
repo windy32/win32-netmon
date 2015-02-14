@@ -86,7 +86,6 @@ TCHAR          g_szAdapterNames[16][256];
 
 // Plugins
 static std::vector<Plugin *> g_plugins;
-static Plugin *g_detailPlugin;
 
 // Language
 static int     g_nLanguage;
@@ -119,28 +118,23 @@ static void InitDatabase()
     
     #pragma region Datebase Structure
 
-    // Structure V1
-    //
-    // - Adapter
-    //    - UID          [Key] : Integer <--------
-    //    - Name               : Varchar(64)      |
-    //    - Description        : Varchar(64)      |
-    //    - Type               : Integer          |
-    //                                            |
-    // - Process                                  |
-    //    - UID          [Key] : Integer <-----   |
-    //    - Name               : Varchar(64)   |  |
-    //                                         |  |
-    // - ProcessActivity                       |  | // PActivity for short
-    //    - ProcessUid         : Integer ------>  |
-    //    - UID          [Key] : Integer <------  |
-    //    - StartTime          : Integer       |  |
-    //    - EndTime            : Integer       |  |
-    //                                         |  |
-    // - Packet                                |  |
-    //    - UID          [Key] : Integer       |  |
-    //    - ProcessActivityUid : Integer ------>  | // PActivityUid for short
-    //    - AdapterUid         : Integer --------->
+    // - 1. Process
+    //    - UID          [Key] : Integer <-----
+    //    - Name               : Varchar(64)   |
+    //                                         |
+    // - 2.1 Traffic (Month View)              |
+    //    - ProcessUID [Key]   : Integer ------>
+    //    - Date       [Key]   : Integer
+    //    - TxBytes            : Integer
+    //    - RxBytes            : Integer
+    //    - TxPackets          : Integer
+    //    - RxPackets          : Integer
+
+
+    //                                         |
+    // - Packet                                |
+    //    - UID          [Key] : Integer       |
+    //    - ProcessUID         : Integer ------>
     //    - Direction          : Integer
     //    - NetProtocol        : Integer
     //    - TraProtocol        : Integer
@@ -176,34 +170,12 @@ static void InitDatabase()
     //    - TxSeconds          : Integer
     //    - RxSeconds          : Integer
     //
-    // - Traffic
-    //    - ProcessUid [Key]   : Integer
-    //    - Date       [Key]   : Integer
-    //    - TxBytes            : Integer
-    //    - RxBytes            : Integer
-    //    - TxPackets          : Integer
-    //    - RxPackets          : Integer
-
-    #pragma endregion
-
-    // V1
-    if (!SQLite::TableExist(TEXT("Adapter")))
-    {
-        SQLite::Exec(TEXT("Create Table Adapter(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    Name           Varchar(64),")
-                     TEXT("    Desc           Varchar(64),")
-                     TEXT("    Type           Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID)")
-                     TEXT(");"), true);
-    }
 
     if (!SQLite::TableExist(TEXT("Process")))
     {
         SQLite::Exec(TEXT("Create Table Process(")
                      TEXT("    UID            Integer,")
-                     TEXT("    Name           Varchar(64),")
+                     TEXT("    Name           Varchar(260),")
                      TEXT("    ")
                      TEXT("    Primary Key (UID)")
                      TEXT(");"), true);
@@ -212,111 +184,6 @@ static void InitDatabase()
         Utils::InsertProcess(TEXT("Unknown"));
         Utils::InsertProcess(TEXT("System"));
         Utils::InsertProcess(TEXT("svchost.exe"));
-    }
-
-    if (!SQLite::TableExist(TEXT("PActivity")))
-    {
-        SQLite::Exec(TEXT("Create Table PActivity(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    StartTime      Integer,")
-                     TEXT("    EndTime        Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
-    }
-
-    if (!SQLite::TableExist(TEXT("Packet")))
-    {
-        SQLite::Exec(TEXT("Create Table Packet(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    PActivityUid   Integer,")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    AdapterUid     Integer,")
-                     TEXT("    Direction      Integer,")
-                     TEXT("    NetProtocol    Integer,")
-                     TEXT("    TraProtocol    Integer,")
-                     TEXT("    Size           Integer,")
-                     TEXT("    Time           Integer,")
-                     TEXT("    Port           Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID),")
-                     TEXT("    Foreign Key (PActivityUid) References PActivity(UID),")
-                     TEXT("    Foreign Key (AdapterUid) References Adapter(UID)")
-                     TEXT(");"), true);
-
-        SQLite::Exec(TEXT("Create Index PUID On Packet(ProcessUid);"), true);
-    }
-
-    // V2
-    if (!SQLite::TableExist(TEXT("PacketCount")))
-    {
-        SQLite::Exec(TEXT("Create Table PacketCount(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Count          Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
-    }
-
-    if (!SQLite::TableExist(TEXT("PacketSize")))
-    {
-        SQLite::Exec(TEXT("Create Table PacketSize(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    PacketSize     Integer,")
-                     TEXT("    TxBytes        Integer,")
-                     TEXT("    RxBytes        Integer,")
-                     TEXT("    TxPackets      Integer,")
-                     TEXT("    RxPackets      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, PacketSize),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
-    }
-
-    if (!SQLite::TableExist(TEXT("Protocol")))
-    {
-        SQLite::Exec(TEXT("Create Table Protocol(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Protocol       Integer,")
-                     TEXT("    TxBytes        Integer,")
-                     TEXT("    RxBytes        Integer,")
-                     TEXT("    TxPackets      Integer,")
-                     TEXT("    RxPackets      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, Protocol),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
-    }
-
-    if (!SQLite::TableExist(TEXT("Rate")))
-    {
-        SQLite::Exec(TEXT("Create Table Rate(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Rate           Integer,")
-                     TEXT("    TxSeconds      Integer,")
-                     TEXT("    RxSeconds      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, Rate),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
-    }
-
-    if (!SQLite::TableExist(TEXT("Traffic")))
-    {
-        SQLite::Exec(TEXT("Create Table Traffic(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Date           Integer,")
-                     TEXT("    TxBytes        Integer,")
-                     TEXT("    RxBytes        Integer,")
-                     TEXT("    TxPackets      Integer,")
-                     TEXT("    RxPackets      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, Date),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
     }
 
     // Flush
@@ -969,8 +836,7 @@ static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
 
 static void OnPreferences(HWND hWnd)
 {
-    DialogBoxParam(g_hInstance, 
-        TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_detailPlugin);
+    DialogBoxParam(g_hInstance, TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, NULL);
 }
 
 static void OnProcessChanged(HWND hWnd, LPARAM lParam)
@@ -1175,7 +1041,6 @@ static void OnExit(HWND hWnd)
         delete g_plugins[i];
     }
     g_plugins.clear();
-    g_detailPlugin = NULL;
 
     // End SQLite
     SQLite::Close();
@@ -1317,8 +1182,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     g_plugins.push_back(new RealtimePlugin());
     g_plugins.push_back(new MonthPlugin());
     g_plugins.push_back(new StatisticsPlugin());
-    g_plugins.push_back(
-        g_detailPlugin = new DetailPlugin());
+    g_plugins.push_back(new DetailPlugin());
 
     // Simulate Selection of the First Item. 
     OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));

@@ -17,40 +17,48 @@
 #define DETAIL_MODEL_H
 
 #include "../abstract/Model.h"
+#include "../../Utils/SQLite.h"
 
 class DetailModel : public Model
 {
-private:
+public:
     // Item Definition
-    typedef struct tagDtModelItem
+    typedef struct tagPacketItem // Packet detail which is not stored in memory
     {
-        __int64 curPackets;
-        __int64 prevPackets;
+        int uid;
+        int puid;
+        int dir;
+        int protocol;
+        int size;
+        __int64 time;
+        int port;
+    } PacketItem;
 
-        struct tagDtModelItem()
-        {
-            curPackets = 0;
-            prevPackets = 0;
-        }
-    } DtModelItem;
-
-    // Items
-    std::map<int, DtModelItem> _items;
+private:
+    // Packet Count which is stored in database
+    std::map<int, int> _packetCounts;
 
 private:
     void InitDatabase();
+    void ReadDatabase();
+    static void ExportCallback(SQLiteRow *row, void *context);
 
 public:
     DetailModel();
+    ~DetailModel();
 
     // Modify the Model
     void InsertPacket(PacketInfoEx *pi);
-    void SetPrevPackets(int process, __int64 numPackets);
-    void ClearPackets();
 
     // Export Model Info
-    __int64 GetCurPackets(int process);
-    __int64 GetPrevPackets(int process);
+    void Export(int process, __int64 page, std::vector<PacketItem> &packets);
+    
+    // Get Page Indexes
+    __int64 GetFirstPageIndex(int puid);
+    __int64 GetLastPageIndex(int puid);
+
+    // Get Packet Count
+    __int64 GetPacketCount(int puid);
 
     // Save Model Into to Database
     void SaveDatabase();

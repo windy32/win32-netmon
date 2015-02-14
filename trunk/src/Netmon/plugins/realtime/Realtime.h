@@ -17,9 +17,15 @@
 #define REALTIME_PLUGIN_H
 
 #include "../Plugin.h"
+#include "RealtimeModel.h"
+#include "RealtimeView.h"
 
 class RealtimePlugin : public Plugin
 {
+private:
+    RealtimeModel *model;
+    RealtimeView *view;
+
 public:
     RealtimePlugin();
     virtual ~RealtimePlugin();
@@ -27,6 +33,7 @@ public:
     virtual void InsertPacket(PacketInfoEx *pi);
     virtual void SetProcess(int puid);
     virtual void SaveDatabase();
+    virtual void ClearDatabase();
 
     virtual DLGPROC GetDialogProc();
     virtual TCHAR * GetTemplateName();

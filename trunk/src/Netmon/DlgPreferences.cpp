@@ -319,7 +319,7 @@ static void OnDeleteAll(HWND hWnd)
     }
     else
     {
-        g_pDetailPlugin->DeleteAllPackets();
+        //g_pDetailPlugin->DeleteAllPackets();
         MessageBox(hWnd, Language::GetString(IDS_PREF_ALL_DELETED), 
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }

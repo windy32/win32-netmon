@@ -17,9 +17,15 @@
 #define STATISTICS_PLUGIN_H
 
 #include "../Plugin.h"
+#include "StatisticsModel.h"
+#include "StatisticsView.h"
 
 class StatisticsPlugin : public Plugin
 {
+private:
+    StatisticsModel *model;
+    StatisticsView *view;
+
 public:
     StatisticsPlugin();
     virtual ~StatisticsPlugin();
@@ -27,6 +33,7 @@ public:
     virtual void InsertPacket(PacketInfoEx *pi);
     virtual void SetProcess(int puid);
     virtual void SaveDatabase();
+    virtual void ClearDatabase();
 
     virtual DLGPROC GetDialogProc();
     virtual TCHAR * GetTemplateName();

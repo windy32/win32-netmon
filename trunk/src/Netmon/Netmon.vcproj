@@ -228,6 +228,10 @@
 				Name="Month"
 				>
 				<File
+					RelativePath=".\plugins\month\Month.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\plugins\month\Month.h"
 					>
 				</File>
@@ -251,6 +255,10 @@
 			<Filter
 				Name="Statistics"
 				>
+				<File
+					RelativePath=".\plugins\statistics\Statistics.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\plugins\statistics\Statistics.h"
 					>
@@ -328,6 +336,10 @@
 				Name="Realtime"
 				>
 				<File
+					RelativePath=".\plugins\realtime\Realtime.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\plugins\realtime\Realtime.h"
 					>
 				</File>
@@ -351,6 +363,10 @@
 			<Filter
 				Name="Detail"
 				>
+				<File
+					RelativePath=".\plugins\detail\Detail.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\plugins\detail\Detail.h"
 					>
@@ -434,6 +450,14 @@
 			</File>
 			<File
 				RelativePath=".\utils\Profile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\SingleLock.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\SingleLock.h"
 				>
 			</File>
 			<File

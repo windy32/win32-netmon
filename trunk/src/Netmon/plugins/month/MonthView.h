@@ -45,16 +45,17 @@ protected:
     // Model Object
     static MonthModel *_model;
 
-protected:
+private:
     static void DrawGraph();
-    static void WINAPI TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+    static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 public:
-    static void Init(MonthModel *model);
-    static void End();
-    virtual void SetProcessUid(int puid);
+    MonthView(MonthModel *model);
+    ~MonthView();
 
-    virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+public:
+    static void SetProcess(int puid);
+    static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif

@@ -17,14 +17,246 @@
 #include "StatisticsModel.h"
 #include "../../Utils/ProcessModel.h"
 
-StatisticsModel *StatisticsModel::_this;
-
 StatisticsModel::StatisticsModel()
 {
     _items[PROCESS_ALL] = StModelItem();
-    _this = this;
 
     InitDatabase();
+    ReadDatabase();
+}
+
+StatisticsModel::~StatisticsModel()
+{
+    SaveDatabase();
+}
+
+void StatisticsModel::InitDatabase()
+{
+    if (!SQLite::TableExist(TEXT("Protocol")))
+    {
+        SQLite::Exec(TEXT("Create Table Protocol(")
+                     TEXT("    ProcessUID     Integer,")
+                     TEXT("    Protocol       Integer,")
+                     TEXT("    TxBytes        Integer,")
+                     TEXT("    RxBytes        Integer,")
+                     TEXT("    TxPackets      Integer,")
+                     TEXT("    RxPackets      Integer,")
+                     TEXT("    ")
+                     TEXT("    Primary Key (ProcessUID, Protocol),")
+                     TEXT("    Foreign Key (ProcessUID) References Process(UID)")
+                     TEXT(");"), true);
+    }
+
+    if (!SQLite::TableExist(TEXT("PacketSize")))
+    {
+        SQLite::Exec(TEXT("Create Table PacketSize(")
+                     TEXT("    ProcessUID     Integer,")
+                     TEXT("    PacketSize     Integer,")
+                     TEXT("    TxBytes        Integer,")
+                     TEXT("    RxBytes        Integer,")
+                     TEXT("    TxPackets      Integer,")
+                     TEXT("    RxPackets      Integer,")
+                     TEXT("    ")
+                     TEXT("    Primary Key (ProcessUID, PacketSize),")
+                     TEXT("    Foreign Key (ProcessUID) References Process(UID)")
+                     TEXT(");"), true);
+    }
+
+    if (!SQLite::TableExist(TEXT("Rate")))
+    {
+        SQLite::Exec(TEXT("Create Table Rate(")
+                     TEXT("    ProcessUid     Integer,")
+                     TEXT("    Rate           Integer,")
+                     TEXT("    TxSeconds      Integer,")
+                     TEXT("    RxSeconds      Integer,")
+                     TEXT("    ")
+                     TEXT("    Primary Key (ProcessUID, Rate),")
+                     TEXT("    Foreign Key (ProcessUID) References Process(UID)")
+                     TEXT(");"), true);
+    }
+}
+
+void StatisticsModel::ReadDatabase()
+{
+    SQLiteRow protocolRow;
+    SQLiteRow packetSizeRow;
+    SQLiteRow rateRow;
+    TCHAR command[256];
+
+    // Protocol
+    _stprintf_s(command, _countof(command), TEXT("Select * From Protocol;"));
+
+    protocolRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
+    protocolRow.InsertType(SQLiteRow::TYPE_INT32); // 1 Protocol
+    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 2 TxBytes
+    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 3 RxBytes
+    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 4 TxPackets
+    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 5 RxPackets
+
+    SQLite::Select(command, &protocolRow, ReadDatabaseProtocolCallback, this);
+
+    // Packet Size
+    _stprintf_s(command, _countof(command), 
+        TEXT("Select * From PacketSize Where TxPackets > 0 Or RxPackets > 0;"));
+
+    packetSizeRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
+    packetSizeRow.InsertType(SQLiteRow::TYPE_INT32); // 1 PacketSize
+    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 2 TxBytes
+    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 3 RxBytes
+    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 4 TxPackets
+    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 5 RxPackets
+
+    SQLite::Select(command, &packetSizeRow, ReadDatabasePacketSizeCallback, this);
+
+    // Traffic Rate
+    _stprintf_s(command, _countof(command), 
+        TEXT("Select * From Rate Where TxSeconds > 0 Or RxSeconds > 0;"));
+
+    rateRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
+    rateRow.InsertType(SQLiteRow::TYPE_INT32); // 1 Rate
+    rateRow.InsertType(SQLiteRow::TYPE_INT64); // 2 TxSeconds
+    rateRow.InsertType(SQLiteRow::TYPE_INT64); // 3 RxSeconds
+
+    SQLite::Select(command, &rateRow, ReadDatabaseRateCallback, this);
+}
+
+void StatisticsModel::ReadDatabaseProtocolCallback(SQLiteRow *row, void *context)
+{
+    StatisticsModel *model = (StatisticsModel *)context;
+
+    int puid          = row->GetDataInt32(0);
+    int protocol      = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), 
+                                              // lower 16 bit for mday
+    __int64 txBytes   = row->GetDataInt64(2);
+    __int64 rxBytes   = row->GetDataInt64(3);
+    __int64 txPackets = row->GetDataInt64(4);
+    __int64 rxPackets = row->GetDataInt64(5);
+
+    // Insert an StViewItem if PUID not Exist
+    if (model->_items.count(puid) == 0 )
+    {
+        model->_items[puid] = StModelItem();
+    }
+
+    // Update
+    StModelItem &sItem = model->_items[puid];
+    StModelItem &sItemAll = model->_items[PROCESS_ALL];
+
+    switch ( protocol )
+    {
+    case TRA_TCP:
+        sItem.tx.tcpBytes = txBytes;
+        sItem.rx.tcpBytes = rxBytes;
+        sItem.tx.tcpPackets = txPackets;
+        sItem.rx.tcpPackets = rxPackets;
+
+        sItemAll.tx.tcpBytes += txBytes;
+        sItemAll.rx.tcpBytes += rxBytes;
+        sItemAll.tx.tcpPackets += txPackets;
+        sItemAll.rx.tcpPackets += rxPackets;
+        break;
+
+    case TRA_UDP:
+        sItem.tx.udpBytes = txBytes;
+        sItem.rx.udpBytes = rxBytes;
+        sItem.tx.udpPackets = txPackets;
+        sItem.rx.udpPackets = rxPackets;
+
+        sItemAll.tx.udpBytes += txBytes;
+        sItemAll.rx.udpBytes += rxBytes;
+        sItemAll.tx.udpPackets += txPackets;
+        sItemAll.rx.udpPackets += rxPackets;
+        break;
+
+    case TRA_ICMP:
+        sItem.tx.icmpBytes = txBytes;
+        sItem.rx.icmpBytes = rxBytes;
+        sItem.tx.icmpPackets = txPackets;
+        sItem.rx.icmpPackets = rxPackets;
+
+        sItemAll.tx.icmpBytes += txBytes;
+        sItemAll.rx.icmpBytes += rxBytes;
+        sItemAll.tx.icmpPackets += txPackets;
+        sItemAll.rx.icmpPackets += rxPackets;
+        break;
+
+    case TRA_OTHER:
+        sItem.tx.otherBytes = txBytes;
+        sItem.rx.otherBytes = rxBytes;
+        sItem.tx.otherPackets = txPackets;
+        sItem.rx.otherPackets = rxPackets;
+
+        sItemAll.tx.otherBytes += txBytes;
+        sItemAll.rx.otherBytes += rxBytes;
+        sItemAll.tx.otherPackets += txPackets;
+        sItemAll.rx.otherPackets += rxPackets;
+        break;
+
+    default:
+        break;
+    }
+}
+
+void StatisticsModel::ReadDatabasePacketSizeCallback(SQLiteRow *row, void *context)
+{
+    StatisticsModel *model = (StatisticsModel *)context;
+
+    int puid          = row->GetDataInt32(0);
+    int packetSize    = row->GetDataInt32(1); // [0, 1500]: 1 to 1501+
+    __int64 txBytes   = row->GetDataInt64(2);
+    __int64 rxBytes   = row->GetDataInt64(3);
+    __int64 txPackets = row->GetDataInt64(4);
+    __int64 rxPackets = row->GetDataInt64(5);
+
+    // Insert an StViewItem if PUID not Exist
+    if (model->_items.count(puid) == 0 )
+    {
+        model->_items[puid] = StModelItem();
+    }
+
+    // Update
+    StModelItem &sItem = model->_items[puid];
+    StModelItem &sItemAll = model->_items[PROCESS_ALL];
+
+    sItem.txPacketSize[packetSize] = txPackets;
+    sItem.rxPacketSize[packetSize] = rxPackets;
+    sItem.txPrevPacketSize[packetSize] = txPackets;
+    sItem.rxPrevPacketSize[packetSize] = rxPackets;
+
+    sItemAll.txPacketSize[packetSize] += txPackets;
+    sItemAll.rxPacketSize[packetSize] += rxPackets;
+    sItemAll.txPrevPacketSize[packetSize] += txPackets;
+    sItemAll.rxPrevPacketSize[packetSize] += rxPackets;
+}
+
+void StatisticsModel::ReadDatabaseRateCallback(SQLiteRow *row, void *context)
+{
+    StatisticsModel *model = (StatisticsModel *)context;
+
+    int puid          = row->GetDataInt32(0);
+    int rate          = row->GetDataInt32(1); // [0, 1024]: 0 to 1024+
+    __int64 txSeconds = row->GetDataInt64(2);
+    __int64 rxSeconds = row->GetDataInt64(3);
+
+    // Insert an StViewItem if PUID not Exist
+    if (model->_items.count(puid) == 0 )
+    {
+        model->_items[puid] = StModelItem();
+    }
+
+    // Update
+    StModelItem &sItem = model->_items[puid];
+    StModelItem &sItemAll = model->_items[PROCESS_ALL];
+
+    sItem.txRate[rate] = txSeconds;
+    sItem.rxRate[rate] = rxSeconds;
+    sItem.txPrevRate[rate] = txSeconds;
+    sItem.rxPrevRate[rate] = rxSeconds;
+
+    sItemAll.txRate[rate] += txSeconds;
+    sItemAll.rxRate[rate] += rxSeconds;
+    sItemAll.txPrevRate[rate] += txSeconds;
+    sItemAll.rxPrevRate[rate] += rxSeconds;
 }
 
 void StatisticsModel::SaveDatabase()
@@ -170,183 +402,6 @@ void StatisticsModel::SaveDatabase()
 
     // Flush
     SQLite::Flush();
-}
-
-void StatisticsModel::InitDatabase()
-{
-    SQLiteRow protocolRow;
-    SQLiteRow packetSizeRow;
-    SQLiteRow rateRow;
-    TCHAR command[256];
-
-    // Process Protocol
-    _stprintf_s(command, _countof(command), TEXT("Select * From Protocol;"));
-
-    protocolRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
-    protocolRow.InsertType(SQLiteRow::TYPE_INT32); // 1 Protocol
-    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 2 TxBytes
-    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 3 RxBytes
-    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 4 TxPackets
-    protocolRow.InsertType(SQLiteRow::TYPE_INT64); // 5 RxPackets
-
-    SQLite::Select(command, &protocolRow, InitDatabaseProtocolCallback);
-
-    // Process Packet Size
-    _stprintf_s(command, _countof(command), 
-        TEXT("Select * From PacketSize Where TxPackets > 0 Or RxPackets > 0;"));
-
-    packetSizeRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
-    packetSizeRow.InsertType(SQLiteRow::TYPE_INT32); // 1 PacketSize
-    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 2 TxBytes
-    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 3 RxBytes
-    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 4 TxPackets
-    packetSizeRow.InsertType(SQLiteRow::TYPE_INT64); // 5 RxPackets
-
-    SQLite::Select(command, &packetSizeRow, InitDatabasePacketSizeCallback);
-
-    // Process Rate
-    _stprintf_s(command, _countof(command), 
-        TEXT("Select * From Rate Where TxSeconds > 0 Or RxSeconds > 0;"));
-
-    rateRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
-    rateRow.InsertType(SQLiteRow::TYPE_INT32); // 1 Rate
-    rateRow.InsertType(SQLiteRow::TYPE_INT64); // 2 TxSeconds
-    rateRow.InsertType(SQLiteRow::TYPE_INT64); // 3 RxSeconds
-
-    SQLite::Select(command, &rateRow, InitDatabaseRateCallback);
-}
-
-void StatisticsModel::InitDatabaseProtocolCallback(SQLiteRow *row)
-{
-    int puid          = row->GetDataInt32(0);
-    int protocol      = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), 
-                                              // lower 16 bit for mday
-    __int64 txBytes   = row->GetDataInt64(2);
-    __int64 rxBytes   = row->GetDataInt64(3);
-    __int64 txPackets = row->GetDataInt64(4);
-    __int64 rxPackets = row->GetDataInt64(5);
-
-    // Insert an StViewItem if PUID not Exist
-    if (_this->_items.count(puid) == 0 )
-    {
-        _this->_items[puid] = StModelItem();
-    }
-
-    // Update
-    StModelItem &svItem = _this->_items[puid];
-    StModelItem &svItemAll = _this->_items[PROCESS_ALL];
-
-    switch ( protocol )
-    {
-    case TRA_TCP:
-        svItem.tx.tcpBytes = txBytes;
-        svItem.rx.tcpBytes = rxBytes;
-        svItem.tx.tcpPackets = txPackets;
-        svItem.rx.tcpPackets = rxPackets;
-
-        svItemAll.tx.tcpBytes += txBytes;
-        svItemAll.rx.tcpBytes += rxBytes;
-        svItemAll.tx.tcpPackets += txPackets;
-        svItemAll.rx.tcpPackets += rxPackets;
-        break;
-
-    case TRA_UDP:
-        svItem.tx.udpBytes = txBytes;
-        svItem.rx.udpBytes = rxBytes;
-        svItem.tx.udpPackets = txPackets;
-        svItem.rx.udpPackets = rxPackets;
-
-        svItemAll.tx.udpBytes += txBytes;
-        svItemAll.rx.udpBytes += rxBytes;
-        svItemAll.tx.udpPackets += txPackets;
-        svItemAll.rx.udpPackets += rxPackets;
-        break;
-
-    case TRA_ICMP:
-        svItem.tx.icmpBytes = txBytes;
-        svItem.rx.icmpBytes = rxBytes;
-        svItem.tx.icmpPackets = txPackets;
-        svItem.rx.icmpPackets = rxPackets;
-
-        svItemAll.tx.icmpBytes += txBytes;
-        svItemAll.rx.icmpBytes += rxBytes;
-        svItemAll.tx.icmpPackets += txPackets;
-        svItemAll.rx.icmpPackets += rxPackets;
-        break;
-
-    case TRA_OTHER:
-        svItem.tx.otherBytes = txBytes;
-        svItem.rx.otherBytes = rxBytes;
-        svItem.tx.otherPackets = txPackets;
-        svItem.rx.otherPackets = rxPackets;
-
-        svItemAll.tx.otherBytes += txBytes;
-        svItemAll.rx.otherBytes += rxBytes;
-        svItemAll.tx.otherPackets += txPackets;
-        svItemAll.rx.otherPackets += rxPackets;
-        break;
-
-    default:
-        break;
-    }
-}
-
-void StatisticsModel::InitDatabasePacketSizeCallback(SQLiteRow *row)
-{
-    int puid          = row->GetDataInt32(0);
-    int packetSize    = row->GetDataInt32(1); // [0, 1500]: 1 to 1501+
-    __int64 txBytes   = row->GetDataInt64(2);
-    __int64 rxBytes   = row->GetDataInt64(3);
-    __int64 txPackets = row->GetDataInt64(4);
-    __int64 rxPackets = row->GetDataInt64(5);
-
-    // Insert an StViewItem if PUID not Exist
-    if (_this->_items.count(puid) == 0 )
-    {
-        _this->_items[puid] = StModelItem();
-    }
-
-    // Update
-    StModelItem &svItem = _this->_items[puid];
-    StModelItem &svItemAll = _this->_items[PROCESS_ALL];
-
-    svItem.txPacketSize[packetSize] = txPackets;
-    svItem.rxPacketSize[packetSize] = rxPackets;
-    svItem.txPrevPacketSize[packetSize] = txPackets;
-    svItem.rxPrevPacketSize[packetSize] = rxPackets;
-
-    svItemAll.txPacketSize[packetSize] += txPackets;
-    svItemAll.rxPacketSize[packetSize] += rxPackets;
-    svItemAll.txPrevPacketSize[packetSize] += txPackets;
-    svItemAll.rxPrevPacketSize[packetSize] += rxPackets;
-}
-
-void StatisticsModel::InitDatabaseRateCallback(SQLiteRow *row)
-{
-    int puid          = row->GetDataInt32(0);
-    int rate          = row->GetDataInt32(1); // [0, 1024]: 0 to 1024+
-    __int64 txSeconds = row->GetDataInt64(2);
-    __int64 rxSeconds = row->GetDataInt64(3);
-
-    // Insert an StViewItem if PUID not Exist
-    if (_this->_items.count(puid) == 0 )
-    {
-        _this->_items[puid] = StModelItem();
-    }
-
-    // Update
-    StModelItem &svItem = _this->_items[puid];
-    StModelItem &svItemAll = _this->_items[PROCESS_ALL];
-
-    svItem.txRate[rate] = txSeconds;
-    svItem.rxRate[rate] = rxSeconds;
-    svItem.txPrevRate[rate] = txSeconds;
-    svItem.rxPrevRate[rate] = rxSeconds;
-
-    svItemAll.txRate[rate] += txSeconds;
-    svItemAll.rxRate[rate] += rxSeconds;
-    svItemAll.txPrevRate[rate] += txSeconds;
-    svItemAll.rxPrevRate[rate] += rxSeconds;
 }
 
 void StatisticsModel::InsertPacket(PacketInfoEx *pi)

@@ -25,6 +25,7 @@ public:
     // Item Definition
     typedef struct tagStModelItem
     {
+        // 1. Protocol Distribution
         struct tagStCountItem
         {
             __int64 tcpPackets;
@@ -38,18 +39,21 @@ public:
             __int64 otherBytes;
         } rx, tx;
 
+        // 2. Packet Size Distribution
         __int64 rxPacketSize[1501]; // 1 to 1501+ Bytes
         __int64 txPacketSize[1501];
 
         __int64 rxPrevPacketSize[1501];
         __int64 txPrevPacketSize[1501];
 
+        // 3. Traffic Rate Distribution
         __int64 rxRate[1025]; // 0 to 1024+ KB/s
         __int64 txRate[1025];
 
         __int64 rxPrevRate[1025];
         __int64 txPrevRate[1025];
 
+        // 4. Item State (new, or already in database)
         bool newItem; // false when the StViewItem is created in InitDatabase
 
         struct tagStModelItem()
@@ -77,17 +81,16 @@ private:
     // Items
     std::map<int, StModelItem> _items;
 
-    // Others
-    static StatisticsModel *_this;
-
 private:
     void InitDatabase();
-    static void InitDatabaseProtocolCallback(SQLiteRow *row);
-    static void InitDatabasePacketSizeCallback(SQLiteRow *row);
-    static void InitDatabaseRateCallback(SQLiteRow *row);
+    void ReadDatabase();
+    static void ReadDatabaseProtocolCallback(SQLiteRow *row, void *context);
+    static void ReadDatabasePacketSizeCallback(SQLiteRow *row, void *context);
+    static void ReadDatabaseRateCallback(SQLiteRow *row, void *context);
 
 public:
     StatisticsModel();
+    ~StatisticsModel();
 
     // Modify the Model
     void InsertPacket(PacketInfoEx *pi);
