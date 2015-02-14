@@ -95,16 +95,28 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
         SetAutoCapture(FALSE);
     }
 
-    if (_pf.GetInt(TEXT("DtViewEnable"), &_bDtViewEnable) == FALSE )
+    // Views
+    if (_pf.GetInt(TEXT("RtViewEnabled"), &_bRtViewEnabled) == FALSE )
     {
-        SetDtViewEnable(FALSE);
+        SetRtViewEnabled(TRUE);
     }
 
-    if (_pf.GetInt(TEXT("DtViewMaxSpace"), &_iDtViewMaxSpace) == FALSE )
+    if (_pf.GetInt(TEXT("MtViewEnabled"), &_bMtViewEnabled) == FALSE )
     {
-        SetDtViewMaxSpace(0); // No limit
+        SetMtViewEnabled(TRUE);
     }
 
+    if (_pf.GetInt(TEXT("StViewEnabled"), &_bStViewEnabled) == FALSE )
+    {
+        SetStViewEnabled(FALSE);
+    }
+
+    if (_pf.GetInt(TEXT("DtViewEnabled"), &_bDtViewEnabled) == FALSE )
+    {
+        SetDtViewEnabled(FALSE);
+    }
+
+    // Hidden processes
     if (_pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 1000) == FALSE)
     {
         SetHiddenProcesses(std::vector<int>());
@@ -124,14 +136,15 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
         }
     }
 
-    if (_pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE )
-    {
-        SetLanguage(TEXT("English"));
-    }
-
     if (_pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE )
     {
         SetShowHidden(TRUE);
+    }
+
+    // Language
+    if (_pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE )
+    {
+        SetLanguage(TEXT("English"));
     }
 
     return TRUE;
@@ -185,33 +198,66 @@ BOOL NetmonProfile::SetAutoCapture(BOOL bAutoCapture)
     return FALSE;
 }
 
-BOOL NetmonProfile::GetDtViewEnable(BOOL *pEnable)
+// Views
+BOOL NetmonProfile::GetRtViewEnabled(BOOL *pEnable)
 {
-    *pEnable = _bDtViewEnable;
+    *pEnable = _bRtViewEnabled;
     return TRUE;
 }
 
-BOOL NetmonProfile::SetDtViewEnable(BOOL bEnable)
+BOOL NetmonProfile::SetRtViewEnabled(BOOL bEnable)
 {
-    if (_pf.SetInt(TEXT("DtViewEnable"), (int)bEnable) == TRUE )
+    if (_pf.SetInt(TEXT("RtViewEnabled"), (int)bEnable) == TRUE )
     {
-        _bDtViewEnable = bEnable;
+        _bRtViewEnabled = bEnable;
         return TRUE;
     }
     return FALSE;
 }
 
-BOOL NetmonProfile::GetDtViewMaxSpace(int *pMaxSpace)
+BOOL NetmonProfile::GetMtViewEnabled(BOOL *pEnable)
 {
-    *pMaxSpace = _iDtViewMaxSpace;
+    *pEnable = _bMtViewEnabled;
     return TRUE;
 }
 
-BOOL NetmonProfile::SetDtViewMaxSpace(int iMaxSpace)
+BOOL NetmonProfile::SetMtViewEnabled(BOOL bEnable)
 {
-    if (_pf.SetInt(TEXT("DtViewMaxSpace"), (int)iMaxSpace) == TRUE )
+    if (_pf.SetInt(TEXT("MtViewEnabled"), (int)bEnable) == TRUE )
     {
-        _iDtViewMaxSpace = iMaxSpace;
+        _bMtViewEnabled = bEnable;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL NetmonProfile::GetStViewEnabled(BOOL *pEnable)
+{
+    *pEnable = _bStViewEnabled;
+    return TRUE;
+}
+
+BOOL NetmonProfile::SetStViewEnabled(BOOL bEnable)
+{
+    if (_pf.SetInt(TEXT("StViewEnabled"), (int)bEnable) == TRUE )
+    {
+        _bStViewEnabled = bEnable;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL NetmonProfile::GetDtViewEnabled(BOOL *pEnable)
+{
+    *pEnable = _bDtViewEnabled;
+    return TRUE;
+}
+
+BOOL NetmonProfile::SetDtViewEnabled(BOOL bEnable)
+{
+    if (_pf.SetInt(TEXT("DtViewEnabled"), (int)bEnable) == TRUE )
+    {
+        _bDtViewEnabled = bEnable;
         return TRUE;
     }
     return FALSE;

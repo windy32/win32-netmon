@@ -74,11 +74,16 @@ protected:
     TCHAR _szAdapter[256];
     TCHAR _szAutoStart[MAX_PATH]; // Full path of Netmon, or empty string
     BOOL _bAutoCapture;
-    BOOL _bDtViewEnable;
-    int  _iDtViewMaxSpace;
+
+    BOOL _bRtViewEnabled;
+    BOOL _bMtViewEnabled;
+    BOOL _bStViewEnabled;
+    BOOL _bDtViewEnabled;
+
     std::vector<int> _hiddenProcesses;
-    TCHAR _szLanguage[64];
     BOOL _bShowHidden;
+
+    TCHAR _szLanguage[64];
 
 public:
     // Netmon calls Load() at startup to get preferences from Netmon.ini.
@@ -90,7 +95,7 @@ public:
     // Netmon may then call GetXXX to get settings and apply settings while running.
     // It will also call GetXXX to get settings when "Preferences" dialog shows up.
     //
-    // Netmon will call SetXXX to save settings when user clicks the "OK" 
+    // Netmon will call SetXXX to save settings when user clicks the "OK" button
     // in the "Preferences" dialog, some of which may be applied immediately, while some are not.
     BOOL GetAdapter(TCHAR *szAdapter, int cchLen);
     BOOL SetAdapter(const TCHAR *szAdapter);
@@ -101,11 +106,17 @@ public:
     BOOL GetAutoCapture(BOOL *pAutoCapture);
     BOOL SetAutoCapture(BOOL bAutoCapture);
 
-    BOOL GetDtViewEnable(BOOL *pEnable);
-    BOOL SetDtViewEnable(BOOL bEnable);
+    BOOL GetRtViewEnabled(BOOL *pEnable);
+    BOOL SetRtViewEnabled(BOOL bEnable);
 
-    BOOL GetDtViewMaxSpace(int *pMaxSpace);
-    BOOL SetDtViewMaxSpace(int iMaxSpace);
+    BOOL GetMtViewEnabled(BOOL *pEnable);
+    BOOL SetMtViewEnabled(BOOL bEnable);
+
+    BOOL GetStViewEnabled(BOOL *pEnable);
+    BOOL SetStViewEnabled(BOOL bEnable);
+
+    BOOL GetDtViewEnabled(BOOL *pEnable);
+    BOOL SetDtViewEnabled(BOOL bEnable);
 
     BOOL GetHiddenProcesses(std::vector<int> &processes);
     BOOL SetHiddenProcesses(const std::vector<int> &processes);
