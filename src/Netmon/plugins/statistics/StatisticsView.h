@@ -21,7 +21,7 @@
 
 class StatisticsView : public View
 {
-protected:
+private:
     // GDI Objects
     static HDC     _hdcTarget;
     static HDC     _hdcBuf;
@@ -33,16 +33,17 @@ protected:
     // Model Object
     static StatisticsModel *_model;
 
-protected:
+private:
     static void DrawGraph();
-    static void WINAPI TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+    static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 public:
-    virtual void Init(StatisticsModel *model);
-    virtual void End();
-    virtual void SetProcessUid(int puid);
+    StatisticsView(StatisticsModel *model);
+    ~StatisticsView();
 
-    virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+public:
+    static void SetProcess(int puid);
+    static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif

@@ -30,12 +30,15 @@ HDC     StatisticsView::_hdcTarget;
 HDC     StatisticsView::_hdcBuf;
 HBITMAP StatisticsView::_hbmpBuf;
 
+// Window Handle
+HWND    StatisticsView::_hWnd;
+
 // Model Object
 StatisticsModel *StatisticsView::_model;
 
 #pragma endregion
 
-void StatisticsView::Init(StatisticsModel *model)
+StatisticsView::StatisticsView(StatisticsModel *model)
 {
     _process = PROCESS_ALL;
     _model = model;
@@ -44,15 +47,13 @@ void StatisticsView::Init(StatisticsModel *model)
     _hbmpBuf = 0;
 }
 
-void StatisticsView::End()
+StatisticsView::~StatisticsView()
 {
     DeleteDC(_hdcBuf);
     DeleteObject(_hbmpBuf);
-
-    _model->SaveDatabase();
 }
 
-void StatisticsView::SetProcessUid(int puid)
+void StatisticsView::SetProcess(int puid)
 {
     _process = puid;
     DrawGraph();
@@ -310,7 +311,7 @@ void StatisticsView::DrawGraph()
     BitBlt(_hdcTarget, 0, 0, _width, _height, _hdcBuf, 0, 0, SRCCOPY);
 }
 
-LRESULT StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR StatisticsView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_INITDIALOG )
     {

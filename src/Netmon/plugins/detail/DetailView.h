@@ -18,11 +18,10 @@
 
 #include "../abstract/View.h"
 #include "DetailModel.h"
-#include "../../utils/SQLite.h"
 
 class DetailView : public View
 {
-protected:
+private:
     // UI Elements & States
     static HWND _hWnd;
     static HWND _hList;
@@ -33,14 +32,12 @@ protected:
     // Model Object
     static DetailModel *_model;
 
-protected:
-    static LRESULT CALLBACK MyProcEdit(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-    static void WINAPI TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+private:
+    static INT_PTR CALLBACK MyProcEdit(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
     static void UpdateSize(HWND hWnd);
     static void UpdateContent(bool rebuildList);
-    static void UpdateContentCallback(SQLiteRow *row);
 
     static void ListViewInsert(
         int uid, int puid, int dir, int protocol, int size, __int64 time, int port);
@@ -52,14 +49,13 @@ protected:
     static void SwitchLanguage(HWND hWnd);
 
 public:
-    virtual void Init(DetailModel *model);
-    virtual void End();
-    virtual void SetProcessUid(int puid);
+    DetailView(DetailModel *model);
+    ~DetailView();
 
-    virtual LRESULT DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+public:
+    static void SetProcess(int puid);
+    static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    __int64 GetPacketCount();
-    void OnAllPacketsDeleted();
 };
 
 #endif

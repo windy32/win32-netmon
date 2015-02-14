@@ -25,6 +25,7 @@ typedef signed int     int32_t;
 typedef signed __int64 int64_t;
 
 typedef void (* SQLiteCallback)(SQLiteRow *);
+typedef void (* SQLiteCallback2)(SQLiteRow *, void *);
 
 class SQLiteRow
 {
@@ -104,6 +105,9 @@ public:
     //  - callback [In]
     //      and then "callback" is called so that caller can process the coming data of the row
     static bool Select(const TCHAR *command, SQLiteRow *row, SQLiteCallback callback);
+
+    // Overrided Version (The callback has a context parameter)
+    static bool Select(const TCHAR *command, SQLiteRow *row, SQLiteCallback2 callback, void *context);
 
     // Overrided Version (Not more than one row will be selected)
     static bool Select(const TCHAR *command, SQLiteRow *row);

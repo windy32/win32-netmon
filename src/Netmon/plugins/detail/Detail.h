@@ -17,9 +17,15 @@
 #define DETAIL_PLUGIN_H
 
 #include "../Plugin.h"
+#include "DetailModel.h"
+#include "DetailView.h"
 
 class DetailPlugin : public Plugin
 {
+private:
+    DetailModel *model;
+    DetailView *view;
+
 public:
     DetailPlugin();
     virtual ~DetailPlugin();
@@ -27,6 +33,7 @@ public:
     virtual void InsertPacket(PacketInfoEx *pi);
     virtual void SetProcess(int puid);
     virtual void SaveDatabase();
+    virtual void ClearDatabase();
 
     virtual DLGPROC GetDialogProc();
     virtual TCHAR * GetTemplateName();

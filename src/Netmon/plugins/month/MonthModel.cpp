@@ -19,14 +19,18 @@
 #include "../../Utils/ProcessModel.h"
 
 int MonthModel::MtModelItem::firstMonth = -1;
-MonthModel *MonthModel::_this;
 
 MonthModel::MonthModel()
 {
-    _this = this;
     _items[PROCESS_ALL] = MtModelItem();
 
     InitDatabase();
+    ReadDatabase();
+}
+
+MonthModel::~MonthModel()
+{
+    SaveDatabase();
 }
 
 void MonthModel::Fill()
@@ -50,7 +54,25 @@ void MonthModel::Fill()
 
 void MonthModel::InitDatabase()
 {
-    static TCHAR command[256];
+    if (!SQLite::TableExist(TEXT("Traffic")))
+    {
+        SQLite::Exec(TEXT("Create Table Traffic(")
+                     TEXT("    ProcessUID     Integer,")
+                     TEXT("    Date           Integer,")
+                     TEXT("    TxBytes        Integer,")
+                     TEXT("    RxBytes        Integer,")
+                     TEXT("    TxPackets      Integer,")
+                     TEXT("    RxPackets      Integer,")
+                     TEXT("    ")
+                     TEXT("    Primary Key (ProcessUID, Date),")
+                     TEXT("    Foreign Key (ProcessUID) References Process(UID)")
+                     TEXT(");"), true);
+    }
+}
+
+void MonthModel::ReadDatabase()
+{
+    TCHAR command[256];
 
     // Build Command
     _stprintf_s(command, _countof(command), TEXT("Select * From Traffic;"));
@@ -66,7 +88,7 @@ void MonthModel::InitDatabase()
     row.InsertType(SQLiteRow::TYPE_INT32); // 5 RxPackets
 
     // Select
-    SQLite::Select(command, &row, InitDatabaseCallback);
+    SQLite::Select(command, &row, ReadDatabaseCallback, this);
 
     // Set current month as first month when no data is available
     if (MtModelItem::firstMonth == -1 )
@@ -75,8 +97,10 @@ void MonthModel::InitDatabase()
     }
 }
 
-void MonthModel::InitDatabaseCallback(SQLiteRow *row)
+void MonthModel::ReadDatabaseCallback(SQLiteRow *row, void *context)
 {
+    MonthModel *model = (MonthModel *)context;
+
     int puid        = row->GetDataInt32(0);
     int date        = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), 
                                             // lower 16 bit for mday
@@ -87,28 +111,28 @@ void MonthModel::InitDatabaseCallback(SQLiteRow *row)
     int exMonth = Utils::GetExMonthByDate(date);
 
     // Insert an MtViewItem if PUID not Exist
-    if (_this->_items.count(puid) == 0 )
+    if (model->_items.count(puid) == 0 )
     {
-        _this->_items[puid] = MtModelItem();
+        model->_items[puid] = MtModelItem();
         MtModelItem::firstMonth = Utils::GetExMonthByDate(date);
     }
 
     // Fill Vectors
-    _this->Fill();
+    model->Fill();
 
-    while( exMonth - MtModelItem::firstMonth > (int)_this->_items[puid].months.size() - 1)
+    while (exMonth - MtModelItem::firstMonth > (int)model->_items[puid].months.size() - 1)
     {
-        _this->_items[puid].months.push_back(MonthItem());
+        model->_items[puid].months.push_back(MonthItem());
     }
 
-    while( exMonth - MtModelItem::firstMonth > (int)_this->_items[PROCESS_ALL].months.size() - 1)
+    while (exMonth - MtModelItem::firstMonth > (int)model->_items[PROCESS_ALL].months.size() - 1)
     {
-        _this->_items[PROCESS_ALL].months.push_back(MonthItem());
+        model->_items[PROCESS_ALL].months.push_back(MonthItem());
     }
 
     // Update Traffic
-    MonthItem &mItem = _this->_items[puid].months[exMonth - MtModelItem::firstMonth];
-    MonthItem &mItemAll = _this->_items[PROCESS_ALL].months[exMonth - MtModelItem::firstMonth];
+    MonthItem &mItem = model->_items[puid].months[exMonth - MtModelItem::firstMonth];
+    MonthItem &mItemAll = model->_items[PROCESS_ALL].months[exMonth - MtModelItem::firstMonth];
 
     mItem.dayTx[mDay - 1] = txBytes;
     mItem.dayRx[mDay - 1] = rxBytes;

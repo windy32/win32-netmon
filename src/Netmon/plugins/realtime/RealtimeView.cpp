@@ -30,35 +30,37 @@ HDC     RealtimeView::_hdcTarget;
 HDC     RealtimeView::_hdcBuf;
 HBITMAP RealtimeView::_hbmpBuf;
 
-HFONT   RealtimeView::_hOldFont;
 HFONT   RealtimeView::_hEnglishFont;
 HFONT   RealtimeView::_hShellDlgFont;
 HFONT   RealtimeView::_hProcessFont;
+
+// Window Handle
+HWND    RealtimeView::_hWnd;
 
 // Model Object
 RealtimeModel *RealtimeView::_model;
 
 #pragma endregion
 
-void RealtimeView::Init(RealtimeModel *model)
+RealtimeView::RealtimeView(RealtimeModel *model)
 {
     _process = PROCESS_ALL;
     _model = model;
 
-    _hdcBuf = 0;
-    _hbmpBuf = 0;
+    _hdcBuf = 0;  // the device context
+    _hbmpBuf = 0; // and the bitmap are not deleted when user goes to another tab
 
     _zoomFactor = ZOOM_1S;
     _smoothFactor = SMOOTH_1X;
 }
 
-void RealtimeView::End()
+RealtimeView::~RealtimeView()
 {
     DeleteDC(_hdcBuf);
     DeleteObject(_hbmpBuf);
 }
 
-void RealtimeView::SetProcessUid(int puid)
+void RealtimeView::SetProcess(int puid)
 {
     _process = puid;
     DrawGraph();
@@ -491,7 +493,7 @@ void RealtimeView::DrawGraph()
     BitBlt(_hdcTarget, 0, 0, _width, _height, _hdcBuf, 0, 0, SRCCOPY);
 }
 
-LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (uMsg == WM_INITDIALOG )
     {
@@ -515,7 +517,7 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         _hShellDlgFont = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, false);
         _hProcessFont  = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, true);
 
-        _hOldFont = (HFONT) SelectObject(_hdcBuf, _hEnglishFont); 
+        SelectObject(_hdcBuf, _hEnglishFont); 
 
         // - Pen
         SelectObject(_hdcBuf, GetStockObject(DC_PEN));
@@ -528,9 +530,7 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         KillTimer(hWnd, 0);
 
         ReleaseDC(hWnd, _hdcTarget);
-        _hdcTarget = 0;
 
-        SelectObject(_hdcBuf, _hOldFont);
         DeleteObject(_hEnglishFont);
         DeleteObject(_hShellDlgFont);
         DeleteObject(_hProcessFont);
