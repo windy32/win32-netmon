@@ -44,20 +44,26 @@ static void InitProfile(HWND hWnd)
     TCHAR szAdapter[256];
     TCHAR szAutoStart[MAX_PATH];
     BOOL bAutoCapture;
-    BOOL bDtViewEnable;
-    int  iDtViewMaxSpace;
+
+    BOOL bRtViewEnabled;
+    BOOL bMtViewEnabled;
+    BOOL bStViewEnabled;
+    BOOL bDtViewEnabled;
 
     g_profile.GetAdapter(szAdapter, 256);
     g_profile.GetAutoStart(szAutoStart, MAX_PATH);
     g_profile.GetAutoCapture(&bAutoCapture);
-    g_profile.GetDtViewEnable(&bDtViewEnable);
-    g_profile.GetDtViewMaxSpace(&iDtViewMaxSpace);
+
+    g_profile.GetRtViewEnabled(&bRtViewEnabled);
+    g_profile.GetMtViewEnabled(&bMtViewEnabled);
+    g_profile.GetStViewEnabled(&bStViewEnabled);
+    g_profile.GetDtViewEnabled(&bDtViewEnabled);
 
     // - Adapter
     ComboBox_SelectString(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), -1, szAdapter);
 
     // - AutoStart
-    if (szAutoStart[0] != 0 ) // Not empty string
+    if (szAutoStart[0] != 0) // Not empty string
     {
         Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START), BST_CHECKED);
 
@@ -66,12 +72,12 @@ static void InitProfile(HWND hWnd)
         GetModuleFileName(0, szNetmon, MAX_PATH);
 
         // Sync registry autorun item
-        if (_tcscmp(szNetmon, szAutoStart) != 0 )
+        if (_tcscmp(szNetmon, szAutoStart) != 0)
         {
             int iResult = MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_NOW),
                 TEXT("Netmon"), MB_YESNO | MB_ICONQUESTION);
 
-            if (iResult == IDYES )
+            if (iResult == IDYES)
             {
                 // Build command line
                 TCHAR szRegUpdater[MAX_PATH];
@@ -81,7 +87,7 @@ static void InitProfile(HWND hWnd)
                 int iExitCode;
                 if (Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
                 {
-                    if (iExitCode == 0 )
+                    if (iExitCode == 0)
                     {
                         g_profile.SetAutoStart(szNetmon); // Update profile
                     }
@@ -101,27 +107,17 @@ static void InitProfile(HWND hWnd)
     }
 
     // - AutoCapture
-    if (bAutoCapture )
+    if (bAutoCapture)
     {
         Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE), BST_CHECKED);
     }
 
     // - DtViewEnable
-    if (bDtViewEnable )
+    if (bDtViewEnabled)
     {
-        Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE), BST_CHECKED);
+        //Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE), BST_CHECKED);
     }
 
-    // - DtViewMaxSpace
-    if (iDtViewMaxSpace == 0 )
-    {
-        EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), FALSE);
-    }
-    else
-    {
-        Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW), BST_CHECKED);
-        SetDlgItemInt(hWnd, IDE_PREF_MAX_DTVIEW, iDtViewMaxSpace, FALSE);
-    }
 }
 
 static void InitLanguage(HWND hWnd)
@@ -129,11 +125,6 @@ static void InitLanguage(HWND hWnd)
     SetDlgItemText(hWnd, IDL_PREF_DEFAULT_ADAPTER, Language::GetString(IDS_PREF_DEFAULT_ADAPTER));
     SetDlgItemText(hWnd, IDC_PREF_AUTO_START,      Language::GetString(IDS_PREF_AUTO_START));
     SetDlgItemText(hWnd, IDC_PREF_AUTO_CAPTURE,    Language::GetString(IDS_PREF_AUTO_CAPTURE));
-    SetDlgItemText(hWnd, IDG_PREF_DETAIL_VIEW,     Language::GetString(IDS_PREF_DTVIEW));
-    SetDlgItemText(hWnd, IDC_PREF_ENABLE,          Language::GetString(IDS_PREF_DTVIEW_ENABLE));
-    SetDlgItemText(hWnd, IDC_PREF_MAX_DTVIEW,      Language::GetString(IDS_PREF_DTVIEW_MAX_SPACE));
-    SetDlgItemText(hWnd, IDB_PREF_COMPACT,         Language::GetString(IDS_PREF_DTVIEW_COMPACT));
-    SetDlgItemText(hWnd, IDB_PREF_DELETE_ALL,      Language::GetString(IDS_PREF_DTVIEW_DELETE_ALL));
     SetDlgItemText(hWnd, IDB_PREF_OK,              Language::GetString(IDS_PREF_OK));
     SetDlgItemText(hWnd, IDB_PREF_CANCEL,          Language::GetString(IDS_PREF_CANCEL));
 }
@@ -141,37 +132,6 @@ static void InitLanguage(HWND hWnd)
 ///----------------------------------------------------------------------------------------------// 
 ///                                    L2 Message Handlers                                       //
 ///----------------------------------------------------------------------------------------------//
-static void OnCheckDtViewEnable(HWND hWnd)
-{
-    if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE)) == BST_CHECKED )
-    {
-        EnableWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW), TRUE);
-        if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
-        {
-            EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), TRUE);
-        }
-    }
-    else
-    {
-        SetDlgItemText(hWnd, IDE_PREF_MAX_DTVIEW, TEXT(""));
-        EnableWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW), FALSE);
-        EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), FALSE);
-    }
-}
-
-static void OnCheckDtViewMaxSpace(HWND hWnd)
-{
-    if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
-    {
-        EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), TRUE);
-    }
-    else
-    {
-        SetDlgItemText(hWnd, IDE_PREF_MAX_DTVIEW, TEXT(""));
-        EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), FALSE);
-    }
-}
-
 static void OnOk(HWND hWnd)
 {
     BOOL bParamOk = TRUE;
@@ -179,42 +139,6 @@ static void OnOk(HWND hWnd)
 
     // Get setting from UI and save profile
     ComboBox_GetText(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), szAdapter, 256);
-
-    // - Detail view max space
-    if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE)) == BST_CHECKED )
-    {
-        if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW)) == BST_CHECKED )
-        {
-            BOOL bTranslated = FALSE;
-            int iDtViewMaxSpace = GetDlgItemInt(hWnd, IDE_PREF_MAX_DTVIEW, &bTranslated, FALSE);
-
-            if (!(bTranslated && iDtViewMaxSpace >= 10 && iDtViewMaxSpace <= 1024 ))
-            {
-                bParamOk = FALSE;
-                MessageBox(hWnd, Language::GetString(IDS_PREF_MAX_SPACE_RANGE), 
-                    TEXT("Error"), MB_OK | MB_ICONWARNING);
-            }
-
-            if (bParamOk )
-            {
-                g_profile.SetDtViewMaxSpace(iDtViewMaxSpace);
-            }
-        }
-        else
-        {
-            g_profile.SetDtViewMaxSpace(0);
-        }
-
-        if (bParamOk )
-        {
-            g_profile.SetDtViewEnable(TRUE);
-        }
-    }
-    else // - Detail view enable
-    {
-        g_profile.SetDtViewEnable(FALSE);
-        g_profile.SetDtViewMaxSpace(0);
-    }
 
     if (bParamOk )
     {
@@ -310,6 +234,7 @@ static void OnCancel(HWND hWnd)
     EndDialog(hWnd, 0);
 }
 
+/*
 static void OnDeleteAll(HWND hWnd)
 {
     if (g_bCapture )
@@ -340,6 +265,7 @@ static void OnCompact(HWND hWnd)
             TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
 }
+*/
 
 ///----------------------------------------------------------------------------------------------// 
 ///                                    L1 Message Handlers                                       //
@@ -373,12 +299,12 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), 120, 12,  275, 20, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_AUTO_START),      15,  40,  380, 20, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE),    15,  65,  380, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDG_PREF_DETAIL_VIEW),     15,  90,  380, 110, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDC_PREF_ENABLE),          25,  110, 300, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW),      25,  135, 280, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW),      315, 135, 65,  20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PREF_DELETE_ALL),      25,  160, 100, 25, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PREF_COMPACT),         135, 160, 100, 25, FALSE);
+    // MoveWindow(GetDlgItem(hWnd, IDG_PREF_DETAIL_VIEW),     15,  90,  380, 110, FALSE);
+    // MoveWindow(GetDlgItem(hWnd, IDC_PREF_ENABLE),          25,  110, 300, 20, FALSE);
+    // MoveWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW),      25,  135, 280, 20, FALSE);
+    // MoveWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW),      315, 135, 65,  20, FALSE);
+    // MoveWindow(GetDlgItem(hWnd, IDB_PREF_DELETE_ALL),      25,  160, 100, 25, FALSE);
+    // MoveWindow(GetDlgItem(hWnd, IDB_PREF_COMPACT),         135, 160, 100, 25, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDB_PREF_OK),              230, 210, 80,  25, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDB_PREF_CANCEL),          315, 210, 80,  25, FALSE);
 
@@ -402,15 +328,7 @@ static void OnClose(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    if (wParam == IDC_PREF_ENABLE )
-    {
-        OnCheckDtViewEnable(hWnd);
-    }
-    else if (wParam == IDC_PREF_MAX_DTVIEW )
-    {
-        OnCheckDtViewMaxSpace(hWnd);
-    }
-    else if (wParam == IDB_PREF_OK )
+    if (wParam == IDB_PREF_OK )
     {
         OnOk(hWnd);
     }
@@ -418,6 +336,7 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     {
         OnCancel(hWnd);
     }
+    /*
     else if (wParam == IDB_PREF_DELETE_ALL )
     {
         OnDeleteAll(hWnd);
@@ -426,6 +345,7 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     {
         OnCompact(hWnd);
     }
+    */
 }
 
 ///----------------------------------------------------------------------------------------------//

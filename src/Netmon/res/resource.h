@@ -24,10 +24,15 @@
 #define IDT_VIEW                                1007
 #define IDB_GOTO                                1008
 #define ICO_MAIN                                4096
+#define IDC_PREF_RTVIEW                         40000
 #define IDM_FILE_CAPTURE                        40000
+#define IDC_PREF_MTVIEW                         40001
 #define IDM_FILE_STOP                           40001
+#define IDG_PREF_ENABLE_VIEWS                   40002
 #define IDM_FILE_EXIT                           40002
+#define IDC_PREF_STVIEW                         40003
 #define IDM_VIEW_REALTIME                       40003
+#define IDC_PREF_DTVIEW                         40004
 #define IDM_VIEW_MONTH                          40004
 #define IDM_VIEW_STATISTICS                     40005
 #define IDM_VIEW_DETAIL                         40006
@@ -50,11 +55,5 @@
 #define IDC_PREF_DEFAULT_ADAPTER                51005
 #define IDC_PREF_AUTO_START                     51006
 #define IDC_PREF_AUTO_CAPTURE                   51007
-#define IDG_PREF_DETAIL_VIEW                    51009
-#define IDC_PREF_ENABLE                         51010
-#define IDC_PREF_MAX_DTVIEW                     51011
-#define IDE_PREF_MAX_DTVIEW                     51012
-#define IDB_PREF_DELETE_ALL                     51013
-#define IDB_PREF_COMPACT                        51014
 #define IDB_PREF_OK                             51015
 #define IDB_PREF_CANCEL                         51016
