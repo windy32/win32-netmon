@@ -30,7 +30,7 @@ BOOL Profile::GetString(const TCHAR *szOption, TCHAR *buf, int cchLen)
 BOOL Profile::GetInt(const TCHAR *szOption, int *pValue)
 {
     TCHAR buf[256];
-    if (GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0 )
+    if (GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0)
     {
         return FALSE; // Key empty or not exist
     }
@@ -62,7 +62,7 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
     TCHAR szCurrentDir[MAX_PATH];
     TCHAR szProfile[MAX_PATH];
     TCHAR *pFilePart;
-    TCHAR szHiddenProcesses[1000];
+    TCHAR szHiddenProcesses[4000];
 
     // Get full path name of Netmon.exe
     GetModuleFileName(0, szCurrentExe, MAX_PATH);
@@ -76,48 +76,48 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
     _tcscat_s(szProfile, MAX_PATH, TEXT("Netmon.ini"));
 
     // Init
-    _pf.Init(szProfile, TEXT("Netmon Profile v1"));
+    _pf.Init(szProfile, TEXT("Netmon Profile v2"));
 
     // Load preferences
     // If the key doesn't exist, a default value is written to the ini file
-    if (_pf.GetString(TEXT("Adapter"), _szAdapter, 256) == FALSE )
+    if (_pf.GetString(TEXT("Adapter"), _szAdapter, 256) == FALSE)
     {
         SetAdapter(szDefaultAdapter);
     }
 
-    if (_pf.GetString(TEXT("AutoStart"), _szAutoStart, MAX_PATH) == FALSE )
+    if (_pf.GetString(TEXT("AutoStart"), _szAutoStart, MAX_PATH) == FALSE)
     {
         SetAutoStart(TEXT(""));
     }
 
-    if (_pf.GetInt(TEXT("AutoCapture"), &_bAutoCapture) == FALSE )
+    if (_pf.GetInt(TEXT("AutoCapture"), &_bAutoCapture) == FALSE)
     {
         SetAutoCapture(FALSE);
     }
 
     // Views
-    if (_pf.GetInt(TEXT("RtViewEnabled"), &_bRtViewEnabled) == FALSE )
+    if (_pf.GetInt(TEXT("RtViewEnabled"), &_bRtViewEnabled) == FALSE)
     {
         SetRtViewEnabled(TRUE);
     }
 
-    if (_pf.GetInt(TEXT("MtViewEnabled"), &_bMtViewEnabled) == FALSE )
+    if (_pf.GetInt(TEXT("MtViewEnabled"), &_bMtViewEnabled) == FALSE)
     {
         SetMtViewEnabled(TRUE);
     }
 
-    if (_pf.GetInt(TEXT("StViewEnabled"), &_bStViewEnabled) == FALSE )
+    if (_pf.GetInt(TEXT("StViewEnabled"), &_bStViewEnabled) == FALSE)
     {
         SetStViewEnabled(FALSE);
     }
 
-    if (_pf.GetInt(TEXT("DtViewEnabled"), &_bDtViewEnabled) == FALSE )
+    if (_pf.GetInt(TEXT("DtViewEnabled"), &_bDtViewEnabled) == FALSE)
     {
         SetDtViewEnabled(FALSE);
     }
 
     // Hidden processes
-    if (_pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 1000) == FALSE)
+    if (_pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 4000) == FALSE)
     {
         SetHiddenProcesses(std::vector<int>());
     }
@@ -136,13 +136,13 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
         }
     }
 
-    if (_pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE )
+    if (_pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE)
     {
         SetShowHidden(TRUE);
     }
 
     // Language
-    if (_pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE )
+    if (_pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE)
     {
         SetLanguage(TEXT("English"));
     }
@@ -158,7 +158,7 @@ BOOL NetmonProfile::GetAdapter(TCHAR *szAdapter, int cchLen)
 
 BOOL NetmonProfile::SetAdapter(const TCHAR *szAdapter)
 {
-    if (_pf.SetString(TEXT("Adapter"), szAdapter) == TRUE )
+    if (_pf.SetString(TEXT("Adapter"), szAdapter) == TRUE)
     {
         _tcscpy_s(_szAdapter, 256, szAdapter);
         return TRUE;
@@ -174,7 +174,7 @@ BOOL NetmonProfile::GetAutoStart(TCHAR *szAutoStart, int cchLen)
 
 BOOL NetmonProfile::SetAutoStart(const TCHAR *szAutoStart)
 {
-    if (_pf.SetString(TEXT("AutoStart"), szAutoStart) == TRUE )
+    if (_pf.SetString(TEXT("AutoStart"), szAutoStart) == TRUE)
     {
         _tcscpy_s(_szAutoStart, MAX_PATH, szAutoStart);
         return TRUE;
@@ -190,7 +190,7 @@ BOOL NetmonProfile::GetAutoCapture(BOOL *pAutoCapture)
 
 BOOL NetmonProfile::SetAutoCapture(BOOL bAutoCapture)
 {
-    if (_pf.SetInt(TEXT("AutoCapture"), (int)bAutoCapture) == TRUE )
+    if (_pf.SetInt(TEXT("AutoCapture"), (int)bAutoCapture) == TRUE)
     {
         _bAutoCapture = bAutoCapture;
         return TRUE;
@@ -207,7 +207,7 @@ BOOL NetmonProfile::GetRtViewEnabled(BOOL *pEnable)
 
 BOOL NetmonProfile::SetRtViewEnabled(BOOL bEnable)
 {
-    if (_pf.SetInt(TEXT("RtViewEnabled"), (int)bEnable) == TRUE )
+    if (_pf.SetInt(TEXT("RtViewEnabled"), (int)bEnable) == TRUE)
     {
         _bRtViewEnabled = bEnable;
         return TRUE;
@@ -223,7 +223,7 @@ BOOL NetmonProfile::GetMtViewEnabled(BOOL *pEnable)
 
 BOOL NetmonProfile::SetMtViewEnabled(BOOL bEnable)
 {
-    if (_pf.SetInt(TEXT("MtViewEnabled"), (int)bEnable) == TRUE )
+    if (_pf.SetInt(TEXT("MtViewEnabled"), (int)bEnable) == TRUE)
     {
         _bMtViewEnabled = bEnable;
         return TRUE;
@@ -239,7 +239,7 @@ BOOL NetmonProfile::GetStViewEnabled(BOOL *pEnable)
 
 BOOL NetmonProfile::SetStViewEnabled(BOOL bEnable)
 {
-    if (_pf.SetInt(TEXT("StViewEnabled"), (int)bEnable) == TRUE )
+    if (_pf.SetInt(TEXT("StViewEnabled"), (int)bEnable) == TRUE)
     {
         _bStViewEnabled = bEnable;
         return TRUE;
@@ -255,7 +255,7 @@ BOOL NetmonProfile::GetDtViewEnabled(BOOL *pEnable)
 
 BOOL NetmonProfile::SetDtViewEnabled(BOOL bEnable)
 {
-    if (_pf.SetInt(TEXT("DtViewEnabled"), (int)bEnable) == TRUE )
+    if (_pf.SetInt(TEXT("DtViewEnabled"), (int)bEnable) == TRUE)
     {
         _bDtViewEnabled = bEnable;
         return TRUE;

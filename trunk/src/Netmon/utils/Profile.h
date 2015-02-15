@@ -20,13 +20,17 @@
 //
 // Here's an example.
 //
-// [Netmon Preference v1]
-// AdapterName=Intel(R) PRO/
-// AutoStart=1
-// AutoCapture=1
-// DtViewEnable=1
-// DtViewMaxSpace=0
+// [Netmon Preference v2]
+// Adapter=Intel(R) PRO/
+// AutoStart=
+// AutoCapture=0
+// RtViewEnabled=1
+// MtViewEnabled=1
+// StViewEnabled=0
+// DtViewEnabled=0
 // HiddenProcess=1 3 6 7 9 16
+// ShowHidden=0
+// Language=English
 //
 // Related Windows API --------------------------------------------------------
 //
@@ -118,6 +122,7 @@ public:
     BOOL GetDtViewEnabled(BOOL *pEnable);
     BOOL SetDtViewEnabled(BOOL bEnable);
 
+    // Settings below are not configured in the preference dialog
     BOOL GetHiddenProcesses(std::vector<int> &processes);
     BOOL SetHiddenProcesses(const std::vector<int> &processes);
 

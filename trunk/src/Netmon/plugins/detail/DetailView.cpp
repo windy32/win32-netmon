@@ -121,11 +121,11 @@ void DetailView::UpdateSize(HWND hWnd)
     int _height = stRect.bottom - stRect.top;
 
     MoveWindow(GetDlgItem(hWnd, IDL_DETAIL),   10, 10, _width - 20, _height - 50, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PAGEUP),   10,  _height - 34,  50, 24, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PAGEDOWN), 70,  _height - 34,  50, 24, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDL_STATUS),   130, _height - 30, 300, 20, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDB_GOTO),     _width - 150, _height - 34, 80, 24, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDE_GOTO),     _width - 60,  _height - 34, 50, 24, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDB_DETAIL_PAGEUP),   10,  _height - 34,  50, 24, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDB_DETAIL_PAGEDOWN), 70,  _height - 34,  50, 24, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDL_DETAIL_STATUS),   130, _height - 30, 300, 20, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDB_DETAIL_GOTO),     _width - 150, _height - 34, 80, 24, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDE_DETAIL_GOTO),     _width - 60,  _height - 34, 50, 24, TRUE);
 }
 
 void DetailView::UpdateContent(bool rebuildList)
@@ -149,13 +149,13 @@ void DetailView::UpdateContent(bool rebuildList)
 
     _stprintf_s(status, 256, szFormat, 
         buf, _curPage + 1, _model->GetLastPageIndex(_process) + 1, _model->GetPacketCount(_process));
-    SetDlgItemText(_hWnd, IDL_STATUS, status);
+    SetDlgItemText(_hWnd, IDL_DETAIL_STATUS, status);
 
     // Update Buttons
-    EnableWindow(GetDlgItem(_hWnd, IDB_GOTO), TRUE);
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), 
+    EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_GOTO), TRUE);
+    EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
         (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+    EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEDOWN), 
         (_curPage + 1 < _model->GetLastPageIndex(_process) + 1) ? TRUE : FALSE);
 
     // Update ListView
@@ -184,9 +184,9 @@ void DetailView::OnPageUp()
     _curPage -= 1;
     UpdateContent(true);
 
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), 
+    EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
         (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+    EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEDOWN), 
         (_curPage + 1 < _model->GetLastPageIndex(_process) + 1) ? TRUE : FALSE);
 }
 
@@ -195,16 +195,16 @@ void DetailView::OnPageDown()
     _curPage += 1;
     UpdateContent(true);
 
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), 
+    EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
         (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
-    EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+    EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEDOWN), 
         (_curPage + 1 < _model->GetLastPageIndex(_process) + 1) ? TRUE : FALSE);
 }
 
 void DetailView::OnGoto()
 {
     BOOL translated;
-    int page = GetDlgItemInt(_hWnd, IDE_GOTO, &translated, TRUE);
+    int page = GetDlgItemInt(_hWnd, IDE_DETAIL_GOTO, &translated, TRUE);
 
     if (!translated ) 
     {
@@ -219,9 +219,9 @@ void DetailView::OnGoto()
         _curPage = page - 1;
         UpdateContent(true);
 
-        EnableWindow(GetDlgItem(_hWnd, IDB_PAGEUP), 
+        EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
             (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
-        EnableWindow(GetDlgItem(_hWnd, IDB_PAGEDOWN), 
+        EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEDOWN), 
             (_curPage + 1 < _model->GetLastPageIndex(_process) + 1) ? TRUE : FALSE);
     }
 }
@@ -242,7 +242,7 @@ void DetailView::SwitchLanguage(HWND hWnd)
     UpdateContent(true);
 
     // Button
-    SetDlgItemText(hWnd, IDB_GOTO, Language::GetString(IDS_DTVIEW_GOTO));
+    SetDlgItemText(hWnd, IDB_DETAIL_GOTO, Language::GetString(IDS_DTVIEW_GOTO));
 }
 
 // Dialog Procedure
@@ -254,13 +254,13 @@ INT_PTR DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         _hList = GetDlgItem(hWnd, IDL_DETAIL);
 
         _lpOldProcEdit = 
-            (WNDPROC)SetWindowLong(GetDlgItem(_hWnd, IDE_GOTO), GWL_WNDPROC, (LONG)MyProcEdit);
+            (WNDPROC)SetWindowLong(GetDlgItem(_hWnd, IDE_DETAIL_GOTO), GWL_WNDPROC, (LONG)MyProcEdit);
 
         // Save current language id
         _iLanguageId = Language::GetLangId();
 
         // Init button
-        SetDlgItemText(hWnd, IDB_GOTO, Language::GetString(IDS_DTVIEW_GOTO));
+        SetDlgItemText(hWnd, IDB_DETAIL_GOTO, Language::GetString(IDS_DTVIEW_GOTO));
 
         // Init ListView
         Utils::ListViewInit(_hList, FALSE, 7, 
@@ -289,15 +289,15 @@ INT_PTR DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     else if (uMsg == WM_COMMAND )
     {
-        if (wParam == IDB_PAGEUP )
+        if (wParam == IDB_DETAIL_PAGEUP )
         {
             OnPageUp();
         }
-        else if (wParam == IDB_PAGEDOWN )
+        else if (wParam == IDB_DETAIL_PAGEDOWN )
         {
             OnPageDown();
         }
-        else if (wParam == IDB_GOTO )
+        else if (wParam == IDB_DETAIL_GOTO )
         {
             OnGoto();
         }
