@@ -19,11 +19,8 @@
 #include "res/resource.h"
 
 #include "utils/Utils.h"
-#include "utils/SQLite.h"
 #include "utils/Profile.h"
 #include "utils/Language.h"
-
-#include "plugins/Detail/Detail.h"
 
 ///----------------------------------------------------------------------------------------------//
 ///                                    Global Variables                                          //
@@ -32,9 +29,6 @@ extern HINSTANCE     g_hInstance;
 extern NetmonProfile g_profile;
 extern int           g_nAdapters;
 extern TCHAR         g_szAdapterNames[16][256];
-
-extern bool          g_bCapture;
-static DetailPlugin *g_pDetailPlugin;
 
 ///----------------------------------------------------------------------------------------------// 
 ///                                    Called by Message Handlers                                //
@@ -112,12 +106,11 @@ static void InitProfile(HWND hWnd)
         Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE), BST_CHECKED);
     }
 
-    // - DtViewEnable
-    if (bDtViewEnabled)
-    {
-        //Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_ENABLE), BST_CHECKED);
-    }
-
+    // - Enable Views
+    if (bRtViewEnabled) Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_RTVIEW), BST_CHECKED);
+    if (bMtViewEnabled) Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_MTVIEW), BST_CHECKED);
+    if (bStViewEnabled) Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_STVIEW), BST_CHECKED);
+    if (bDtViewEnabled) Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_DTVIEW), BST_CHECKED);
 }
 
 static void InitLanguage(HWND hWnd)
@@ -125,6 +118,11 @@ static void InitLanguage(HWND hWnd)
     SetDlgItemText(hWnd, IDL_PREF_DEFAULT_ADAPTER, Language::GetString(IDS_PREF_DEFAULT_ADAPTER));
     SetDlgItemText(hWnd, IDC_PREF_AUTO_START,      Language::GetString(IDS_PREF_AUTO_START));
     SetDlgItemText(hWnd, IDC_PREF_AUTO_CAPTURE,    Language::GetString(IDS_PREF_AUTO_CAPTURE));
+    SetDlgItemText(hWnd, IDG_PREF_ENABLE_VIEWS,    Language::GetString(IDS_PREF_ENABLE_VIEWS));
+    SetDlgItemText(hWnd, IDC_PREF_RTVIEW,          Language::GetString(IDS_PREF_RTVIEW));
+    SetDlgItemText(hWnd, IDC_PREF_MTVIEW,          Language::GetString(IDS_PREF_MTVIEW));
+    SetDlgItemText(hWnd, IDC_PREF_STVIEW,          Language::GetString(IDS_PREF_STVIEW));
+    SetDlgItemText(hWnd, IDC_PREF_DTVIEW,          Language::GetString(IDS_PREF_DTVIEW));
     SetDlgItemText(hWnd, IDB_PREF_OK,              Language::GetString(IDS_PREF_OK));
     SetDlgItemText(hWnd, IDB_PREF_CANCEL,          Language::GetString(IDS_PREF_CANCEL));
 }
@@ -134,99 +132,167 @@ static void InitLanguage(HWND hWnd)
 ///----------------------------------------------------------------------------------------------//
 static void OnOk(HWND hWnd)
 {
-    BOOL bParamOk = TRUE;
-    TCHAR szAdapter[256];
-
     // Get setting from UI and save profile
+
+    // - Adapter
+    TCHAR szAdapter[256];
     ComboBox_GetText(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), szAdapter, 256);
+    g_profile.SetAdapter(szAdapter);
 
-    if (bParamOk )
+    // - Auto start
+    if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START)) == BST_CHECKED )
     {
-        // - Adapter
-        g_profile.SetAdapter(szAdapter);
+        // Get Netmon's auto start item in registry
+        TCHAR szAutoStart[MAX_PATH];
+        g_profile.GetAutoStart(szAutoStart, MAX_PATH);
 
-        // - Auto start
-        if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START)) == BST_CHECKED )
+        // Get Netmon's actual path
+        TCHAR szNetmon[MAX_PATH];
+        GetModuleFileName(0, szNetmon, MAX_PATH);
+
+        // Update registry if necessary
+        if (_tcscmp(szAutoStart, szNetmon) != 0 )
         {
-            // Get Netmon's auto start item in registry
-            TCHAR szAutoStart[MAX_PATH];
-            g_profile.GetAutoStart(szAutoStart, MAX_PATH);
+            // Build command line
+            TCHAR szRegUpdater[MAX_PATH];
+            Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
 
-            // Get Netmon's actual path
-            TCHAR szNetmon[MAX_PATH];
-            GetModuleFileName(0, szNetmon, MAX_PATH);
-
-            // Update registry if necessary
-            if (_tcscmp(szAutoStart, szNetmon) != 0 )
+            // Start process and update registry
+            int iExitCode;
+            if (Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
             {
-                // Build command line
-                TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
-
-                // Start process and update registry
-                int iExitCode;
-                if (Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
+                if (iExitCode != 0 )
                 {
-                    if (iExitCode != 0 )
-                    {
-                        MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
-                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
-                    }
-                    else
-                    {
-                        g_profile.SetAutoStart(szNetmon); // Update profile
-                    }
+                    MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
+                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
                 else
                 {
-                    MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
-                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                    g_profile.SetAutoStart(szNetmon); // Update profile
                 }
             }
-        }
-        else // "Auto start" not checked
-        {
-            // Get Netmon's auto start item in registry
-            TCHAR szAutoStart[MAX_PATH];
-            g_profile.GetAutoStart(szAutoStart, MAX_PATH);
-
-            // Delete the auto start item in registry if necessary
-            if (szAutoStart[0] != 0 )
+            else
             {
-                int iExitCode;
-                TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+                MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
+                    TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+            }
+        }
+    }
+    else // "Auto start" not checked
+    {
+        // Get Netmon's auto start item in registry
+        TCHAR szAutoStart[MAX_PATH];
+        g_profile.GetAutoStart(szAutoStart, MAX_PATH);
 
-                if (Utils::StartProcessAndWait(szRegUpdater, TEXT("-c"), &iExitCode, TRUE))
+        // Delete the auto start item in registry if necessary
+        if (szAutoStart[0] != 0 )
+        {
+            int iExitCode;
+            TCHAR szRegUpdater[MAX_PATH];
+            Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+
+            if (Utils::StartProcessAndWait(szRegUpdater, TEXT("-c"), &iExitCode, TRUE))
+            {
+                if (iExitCode != 0 )
                 {
-                    if (iExitCode != 0 )
-                    {
-                        MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
-                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
-                    }
-                    else
-                    {
-                        g_profile.SetAutoStart(TEXT("")); // Update profile
-                    }
+                    MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
+                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
                 else
                 {
-                    MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
-                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                    g_profile.SetAutoStart(TEXT("")); // Update profile
                 }
             }
+            else
+            {
+                MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
+                    TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+            }
         }
+    }
 
-        // - Auto capture
-        g_profile.SetAutoCapture(
-            Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE)) == BST_CHECKED);
+    // - Auto capture
+    g_profile.SetAutoCapture(
+        Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE)) == BST_CHECKED);
+
+    // - Enable views
+    BOOL bRtEnabled = FALSE;
+    BOOL bMtEnabled = FALSE;
+    BOOL bStEnabled = FALSE;
+    BOOL bDtEnabled = FALSE;
+
+    g_profile.GetRtViewEnabled(&bRtEnabled);
+    g_profile.GetMtViewEnabled(&bMtEnabled);
+    g_profile.GetStViewEnabled(&bStEnabled);
+    g_profile.GetDtViewEnabled(&bDtEnabled);
+
+    // At least one view should be enabled
+    if (bRtEnabled == FALSE &&
+        bMtEnabled == FALSE &&
+        bStEnabled == FALSE &&
+        bDtEnabled == FALSE)
+    {
+        MessageBox(hWnd, Language::GetString(IDS_PREF_AT_LEAST_ONE_VIEW), 
+            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    // If one of the views has been disabled, Netmon will prompt the user 
+    // to decide whether related data in database should be deleted
+    BOOL bNeedClearDatabase = FALSE;
+    BOOL bNeedReboot = FALSE;
+
+    BOOL bRtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_RTVIEW)) == BST_CHECKED;
+    BOOL bMtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MTVIEW)) == BST_CHECKED;
+    BOOL bStNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_STVIEW)) == BST_CHECKED;
+    BOOL bDtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_DTVIEW)) == BST_CHECKED;
+
+    if ((bRtEnabled != bRtNowEnabled) ||
+        (bMtEnabled != bMtNowEnabled) ||
+        (bStEnabled != bStNowEnabled) ||
+        (bDtEnabled != bDtNowEnabled))
+    {
+        bNeedReboot = TRUE;
+    }
+
+    if ((bRtEnabled && !bRtNowEnabled) ||
+        (bMtEnabled && !bMtNowEnabled) ||
+        (bStEnabled && !bStNowEnabled) ||
+        (bDtEnabled && !bDtNowEnabled))
+    {
+        bNeedClearDatabase = TRUE;
+    }
+
+    if (bNeedReboot)
+    {
+        HWND hMainWindow = GetParent(hWnd);
+
+        if (bNeedClearDatabase)
+        {
+            int iResult = MessageBox(hWnd, Language::GetString(IDS_PREF_WHETHER_DELETE_DATA),
+                TEXT("Netmon"), MB_YESNO | MB_ICONQUESTION);
+
+            if (iResult == IDYES)
+            {
+                PostMessage(hMainWindow, WM_CLEAR_DB_AND_RESTART, NULL, NULL);
+            }
+            else
+            {
+                MessageBox(hWnd, Language::GetString(IDS_NETMON_WILL_RESTART),
+                    TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+                PostMessage(hMainWindow, WM_RESTART, NULL, NULL);
+            }
+        }
+        else
+        {
+            MessageBox(hWnd, Language::GetString(IDS_NETMON_WILL_RESTART),
+                TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+            PostMessage(hMainWindow, WM_RESTART, NULL, NULL);
+        }
     }
 
     // Close dialog
-    if (bParamOk )
-    {
-        EndDialog(hWnd, 0);
-    }
+    EndDialog(hWnd, 0);
 }
 
 static void OnCancel(HWND hWnd)
@@ -234,47 +300,11 @@ static void OnCancel(HWND hWnd)
     EndDialog(hWnd, 0);
 }
 
-/*
-static void OnDeleteAll(HWND hWnd)
-{
-    if (g_bCapture )
-    {
-        MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
-    }
-    else
-    {
-        //g_pDetailPlugin->DeleteAllPackets();
-        MessageBox(hWnd, Language::GetString(IDS_PREF_ALL_DELETED), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
-    }
-}
-
-static void OnCompact(HWND hWnd)
-{
-    if (g_bCapture )
-    {
-        MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
-    }
-    else
-    {
-        SQLite::Flush();
-        SQLite::Exec(TEXT("Vacuum;"), false);
-        MessageBox(hWnd, Language::GetString(IDS_PREF_COMPACT_FINISHED), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
-    }
-}
-*/
-
 ///----------------------------------------------------------------------------------------------// 
 ///                                    L1 Message Handlers                                       //
 ///----------------------------------------------------------------------------------------------//
 static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    // Save pointer to detail view
-    g_pDetailPlugin = (DetailPlugin *)lParam;
-
     // Load Icon
     HICON hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN));
     SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
@@ -299,12 +329,11 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), 120, 12,  275, 20, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_AUTO_START),      15,  40,  380, 20, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE),    15,  65,  380, 20, FALSE);
-    // MoveWindow(GetDlgItem(hWnd, IDG_PREF_DETAIL_VIEW),     15,  90,  380, 110, FALSE);
-    // MoveWindow(GetDlgItem(hWnd, IDC_PREF_ENABLE),          25,  110, 300, 20, FALSE);
-    // MoveWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW),      25,  135, 280, 20, FALSE);
-    // MoveWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW),      315, 135, 65,  20, FALSE);
-    // MoveWindow(GetDlgItem(hWnd, IDB_PREF_DELETE_ALL),      25,  160, 100, 25, FALSE);
-    // MoveWindow(GetDlgItem(hWnd, IDB_PREF_COMPACT),         135, 160, 100, 25, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDG_PREF_ENABLE_VIEWS),    15,  90,  380, 110, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  110, 300, 20, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  135, 300, 20, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  160, 300, 20, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  185, 300, 20, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDB_PREF_OK),              230, 210, 80,  25, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDB_PREF_CANCEL),          315, 210, 80,  25, FALSE);
 
@@ -336,16 +365,6 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     {
         OnCancel(hWnd);
     }
-    /*
-    else if (wParam == IDB_PREF_DELETE_ALL )
-    {
-        OnDeleteAll(hWnd);
-    }
-    else if (wParam == IDB_PREF_COMPACT )
-    {
-        OnCompact(hWnd);
-    }
-    */
 }
 
 ///----------------------------------------------------------------------------------------------//

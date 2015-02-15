@@ -16,6 +16,9 @@
 #ifndef DLG_PREFERENCES_H
 #define DLG_PREFERENCES_H
 
+#define WM_CLEAR_DB_AND_RESTART (WM_USER + 3)
+#define WM_RESTART              (WM_USER + 4)
+
 INT_PTR CALLBACK ProcDlgPreferences(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 #endif

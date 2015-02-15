@@ -36,8 +36,10 @@
 #include "plugins/statistics/Statistics.h"
 #include "plugins/detail/Detail.h"
 
-#define WM_USER_TRAY (WM_USER + 1)
-#define WM_RECONNECT (WM_USER + 2)
+#define WM_USER_TRAY            (WM_USER + 1)
+#define WM_RECONNECT            (WM_USER + 2)
+#define WM_CLEAR_DB_AND_RESTART (WM_USER + 3) // also defined in DlgPreference.h
+#define WM_RESTART              (WM_USER + 4)
 
 ///----------------------------------------------------------------------------------------------//
 ///                                    Global Variables                                          //

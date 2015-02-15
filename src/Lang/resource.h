@@ -76,30 +76,31 @@
 #define IDS_DTVIEW_PAGE                         40071
 #define IDS_DTVIEW_GOTO                         40072
 #define IDS_ALL_PROCESS                         40073
+
 #define IDS_PREF_DEFAULT_ADAPTER                40074
 #define IDS_PREF_AUTO_START                     40075
 #define IDS_PREF_AUTO_CAPTURE                   40076
-#define IDS_PREF_DTVIEW                         40077
-#define IDS_PREF_DTVIEW_ENABLE                  40078
-#define IDS_PREF_DTVIEW_MAX_SPACE               40079
-#define IDS_PREF_DTVIEW_DELETE_ALL              40080
-#define IDS_PREF_DTVIEW_COMPACT                 40081
+#define IDS_PREF_ENABLE_VIEWS                   40077
+#define IDS_PREF_RTVIEW                         40078
+#define IDS_PREF_MTVIEW                         40079
+#define IDS_PREF_STVIEW                         40080
+#define IDS_PREF_DTVIEW                         40081
 #define IDS_PREF_OK                             40082
 #define IDS_PREF_CANCEL                         40083
 
 #define IDS_PREF_UPDATE_NOW                     40084
 #define IDS_PREF_UPDATE_ERROR                   40085
 #define IDS_PREF_CANNOT_EXECUTE                 40086
-#define IDS_PREF_MAX_SPACE_RANGE                40087
-#define IDS_PREF_STOP_FIRST                     40088
-#define IDS_PREF_ALL_DELETED                    40089
-#define IDS_PREF_COMPACT_FINISHED               40090
+#define IDS_PREF_AT_LEAST_ONE_VIEW              40087
+#define IDS_PREF_WHETHER_DELETE_DATA            40088
 
-#define IDS_MENU_PROCESS_SHOW                   40091
-#define IDS_MENU_PROCESS_HIDE                   40092
-#define IDS_MENU_VIEW_SHOW_HIDDEN               40093
+#define IDS_NETMON_WILL_RESTART                 40089
 
-#define IDS_TRAY_RECONNECT_TITLE                40094
-#define IDS_TRAY_RECONNECT_DESC                 40095
+#define IDS_MENU_PROCESS_SHOW                   40090
+#define IDS_MENU_PROCESS_HIDE                   40091
+#define IDS_MENU_VIEW_SHOW_HIDDEN               40092
+
+#define IDS_TRAY_RECONNECT_TITLE                40093
+#define IDS_TRAY_RECONNECT_DESC                 40094
 
 // Remember to update "Language.h"

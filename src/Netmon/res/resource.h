@@ -15,14 +15,11 @@
 #define IDB_START_HOVER                         122
 #define IDB_STOP                                124
 #define IDB_STOP_HOVER                          126
+#define IDB_DETAIL_PAGEUP                       1000
 #define IDS_SIDEBAR                             1001
 #define IDE_THIRD_PARTY                         1002
-#define IDB_PAGEUP                              1003
-#define IDB_PAGEDOWN                            1004
 #define IDL_PROCESS                             1005
-#define IDL_STATUS                              1006
 #define IDT_VIEW                                1007
-#define IDB_GOTO                                1008
 #define ICO_MAIN                                4096
 #define IDC_PREF_RTVIEW                         40000
 #define IDM_FILE_CAPTURE                        40000
@@ -47,7 +44,6 @@
 #define IDM_PROCESS_SHOW                        40015
 #define IDM_PROCESS_HIDE                        40016
 #define IDB_CLOSE                               40030
-#define IDE_GOTO                                40040
 #define IDL_DETAIL                              40041
 #define IDM_VIEW_ADAPTER_FIRST                  50000
 #define IDM_OPTIONS_LANGUAGE_FIRST              51000
@@ -57,3 +53,7 @@
 #define IDC_PREF_AUTO_CAPTURE                   51007
 #define IDB_PREF_OK                             51015
 #define IDB_PREF_CANCEL                         51016
+#define IDB_DETAIL_PAGEDOWN                     51017
+#define IDL_DETAIL_STATUS                       51018
+#define IDB_DETAIL_GOTO                         51019
+#define IDE_DETAIL_GOTO                         51020
