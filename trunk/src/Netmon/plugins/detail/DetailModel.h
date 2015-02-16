@@ -37,6 +37,7 @@ public:
 private:
     // Packet Count which is stored in database
     std::map<int, __int64> _packetCounts;
+    bool _clear_flag;
 
 private:
     void InitDatabase();

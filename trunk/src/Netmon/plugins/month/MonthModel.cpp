@@ -23,6 +23,7 @@ int MonthModel::MtModelItem::firstMonth = -1;
 MonthModel::MonthModel()
 {
     _items[PROCESS_ALL] = MtModelItem();
+    _clear_flag = false;
 
     InitDatabase();
     ReadDatabase();
@@ -30,7 +31,16 @@ MonthModel::MonthModel()
 
 MonthModel::~MonthModel()
 {
-    SaveDatabase();
+    if (_clear_flag)
+    {
+        SQLite::Exec(TEXT("Delete From Traffic;"), true);
+        SQLite::Flush();
+        SQLite::Exec(TEXT("Vacuum;"), false);
+    }
+    else
+    {
+        SaveDatabase();
+    }
 }
 
 void MonthModel::Fill()
@@ -193,8 +203,7 @@ void MonthModel::SaveDatabase()
 
 void MonthModel::ClearDatabase()
 {
-    SQLite::Exec(TEXT("Delete From Traffic;"), true);
-    SQLite::Exec(TEXT("Vacuum;"), true);
+    _clear_flag = true;
 }
 
 void MonthModel::InsertPacket(PacketInfoEx *pi)

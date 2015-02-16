@@ -51,6 +51,7 @@ public:
 
 private:
     std::map<int, MtModelItem> _items;
+    bool _clear_flag;
 
 private:
     void Fill();

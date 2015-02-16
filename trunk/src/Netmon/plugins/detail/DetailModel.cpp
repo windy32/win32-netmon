@@ -21,6 +21,7 @@
 DetailModel::DetailModel()
 {
     _packetCounts[PROCESS_ALL] = 0;
+    _clear_flag = false;
 
     InitDatabase();
     ReadDatabase();
@@ -28,7 +29,17 @@ DetailModel::DetailModel()
 
 DetailModel::~DetailModel()
 {
-    SaveDatabase();
+    if (_clear_flag)
+    {
+        SQLite::Exec(TEXT("Delete From Packet;"), true);
+        SQLite::Exec(TEXT("Delete From PacketCount;"), true);
+        SQLite::Flush();
+        SQLite::Exec(TEXT("Vacuum;"), false);
+    }
+    else
+    {
+        SaveDatabase();
+    }
 }
 
 void DetailModel::InitDatabase()
@@ -126,9 +137,7 @@ void DetailModel::SaveDatabase()
 
 void DetailModel::ClearDatabase()
 {
-    SQLite::Exec(TEXT("Delete From Packet;"), true);
-    SQLite::Exec(TEXT("Delete From PacketCount;"), true);
-    SQLite::Exec(TEXT("Vacuum;"), true);
+    _clear_flag = true;
 }
 
 void DetailModel::InsertPacket(PacketInfoEx *pi)

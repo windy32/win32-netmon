@@ -148,10 +148,10 @@ void Utils::InsertPacket(PacketInfoEx *pi)
     __int64 i64time = ((__int64)(pi->time_s) << 32) + (__int64)(pi->time_us);
 
     _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into Packet(PActivityUid, ProcessUid, AdapterUid, Direction, ")
+        TEXT("Insert Into Packet(ProcessUID, Direction, ")
         TEXT("NetProtocol, TraProtocol, Size, Time, Port) ")
-        TEXT("Values(%d, %d, Null, %d, %d, %d, %d, %I64d, %d);"), 
-        pi->pauid, pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, 
+        TEXT("Values(%d, %d, %d, %d, %d, %I64d, %d);"), 
+        pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, 
         pi->size, i64time, pi->remote_port);
 
     // Insert
@@ -567,10 +567,9 @@ void Utils::GetVersionString(TCHAR *buf, int cchLen)
 void Utils::SetMenuString(
     HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem)
 {
-    UINT uMenuState = LOWORD(GetMenuState(hMnu, uPosition, uFlags));
+    UINT uMenuState = GetMenuState(hMnu, uPosition, uFlags);
     ModifyMenu(hMnu, uPosition, 
-        (uFlags | uMenuState | MF_STRING) & 
-        (~MF_SEPARATOR) & (~MF_USECHECKBITMAPS) & (~MF_OWNERDRAW), uIDNewItem, lpNewItem);
+        (uFlags | uMenuState | MF_STRING) & (~MF_SEPARATOR), uIDNewItem, lpNewItem);
 }
 
 // Process

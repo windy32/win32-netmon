@@ -226,11 +226,16 @@ static void OnOk(HWND hWnd)
     g_profile.GetStViewEnabled(&bStEnabled);
     g_profile.GetDtViewEnabled(&bDtEnabled);
 
+    BOOL bRtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_RTVIEW)) == BST_CHECKED;
+    BOOL bMtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MTVIEW)) == BST_CHECKED;
+    BOOL bStNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_STVIEW)) == BST_CHECKED;
+    BOOL bDtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_DTVIEW)) == BST_CHECKED;
+
     // At least one view should be enabled
-    if (bRtEnabled == FALSE &&
-        bMtEnabled == FALSE &&
-        bStEnabled == FALSE &&
-        bDtEnabled == FALSE)
+    if (bRtNowEnabled == FALSE &&
+        bMtNowEnabled == FALSE &&
+        bStNowEnabled == FALSE &&
+        bDtNowEnabled == FALSE)
     {
         MessageBox(hWnd, Language::GetString(IDS_PREF_AT_LEAST_ONE_VIEW), 
             TEXT("Netmon"), MB_OK | MB_ICONWARNING);
@@ -241,11 +246,6 @@ static void OnOk(HWND hWnd)
     // to decide whether related data in database should be deleted
     BOOL bNeedClearDatabase = FALSE;
     BOOL bNeedReboot = FALSE;
-
-    BOOL bRtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_RTVIEW)) == BST_CHECKED;
-    BOOL bMtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MTVIEW)) == BST_CHECKED;
-    BOOL bStNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_STVIEW)) == BST_CHECKED;
-    BOOL bDtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_DTVIEW)) == BST_CHECKED;
 
     if ((bRtEnabled != bRtNowEnabled) ||
         (bMtEnabled != bMtNowEnabled) ||
