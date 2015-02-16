@@ -114,65 +114,17 @@ static void InitDatabase()
 {
     // Netmon.db consists of following tables:
     //
+    // Process
+    //    - UID          [Key] : Integer
+    //    - Name               : Varchar(64)
+    //
     // Note:
-    //     In SQLite 3.x, the "Integer" storage class may refer to data type:
-    //     int8, int16, int24, int32, int48 or int64.
-    
-    #pragma region Datebase Structure
-
-    // - 1. Process
-    //    - UID          [Key] : Integer <-----
-    //    - Name               : Varchar(64)   |
-    //                                         |
-    // - 2.1 Traffic (Month View)              |
-    //    - ProcessUID [Key]   : Integer ------>
-    //    - Date       [Key]   : Integer
-    //    - TxBytes            : Integer
-    //    - RxBytes            : Integer
-    //    - TxPackets          : Integer
-    //    - RxPackets          : Integer
-
-
-    //                                         |
-    // - Packet                                |
-    //    - UID          [Key] : Integer       |
-    //    - ProcessUID         : Integer ------>
-    //    - Direction          : Integer
-    //    - NetProtocol        : Integer
-    //    - TraProtocol        : Integer
-    //    - Size               : Integer
-    //    - Time               : Integer
-    //    - Port               : Integer
+    //    - In SQLite 3.x, the "Integer" storage class may refer to data type:
+    //      int8, int16, int24, int32, int48 or int64.
     //
-    // Structure V2 (+ 5 tables)
-    //
-    // - PacketCount
-    //    - ProcessUid [Key]   : Integer
-    //    - Count              : Integer
-    //
-    // - PacketSize
-    //    - ProcessUid [Key]   : Integer
-    //    - PacketSize [Key]   : Integer
-    //    - TxBytes            : Integer
-    //    - RxBytes            : Integer
-    //    - TxPackets          : Integer
-    //    - RxPackets          : Integer
-    //
-    // - Protocol
-    //    - ProcessUid [Key]   : Integer
-    //    - Protocol   [Key]   : Integer
-    //    - TxBytes            : Integer
-    //    - RxBytes            : Integer
-    //    - TxPackets          : Integer
-    //    - RxPackets          : Integer
-    //
-    // - Rate
-    //    - ProcessUid [Key]   : Integer
-    //    - Rate       [Key]   : Integer
-    //    - TxSeconds          : Integer
-    //    - RxSeconds          : Integer
-    //
-
+    //    - There is only one table created by Netmon core.
+    //      Other tables may be created by different plugins (views), and they are
+    //      maintained by different plugins
     if (!SQLite::TableExist(TEXT("Process")))
     {
         SQLite::Exec(TEXT("Create Table Process(")
@@ -187,9 +139,6 @@ static void InitDatabase()
         Utils::InsertProcess(TEXT("System"));
         Utils::InsertProcess(TEXT("svchost.exe"));
     }
-
-    // Flush
-    SQLite::Flush();
 }
 
 ///----------------------------------------------------------------------------------------------//
@@ -680,6 +629,62 @@ static void ResizeChildWindow(HWND hWnd)
         stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, 
         SWP_SHOWWINDOW);
 }
+static void Exit(HWND hWnd, bool restart)
+{
+    // Delete Tray Icon
+    NOTIFYICONDATA nti; 
+
+    nti.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN)); 
+    nti.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE; 
+    nti.hWnd = hWnd; 
+    nti.uID = 0;
+    nti.uCallbackMessage = WM_USER_TRAY; 
+    _tcscpy_s(nti.szTip, _countof(nti.szTip), TEXT("Netmon")); 
+
+    Shell_NotifyIcon(NIM_DELETE, &nti);
+
+    // Delete GDI Objects
+    DeleteDC(g_hDcSidebarBg);
+    DeleteDC(g_hDcSidebarBuf);
+
+    DeleteObject(g_hBmpSidebarBg);
+    DeleteObject(g_hBmpSidebarBuf);
+
+    DeleteDC(g_hDcStart);
+    DeleteDC(g_hDcStartHover);
+    DeleteDC(g_hDcStop);
+    DeleteDC(g_hDcStopHover);
+
+    DeleteObject(g_hBmpStart);
+    DeleteObject(g_hBmpStartHover);
+    DeleteObject(g_hBmpStop);
+    DeleteObject(g_hBmpStopHover);
+
+    // Close Plugins
+    for (unsigned int i = 0; i < g_plugins.size(); i++)
+    {
+        delete g_plugins[i];
+    }
+
+    // End SQLite
+    SQLite::Close();
+
+    // Restart
+    if (restart)
+    {
+        // Get full path name of Netmon.exe
+        TCHAR szCurrentExe[MAX_PATH];
+        GetModuleFileName(0, szCurrentExe, MAX_PATH);
+    
+        // Start Netmon (silent mode)
+        Utils::StartProcess(szCurrentExe, TEXT("-s"), FALSE);
+    }
+
+    // Exit
+    DestroyWindow(hWnd);
+    PostQuitMessage(0);
+}
+
 ///----------------------------------------------------------------------------------------------// 
 ///                                    L2 Message Handlers                                       //
 ///----------------------------------------------------------------------------------------------//
@@ -992,64 +997,20 @@ static void OnCapture(HWND hWnd)
 
 static void OnStop(HWND hWnd)
 {
-    // Stop Thread
-    g_bCapture = false;
-    WaitForSingleObject(g_hCaptureThread, INFINITE);
+    if (g_bCapture == true) // Stop Thread
+    {
+        g_bCapture = false;
+        WaitForSingleObject(g_hCaptureThread, INFINITE);
 
-    EnableMenuItem(GetMenu(hWnd), IDM_FILE_CAPTURE, MF_ENABLED);
-    EnableMenuItem(GetMenu(hWnd), IDM_FILE_STOP, MF_GRAYED);
+        EnableMenuItem(GetMenu(hWnd), IDM_FILE_CAPTURE, MF_ENABLED);
+        EnableMenuItem(GetMenu(hWnd), IDM_FILE_STOP, MF_GRAYED);
+    }
 }
 
 static void OnExit(HWND hWnd)
 {
-    // Stop
-    if (g_bCapture == true )
-    {
-        OnStop(hWnd);
-    }
-
-    // Delete Tray Icon
-    NOTIFYICONDATA nti; 
-
-    nti.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN)); 
-    nti.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE; 
-    nti.hWnd = hWnd; 
-    nti.uID = 0;
-    nti.uCallbackMessage = WM_USER_TRAY; 
-    _tcscpy_s(nti.szTip, _countof(nti.szTip), TEXT("Netmon")); 
-
-    Shell_NotifyIcon(NIM_DELETE, &nti);
-
-    // Delete GDI Objects
-    DeleteDC(g_hDcSidebarBg);
-    DeleteDC(g_hDcSidebarBuf);
-
-    DeleteObject(g_hBmpSidebarBg);
-    DeleteObject(g_hBmpSidebarBuf);
-
-    DeleteDC(g_hDcStart);
-    DeleteDC(g_hDcStartHover);
-    DeleteDC(g_hDcStop);
-    DeleteDC(g_hDcStopHover);
-
-    DeleteObject(g_hBmpStart);
-    DeleteObject(g_hBmpStartHover);
-    DeleteObject(g_hBmpStop);
-    DeleteObject(g_hBmpStopHover);
-
-    // Close Plugins
-    for (unsigned int i = 0; i < g_plugins.size(); i++)
-    {
-        delete g_plugins[i];
-    }
-    g_plugins.clear();
-
-    // End SQLite
-    SQLite::Close();
-
-    // Exit
-    DestroyWindow(hWnd);
-    PostQuitMessage(0);
+    OnStop(hWnd);
+    Exit(hWnd, false); // Will not restart
 }
 
 ///----------------------------------------------------------------------------------------------// 
@@ -1319,6 +1280,45 @@ static void OnReconnect(HWND hWnd, WPARAM wParam, LPARAM lParam)
     Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
+static void OnClearAndRestart(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+    OnStop(hWnd);
+
+    for (unsigned int i = 0; i < g_plugins.size(); i++)
+    {
+        Plugin *p = g_plugins[i];
+
+        RealtimePlugin   *rp = dynamic_cast<RealtimePlugin *>(p);
+        MonthPlugin      *mp = dynamic_cast<MonthPlugin *>(p);
+        StatisticsPlugin *sp = dynamic_cast<StatisticsPlugin *>(p);
+        DetailPlugin     *dp = dynamic_cast<DetailPlugin *>(p);
+
+        BOOL bRtViewEnabled = FALSE;
+        BOOL bMtViewEnabled = FALSE;
+        BOOL bStViewEnabled = FALSE;
+        BOOL bDtViewEnabled = FALSE;
+
+        g_profile.GetRtViewEnabled(&bRtViewEnabled);
+        g_profile.GetMtViewEnabled(&bMtViewEnabled);
+        g_profile.GetStViewEnabled(&bStViewEnabled);
+        g_profile.GetDtViewEnabled(&bDtViewEnabled);
+
+        // If the plugin is now enabled, and it has been disabled in the preference dialog
+        if (rp != NULL && !bRtViewEnabled) rp->ClearDatabase();
+        if (mp != NULL && !bMtViewEnabled) mp->ClearDatabase();
+        if (sp != NULL && !bStViewEnabled) sp->ClearDatabase();
+        if (dp != NULL && !bDtViewEnabled) dp->ClearDatabase();
+    }
+
+    Exit(hWnd, true); // Will restart
+}
+
+static void OnRestart(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+    OnStop(hWnd);
+    Exit(hWnd, true);
+}
+
 static void OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT stPS;
@@ -1557,20 +1557,22 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 {
 #define PROCESS_MSG(MSG, HANDLER) if(uMsg == MSG) { HANDLER(hWnd, wParam, lParam); return TRUE; }
 
-    PROCESS_MSG(WM_MOUSEMOVE,       OnMouseMove)
-    PROCESS_MSG(WM_LBUTTONDOWN,     OnLButtonDown)
-    PROCESS_MSG(WM_LBUTTONUP,       OnLButtonUp)
-    PROCESS_MSG(WM_INITDIALOG,      OnInitDialog)    // Init
-    PROCESS_MSG(WM_CLOSE,           OnClose)
-    PROCESS_MSG(WM_QUERYENDSESSION, OnQueryEndSession)
-    PROCESS_MSG(WM_ENDSESSION,      OnEndSession)
-    PROCESS_MSG(WM_COMMAND,         OnCommand)
-    PROCESS_MSG(WM_USER_TRAY,       OnUserTray)      // Tray icon messages
-    PROCESS_MSG(WM_RECONNECT,       OnReconnect)     // Resume from hibernation
-    PROCESS_MSG(WM_PAINT,           OnPaint)
-    PROCESS_MSG(WM_SIZE,            OnSize)          // Resize Sidebar, ListView and Tab Control
-    PROCESS_MSG(WM_GETMINMAXINFO,   OnGetMinMaxInfo) // Set Window's minimun size
-    PROCESS_MSG(WM_NOTIFY,          OnNotify)
+    PROCESS_MSG(WM_MOUSEMOVE,            OnMouseMove)
+    PROCESS_MSG(WM_LBUTTONDOWN,          OnLButtonDown)
+    PROCESS_MSG(WM_LBUTTONUP,            OnLButtonUp)
+    PROCESS_MSG(WM_INITDIALOG,           OnInitDialog)      // Init
+    PROCESS_MSG(WM_CLOSE,                OnClose)
+    PROCESS_MSG(WM_QUERYENDSESSION,      OnQueryEndSession)
+    PROCESS_MSG(WM_ENDSESSION,           OnEndSession)
+    PROCESS_MSG(WM_COMMAND,              OnCommand)
+    PROCESS_MSG(WM_USER_TRAY,            OnUserTray)        // Tray icon messages
+    PROCESS_MSG(WM_RECONNECT,            OnReconnect)       // Resume from hibernation
+    PROCESS_MSG(WM_PAINT,                OnPaint)
+    PROCESS_MSG(WM_SIZE,                 OnSize)            // Resize controls
+    PROCESS_MSG(WM_GETMINMAXINFO,        OnGetMinMaxInfo)   // Set Window's minimun size
+    PROCESS_MSG(WM_NOTIFY,               OnNotify)
+    PROCESS_MSG(WM_CLEAR_DB_AND_RESTART, OnClearAndRestart)
+    PROCESS_MSG(WM_RESTART,              OnRestart)
 
 #undef PROCESS_MSG
 
@@ -1587,13 +1589,29 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     g_hInstance = hInstance;
 
     // Single Instance (Create a Named-Pipe)
-    HANDLE hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), 
-        PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, 0, 4, 1024, 1024, 1000, NULL);
-    if (hPipe == INVALID_HANDLE_VALUE )
+    HANDLE hPipe = 0;
+
+    // Option "-s" (silent mode)
+    if (strcmp(lpCmdLine, "-s") == 0) // Wait until the pipe is available
     {
-        MessageBox(0, TEXT("Netmon is still running.\nOnly one instance is allowed for Netmon!"), 
-            TEXT("Error"), MB_OK | MB_ICONWARNING);
-        return 1;
+        do
+        {
+            hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), 
+                PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, 0, 4, 1024, 1024, 1000, NULL);
+        }
+        while (hPipe == INVALID_HANDLE_VALUE);
+    }
+    else // Normal mode: prompt user and exit
+    {
+        hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), 
+            PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, 0, 4, 1024, 1024, 1000, NULL);
+
+        if (hPipe == INVALID_HANDLE_VALUE)
+        {
+            MessageBox(0, TEXT("Netmon is still running.\nOnly one instance is allowed for Netmon!"), 
+                TEXT("Error"), MB_OK | MB_ICONWARNING);
+            return 1;
+        }
     }
 
     // Load languages
@@ -1629,7 +1647,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     // Display the window
     CreateDialogParam(g_hInstance, TEXT("DLG_MAIN"), NULL, ProcDlgMain, 0);
 
-    while( GetMessage(&stMsg, NULL, 0, 0) != 0)
+    while (GetMessage(&stMsg, NULL, 0, 0) != 0)
     {
         TranslateMessage(&stMsg);
         DispatchMessage(&stMsg);

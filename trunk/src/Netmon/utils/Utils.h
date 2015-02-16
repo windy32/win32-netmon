@@ -88,6 +88,9 @@ public:
         HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem);
 
     // Process
+    static BOOL StartProcess(
+        const TCHAR *szFile, const TCHAR *szParam, BOOL bRunAs);
+
     static BOOL StartProcessAndWait(
         const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs);
 

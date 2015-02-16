@@ -552,6 +552,29 @@ void Utils::SetMenuString(
 }
 
 // Process
+BOOL Utils::StartProcess(const TCHAR *szFile, const TCHAR *szParam, BOOL bRunAs)
+{
+    SHELLEXECUTEINFO sei = { sizeof(SHELLEXECUTEINFO) };
+    DWORD dwExitCode;
+
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+    if (bRunAs )
+    {
+        sei.lpVerb = TEXT("runas");
+    }
+    sei.lpFile = szFile;
+    sei.lpParameters = szParam;
+    sei.nShow = SW_SHOWNORMAL;
+
+    if (ShellExecuteEx(&sei) && sei.hProcess != 0)
+    {
+        CloseHandle(sei.hProcess);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 BOOL Utils::StartProcessAndWait(
     const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs)
 {

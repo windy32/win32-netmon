@@ -272,21 +272,17 @@ static void OnOk(HWND hWnd)
             int iResult = MessageBox(hWnd, Language::GetString(IDS_PREF_WHETHER_DELETE_DATA),
                 TEXT("Netmon"), MB_YESNO | MB_ICONQUESTION);
 
-            if (iResult == IDYES)
-            {
-                PostMessage(hMainWindow, WM_CLEAR_DB_AND_RESTART, NULL, NULL);
-            }
-            else
-            {
-                MessageBox(hWnd, Language::GetString(IDS_NETMON_WILL_RESTART),
-                    TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
-                PostMessage(hMainWindow, WM_RESTART, NULL, NULL);
-            }
+            MessageBox(hWnd, Language::GetString(IDS_NETMON_WILL_RESTART),
+                TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+
+            PostMessage(hMainWindow, 
+                (iResult == IDYES) ? WM_CLEAR_DB_AND_RESTART : WM_RESTART, NULL, NULL);
         }
         else
         {
             MessageBox(hWnd, Language::GetString(IDS_NETMON_WILL_RESTART),
                 TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+
             PostMessage(hMainWindow, WM_RESTART, NULL, NULL);
         }
     }
