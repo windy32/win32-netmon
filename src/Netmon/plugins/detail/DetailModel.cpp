@@ -99,7 +99,7 @@ void DetailModel::SaveDatabase()
     SQLite::Exec(TEXT("Delete From PacketCount;"), true);
 
     // Insert records
-    for(std::map<int, __int64>::iterator it = _packetCounts.begin(); it != _packetCounts.end(); ++it)
+    for (std::map<int, __int64>::iterator it = _packetCounts.begin(); it != _packetCounts.end(); ++it)
     {
         int puid = it->first;
         __int64 count = it->second;

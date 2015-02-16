@@ -309,7 +309,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     InitLanguage(hWnd);
 
     // Size Dialog
-    SetWindowPos(hWnd, HWND_TOP, 140, 140, 415, 275, 0);
+    SetWindowPos(hWnd, HWND_TOP, 140, 140, 415, 290, 0);
 
     // Get Client Rectangle
     RECT stClientRect;
@@ -325,13 +325,13 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), 120, 12,  275, 20, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_AUTO_START),      15,  40,  380, 20, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE),    15,  65,  380, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDG_PREF_ENABLE_VIEWS),    15,  90,  380, 110, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDG_PREF_ENABLE_VIEWS),    15,  90,  380, 125, FALSE);
     MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  110, 300, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  135, 300, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  160, 300, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDC_PREF_RTVIEW),          25,  185, 300, 20, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PREF_OK),              230, 210, 80,  25, FALSE);
-    MoveWindow(GetDlgItem(hWnd, IDB_PREF_CANCEL),          315, 210, 80,  25, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDC_PREF_MTVIEW),          25,  135, 300, 20, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDC_PREF_STVIEW),          25,  160, 300, 20, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDC_PREF_DTVIEW),          25,  185, 300, 20, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDB_PREF_OK),              230, 225, 80,  25, FALSE);
+    MoveWindow(GetDlgItem(hWnd, IDB_PREF_CANCEL),          315, 225, 80,  25, FALSE);
 
     // Get Device Names
     for(int i = 0; i < g_nAdapters; i++)
