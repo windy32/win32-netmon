@@ -128,6 +128,7 @@ void DetailModel::ClearDatabase()
 {
     SQLite::Exec(TEXT("Delete From Packet;"), true);
     SQLite::Exec(TEXT("Delete From PacketCount;"), true);
+    SQLite::Exec(TEXT("Vacuum;"), true);
 }
 
 void DetailModel::InsertPacket(PacketInfoEx *pi)

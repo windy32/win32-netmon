@@ -263,6 +263,13 @@ static void OnOk(HWND hWnd)
         bNeedClearDatabase = TRUE;
     }
 
+    // Update Profile
+    g_profile.SetRtViewEnabled(bRtNowEnabled);
+    g_profile.SetMtViewEnabled(bMtNowEnabled);
+    g_profile.SetStViewEnabled(bStNowEnabled);
+    g_profile.SetDtViewEnabled(bDtNowEnabled);
+
+    // Reboot
     if (bNeedReboot)
     {
         HWND hMainWindow = GetParent(hWnd);

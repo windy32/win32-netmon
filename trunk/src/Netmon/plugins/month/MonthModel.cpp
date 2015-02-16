@@ -194,6 +194,7 @@ void MonthModel::SaveDatabase()
 void MonthModel::ClearDatabase()
 {
     SQLite::Exec(TEXT("Delete From Traffic;"), true);
+    SQLite::Exec(TEXT("Vacuum;"), true);
 }
 
 void MonthModel::InsertPacket(PacketInfoEx *pi)
