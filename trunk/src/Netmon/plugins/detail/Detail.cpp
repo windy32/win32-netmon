@@ -30,15 +30,20 @@ void DetailPlugin::SaveDatabase()
 
 void DetailPlugin::ClearDatabase()
 {
-    // TODO: Implement this method
+    model->ClearDatabase();
+}
+
+const TCHAR * DetailPlugin::GetName()
+{
+    return Language::GetString(IDS_TAB_DETAIL);
+}
+
+const TCHAR * DetailPlugin::GetTemplateName()
+{
+    return TEXT("DLG_DETAIL");
 }
 
 DLGPROC DetailPlugin::GetDialogProc()
 {
     return view->DlgProc;
-}
-
-TCHAR * DetailPlugin::GetTemplateName()
-{
-    return TEXT("DLG_DETAIL");
 }

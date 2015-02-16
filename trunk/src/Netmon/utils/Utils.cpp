@@ -423,7 +423,7 @@ void Utils::TabInit(HWND hTab, int numTabs, ...)
     tci.mask = TCIF_TEXT; 
  
     // Insert Tabs
-    for (int i = 0; i < numTabs; i++) 
+    for (int i = 0; i < numTabs; i++)
     {
         tci.pszText = va_arg(argList, TCHAR *);
 
@@ -431,6 +431,17 @@ void Utils::TabInit(HWND hTab, int numTabs, ...)
     }
 
     va_end(argList);
+}
+
+void Utils::TabInit(HWND hTab, int numTabs, const TCHAR *names[])
+{
+    for (int i = 0; i < numTabs; i++)
+    {
+        TCITEM tci;
+        tci.mask = TCIF_TEXT;
+        tci.pszText = (TCHAR *)names[i];
+        TabCtrl_InsertItem(hTab, i, &tci);
+    }
 }
 
 void Utils::TabSetText(HWND hTab, int numTabs, ...)
@@ -451,6 +462,17 @@ void Utils::TabSetText(HWND hTab, int numTabs, ...)
     }
 
     va_end(argList);
+}
+
+void Utils::TabSetText(HWND hTab, int numTabs, const TCHAR *names[])
+{
+    for (int i = 0; i < numTabs; i++)
+    {
+        TCITEM tci;
+        tci.mask = TCIF_TEXT; 
+        tci.pszText = (TCHAR *)names[i];
+        TabCtrl_SetItem(hTab, i, &tci);
+    }
 }
 
 // GDI
@@ -555,7 +577,6 @@ void Utils::SetMenuString(
 BOOL Utils::StartProcess(const TCHAR *szFile, const TCHAR *szParam, BOOL bRunAs)
 {
     SHELLEXECUTEINFO sei = { sizeof(SHELLEXECUTEINFO) };
-    DWORD dwExitCode;
 
     sei.fMask = SEE_MASK_NOCLOSEPROCESS;
     if (bRunAs )

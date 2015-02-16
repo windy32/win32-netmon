@@ -101,6 +101,9 @@ public:
 
     // Save Model Into to Database
     void SaveDatabase();
+
+    // Clear Database
+    void ClearDatabase();
 };
 
 #endif

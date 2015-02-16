@@ -35,8 +35,9 @@ public:
     virtual void SaveDatabase();
     virtual void ClearDatabase();
 
+    virtual const TCHAR * GetName();
+    virtual const TCHAR * GetTemplateName();
     virtual DLGPROC GetDialogProc();
-    virtual TCHAR * GetTemplateName();
 };
 
 #endif

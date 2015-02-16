@@ -30,15 +30,20 @@ void MonthPlugin::SaveDatabase()
 
 void MonthPlugin::ClearDatabase()
 {
-    // TODO: Implement this method
+    model->ClearDatabase();
+}
+
+const TCHAR * MonthPlugin::GetName()
+{
+    return Language::GetString(IDS_TAB_MONTH);
+}
+
+const TCHAR * MonthPlugin::GetTemplateName()
+{
+    return TEXT("DLG_MONTH");
 }
 
 DLGPROC MonthPlugin::GetDialogProc()
 {
     return view->DlgProc;
-}
-
-TCHAR * MonthPlugin::GetTemplateName()
-{
-    return TEXT("DLG_MONTH");
 }

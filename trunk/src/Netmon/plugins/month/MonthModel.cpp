@@ -191,6 +191,11 @@ void MonthModel::SaveDatabase()
     SQLite::Flush();
 }
 
+void MonthModel::ClearDatabase()
+{
+    SQLite::Exec(TEXT("Delete From Traffic;"), true);
+}
+
 void MonthModel::InsertPacket(PacketInfoEx *pi)
 {
     // Insert an MtViewItem if PUID not Exist

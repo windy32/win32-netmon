@@ -33,12 +33,17 @@ void RealtimePlugin::ClearDatabase()
     // nothing to do here
 }
 
+const TCHAR * RealtimePlugin::GetName()
+{
+    return Language::GetString(IDS_TAB_REALTIME);
+}
+
+const TCHAR * RealtimePlugin::GetTemplateName()
+{
+    return TEXT("DLG_REALTIME");
+}
+
 DLGPROC RealtimePlugin::GetDialogProc()
 {
     return view->DlgProc;
-}
-
-TCHAR * RealtimePlugin::GetTemplateName()
-{
-    return TEXT("DLG_REALTIME");
 }

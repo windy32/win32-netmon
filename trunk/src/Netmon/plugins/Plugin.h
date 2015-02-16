@@ -17,6 +17,7 @@
 #define PLUGIN_H
 
 #include "../utils/Packet.h"
+#include "../utils/Language.h"
 
 class Plugin
 {
@@ -27,22 +28,9 @@ public:
     virtual void SaveDatabase() = 0;
     virtual void ClearDatabase() = 0;
 
+    virtual const TCHAR * GetName() = 0;
+    virtual const TCHAR * GetTemplateName() = 0;
     virtual DLGPROC GetDialogProc() = 0;
-    virtual TCHAR * GetTemplateName() = 0;
-};
-
-// A place holder plugin which is not associated with a child window (tab page not created)
-class NullPlugin : public Plugin
-{
-public:
-    virtual ~NullPlugin() {}
-    virtual void InsertPacket(PacketInfoEx *pi) {}
-    virtual void SetProcess(int puid) {}
-    virtual void SaveDatabase() {}
-    virtual void ClearDatabase() {}
-
-    virtual DLGPROC GetDialogProc() { return NULL; }
-    virtual TCHAR * GetTemplateName() { return NULL; }
 };
 
 #endif
