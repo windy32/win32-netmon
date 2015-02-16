@@ -107,40 +107,6 @@ static bool    g_bHideWindow = false;
 
 #pragma endregion
 
-///----------------------------------------------------------------------------------------------// 
-///                                    Database Operations                                       //
-///----------------------------------------------------------------------------------------------//
-static void InitDatabase()
-{
-    // Netmon.db consists of following tables:
-    //
-    // Process
-    //    - UID          [Key] : Integer
-    //    - Name               : Varchar(64)
-    //
-    // Note:
-    //    - In SQLite 3.x, the "Integer" storage class may refer to data type:
-    //      int8, int16, int24, int32, int48 or int64.
-    //
-    //    - There is only one table created by Netmon core.
-    //      Other tables may be created by different plugins (views), and they are
-    //      maintained by different plugins
-    if (!SQLite::TableExist(TEXT("Process")))
-    {
-        SQLite::Exec(TEXT("Create Table Process(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    Name           Varchar(260),")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID)")
-                     TEXT(");"), true);
-
-        // Add some init data
-        Utils::InsertProcess(TEXT("Unknown"));
-        Utils::InsertProcess(TEXT("System"));
-        Utils::InsertProcess(TEXT("svchost.exe"));
-    }
-}
-
 ///----------------------------------------------------------------------------------------------//
 ///                                    Capture Thread                                            //
 ///----------------------------------------------------------------------------------------------//
@@ -400,6 +366,37 @@ static void UpdateLanguage()
 ///----------------------------------------------------------------------------------------------// 
 ///                                    Called by Message Handlers                                //
 ///----------------------------------------------------------------------------------------------//
+static void InitDatabase()
+{
+    // Netmon.db consists of following tables:
+    //
+    // Process
+    //    - UID          [Key] : Integer
+    //    - Name               : Varchar(64)
+    //
+    // Note:
+    //    - In SQLite 3.x, the "Integer" storage class may refer to data type:
+    //      int8, int16, int24, int32, int48 or int64.
+    //
+    //    - There is only one table created by Netmon core.
+    //      Other tables may be created by different plugins (views), and they are
+    //      maintained by different plugins
+    if (!SQLite::TableExist(TEXT("Process")))
+    {
+        SQLite::Exec(TEXT("Create Table Process(")
+                     TEXT("    UID            Integer,")
+                     TEXT("    Name           Varchar(260),")
+                     TEXT("    ")
+                     TEXT("    Primary Key (UID)")
+                     TEXT(");"), true);
+
+        // Add some init data
+        Utils::InsertProcess(TEXT("Unknown"));
+        Utils::InsertProcess(TEXT("System"));
+        Utils::InsertProcess(TEXT("svchost.exe"));
+    }
+}
+
 static void CreateLanguageMenuItems()
 {
     HMENU hMenuMain = GetMenu(g_hDlgMain);
@@ -483,8 +480,7 @@ static void InitUI(HWND hWnd)
 
     EnableMenuItem(hMainMenu, IDM_FILE_CAPTURE, MF_ENABLED);
     EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
-    CheckMenuRadioItem(hMainMenu, 
-        IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
+
     CheckMenuRadioItem(hLanguageMenu, 
         0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
 
@@ -805,8 +801,8 @@ static void OnAbout(HWND hWnd)
     DialogBoxParam(g_hInstance, TEXT("DLG_ABOUT"), g_hDlgMain, ProcDlgAbout, 0);
 }
 
-static void OnSelChanged(HWND hWnd, HWND hTab) 
-{ 
+static void OnSelChanged(HWND hWnd, HWND hTab)
+{
     // Get the Index of the Selected Tab.
     int i = TabCtrl_GetCurSel(hTab); 
 
@@ -814,23 +810,28 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
     DLGPROC proc = g_plugins[i]->GetDialogProc();
     const TCHAR *name = g_plugins[i]->GetTemplateName();
 
+    RealtimePlugin   *rt = dynamic_cast<RealtimePlugin *>  (g_plugins[i]);
+    MonthPlugin      *mt = dynamic_cast<MonthPlugin *>     (g_plugins[i]);
+    StatisticsPlugin *st = dynamic_cast<StatisticsPlugin *>(g_plugins[i]);
+    DetailPlugin     *dt = dynamic_cast<DetailPlugin *>    (g_plugins[i]);
+
     // Check MenuItem
-    if (i == 0)
+    if (rt != NULL)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
     }
-    else if (i == 1)
+    else if (mt != NULL)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
     }
-    else if (i == 2)
+    else if (st != NULL)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
     }
-    else if (i == 3)
+    else if (dt != NULL)
     {
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
@@ -855,27 +856,59 @@ static void OnViewSwitch(HWND hWnd, WPARAM wParam)
 {
     HWND hTab = GetDlgItem(hWnd, IDT_VIEW);
 
-    if (wParam == IDM_VIEW_REALTIME )
+    if (wParam == IDM_VIEW_REALTIME)
     {
-        TabCtrl_SetCurSel(hTab, 0);
+        for (unsigned int i = 0; i < g_plugins.size(); i++)
+        {
+            RealtimePlugin *rt = dynamic_cast<RealtimePlugin *>(g_plugins[i]);
+            if (rt != NULL)
+            {
+                TabCtrl_SetCurSel(hTab, i);
+                break;
+            }
+        }
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
     }
-    else if (wParam == IDM_VIEW_MONTH )
+    else if (wParam == IDM_VIEW_MONTH)
     {
-        TabCtrl_SetCurSel(hTab, 1);
+        for (unsigned int i = 0; i < g_plugins.size(); i++)
+        {
+            MonthPlugin *mt = dynamic_cast<MonthPlugin *>(g_plugins[i]);
+            if (mt != NULL)
+            {
+                TabCtrl_SetCurSel(hTab, i);
+                break;
+            }
+        }
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
     }
-    else if (wParam == IDM_VIEW_STATISTICS )
+    else if (wParam == IDM_VIEW_STATISTICS)
     {
-        TabCtrl_SetCurSel(hTab, 2);
+        for (unsigned int i = 0; i < g_plugins.size(); i++)
+        {
+            StatisticsPlugin *st = dynamic_cast<StatisticsPlugin *>(g_plugins[i]);
+            if (st != NULL)
+            {
+                TabCtrl_SetCurSel(hTab, i);
+                break;
+            }
+        }
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
     }
-    else if (wParam == IDM_VIEW_DETAIL )
+    else if (wParam == IDM_VIEW_DETAIL)
     {
-        TabCtrl_SetCurSel(hTab, 3);
+        for (unsigned int i = 0; i < g_plugins.size(); i++)
+        {
+            DetailPlugin *dt = dynamic_cast<DetailPlugin *>(g_plugins[i]);
+            if (dt != NULL)
+            {
+                TabCtrl_SetCurSel(hTab, i);
+                break;
+            }
+        }
         CheckMenuRadioItem(GetMenu(hWnd), 
             IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
     }
@@ -1175,6 +1208,13 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (bStViewEnabled) g_plugins.push_back(new StatisticsPlugin());
     if (bDtViewEnabled) g_plugins.push_back(new DetailPlugin());
 
+    // Init Menu Items for Views
+    HMENU hMenuMain = GetMenu(g_hDlgMain);
+    if (!bRtViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_REALTIME,   MF_GRAYED);
+    if (!bMtViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_MONTH,      MF_GRAYED);
+    if (!bStViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_STATISTICS, MF_GRAYED);
+    if (!bDtViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_DETAIL,     MF_GRAYED);
+
     // Init Tab (The names will be updated in UpdateLanguage())
     std::vector<const TCHAR *> names(g_plugins.size(), TEXT(""));
     Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), g_plugins.size(), &names[0]);
@@ -1318,10 +1358,10 @@ static void OnClearAndRestart(HWND hWnd, WPARAM wParam, LPARAM lParam)
     {
         Plugin *p = g_plugins[i];
 
-        RealtimePlugin   *rp = dynamic_cast<RealtimePlugin *>(p);
-        MonthPlugin      *mp = dynamic_cast<MonthPlugin *>(p);
+        RealtimePlugin   *rp = dynamic_cast<RealtimePlugin *>  (p);
+        MonthPlugin      *mp = dynamic_cast<MonthPlugin *>     (p);
         StatisticsPlugin *sp = dynamic_cast<StatisticsPlugin *>(p);
-        DetailPlugin     *dp = dynamic_cast<DetailPlugin *>(p);
+        DetailPlugin     *dp = dynamic_cast<DetailPlugin *>    (p);
 
         BOOL bRtViewEnabled = FALSE;
         BOOL bMtViewEnabled = FALSE;

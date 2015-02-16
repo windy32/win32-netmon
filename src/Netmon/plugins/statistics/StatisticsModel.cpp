@@ -20,6 +20,7 @@
 StatisticsModel::StatisticsModel()
 {
     _items[PROCESS_ALL] = StModelItem();
+    _clear_flag = false;
 
     InitDatabase();
     ReadDatabase();
@@ -27,7 +28,18 @@ StatisticsModel::StatisticsModel()
 
 StatisticsModel::~StatisticsModel()
 {
-    SaveDatabase();
+    if (_clear_flag)
+    {
+        SQLite::Exec(TEXT("Delete From Protocol;"), true);
+        SQLite::Exec(TEXT("Delete From PacketSize;"), true);
+        SQLite::Exec(TEXT("Delete From Rate;"), true);
+        SQLite::Flush();
+        SQLite::Exec(TEXT("Vacuum;"), false);
+    }
+    else
+    {
+        SaveDatabase();
+    }
 }
 
 void StatisticsModel::InitDatabase()
@@ -406,10 +418,7 @@ void StatisticsModel::SaveDatabase()
 
 void StatisticsModel::ClearDatabase()
 {
-    SQLite::Exec(TEXT("Delete From Protocol;"), true);
-    SQLite::Exec(TEXT("Delete From PacketSize;"), true);
-    SQLite::Exec(TEXT("Delete From Rate;"), true);
-    SQLite::Exec(TEXT("Vacuum;"), true);
+    _clear_flag = true;
 }
 
 void StatisticsModel::InsertPacket(PacketInfoEx *pi)

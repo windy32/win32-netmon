@@ -80,6 +80,7 @@ public:
 private:
     // Items
     std::map<int, StModelItem> _items;
+    bool _clear_flag;
 
 private:
     void InitDatabase();
