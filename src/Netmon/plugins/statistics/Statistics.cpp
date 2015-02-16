@@ -30,15 +30,20 @@ void StatisticsPlugin::SaveDatabase()
 
 void StatisticsPlugin::ClearDatabase()
 {
-    // TODO: Implement this method
+    model->ClearDatabase();
+}
+
+const TCHAR * StatisticsPlugin::GetName()
+{
+    return Language::GetString(IDS_TAB_STATISTICS);
+}
+
+const TCHAR * StatisticsPlugin::GetTemplateName()
+{
+    return TEXT("DLG_STATISTICS");
 }
 
 DLGPROC StatisticsPlugin::GetDialogProc()
 {
     return view->DlgProc;
-}
-
-TCHAR * StatisticsPlugin::GetTemplateName()
-{
-    return TEXT("DLG_STATISTICS");
 }

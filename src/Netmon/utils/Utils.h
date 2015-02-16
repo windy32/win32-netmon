@@ -63,7 +63,9 @@ public:
 
     // Tab
     static void TabInit(HWND hTab, int numTabs, ...);
+    static void TabInit(HWND hTab, int numTabs, const TCHAR *names[]);
     static void TabSetText(HWND hTab, int numTabs, ...);
+    static void TabSetText(HWND hTab, int numTabs, const TCHAR *names[]);
 
     // GDI operations
     static HFONT MyCreateFont(const TCHAR *name, int height, int width, bool bold);

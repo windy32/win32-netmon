@@ -404,6 +404,13 @@ void StatisticsModel::SaveDatabase()
     SQLite::Flush();
 }
 
+void StatisticsModel::ClearDatabase()
+{
+    SQLite::Exec(TEXT("Delete From Protocol;"), true);
+    SQLite::Exec(TEXT("Delete From PacketSize;"), true);
+    SQLite::Exec(TEXT("Delete From Rate;"), true);
+}
+
 void StatisticsModel::InsertPacket(PacketInfoEx *pi)
 {
     Lock();

@@ -71,6 +71,9 @@ public:
     // Save Database (in case of crash)
     void SaveDatabase();
 
+    // Clear Database
+    void ClearDatabase();
+
     int GetFirstMonth();
     int GetLastMonth();
 };

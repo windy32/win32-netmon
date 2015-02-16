@@ -36,7 +36,7 @@ public:
 
 private:
     // Packet Count which is stored in database
-    std::map<int, int> _packetCounts;
+    std::map<int, __int64> _packetCounts;
 
 private:
     void InitDatabase();
@@ -62,6 +62,9 @@ public:
 
     // Save Model Into to Database
     void SaveDatabase();
+
+    // Clear Database
+    void ClearDatabase();
 };
 
 #endif

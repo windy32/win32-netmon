@@ -364,11 +364,13 @@ static void UpdateMenuLanguage()
 
 static void UpdateTabLanguage()
 {
-    Utils::TabSetText(GetDlgItem(g_hDlgMain, IDT_VIEW), 4, 
-        Language::GetString(IDS_TAB_REALTIME), 
-        Language::GetString(IDS_TAB_MONTH), 
-        Language::GetString(IDS_TAB_STATISTICS), 
-        Language::GetString(IDS_TAB_DETAIL));
+    std::vector<const TCHAR *> names;
+    for (unsigned int i = 0; i < g_plugins.size(); i++)
+    {
+        names.push_back(g_plugins[i]->GetName());
+    }
+
+    Utils::TabSetText(GetDlgItem(g_hDlgMain, IDT_VIEW), g_plugins.size(), &names[0]);
 }
 
 static void UpdateProcessListLanguage() // Process List
@@ -1131,9 +1133,28 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     // Init ListView
     ProcessView::Init(GetDlgItem(hWnd, IDL_PROCESS));
 
-    // Init Tab
-    Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), 
-        4, TEXT("Realtime"), TEXT("Month"), TEXT("Statistics"), TEXT("Detail"));
+    // Init Profile
+    ProfileInit(hWnd);
+
+    // Init Plugins
+    BOOL bRtViewEnabled = FALSE;
+    BOOL bMtViewEnabled = FALSE;
+    BOOL bStViewEnabled = FALSE;
+    BOOL bDtViewEnabled = FALSE;
+
+    g_profile.GetRtViewEnabled(&bRtViewEnabled);
+    g_profile.GetMtViewEnabled(&bMtViewEnabled);
+    g_profile.GetStViewEnabled(&bStViewEnabled);
+    g_profile.GetDtViewEnabled(&bDtViewEnabled);
+
+    if (bRtViewEnabled) g_plugins.push_back(new RealtimePlugin());
+    if (bMtViewEnabled) g_plugins.push_back(new MonthPlugin());
+    if (bStViewEnabled) g_plugins.push_back(new StatisticsPlugin());
+    if (bDtViewEnabled) g_plugins.push_back(new DetailPlugin());
+
+    // Init Tab (The names will be updated in UpdateLanguage())
+    std::vector<const TCHAR *> names(g_plugins.size(), TEXT(""));
+    Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), g_plugins.size(), &names[0]);
 
     // Set Window Size
     MoveWindow(hWnd, 100, 100, 721, 446, FALSE);
@@ -1141,20 +1162,11 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     // Enum Devices
     EnumDevices();
 
-    // Init Plugins
-    g_plugins.push_back(new RealtimePlugin());
-    g_plugins.push_back(new MonthPlugin());
-    g_plugins.push_back(new StatisticsPlugin());
-    g_plugins.push_back(new DetailPlugin());
-
     // Simulate Selection of the First Item. 
     OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
 
     // Start the Timer that Updates Process List
     SetTimer(hWnd, 1, 1000, OnTimer);
-
-    // Init profile
-    ProfileInit(hWnd);
 
     // Update language
     UpdateLanguage();
