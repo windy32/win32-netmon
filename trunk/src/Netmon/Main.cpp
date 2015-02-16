@@ -437,6 +437,95 @@ static void CreateLanguageMenuItems()
     }
 }
 
+static void InitUI(HWND hWnd)
+{
+    NOTIFYICONDATA nti; 
+    HMENU hMainMenu;
+    HMENU hViewMenu;
+    HMENU hOptionsMenu;
+    HMENU hLanguageMenu;
+    HBRUSH hBrush;
+    HDC hDc;
+
+    // Set Window Size
+    MoveWindow(hWnd, 100, 100, 721, 446, FALSE);
+
+    // Load Icon
+    HICON hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN));
+    SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+
+    // Load Process Menu
+    g_hProcessMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_PROCESS));
+    g_hProcessMenu = GetSubMenu(g_hProcessMenu, 0);
+
+    // Load Tray Icon Menu
+    g_hTrayMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_TRAY)); 
+    g_hTrayMenu = GetSubMenu(g_hTrayMenu, 0);
+
+    // Create Tray Icon
+    nti.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN)); 
+    nti.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE; 
+    nti.hWnd = hWnd; 
+    nti.uID = 0;
+    nti.uCallbackMessage = WM_USER_TRAY; 
+    _tcscpy_s(nti.szTip, _countof(nti.szTip), TEXT("Netmon")); 
+
+    Shell_NotifyIcon(NIM_ADD, &nti); 
+
+    // Init main menu
+    hMainMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_MAIN));
+    SetMenu(hWnd, hMainMenu);
+    CreateLanguageMenuItems();
+
+    hViewMenu = GetSubMenu(hMainMenu, 1);
+    hOptionsMenu = GetSubMenu(hMainMenu, 2);
+    hLanguageMenu = GetSubMenu(hOptionsMenu, 0);
+
+    EnableMenuItem(hMainMenu, IDM_FILE_CAPTURE, MF_ENABLED);
+    EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
+    CheckMenuRadioItem(hMainMenu, 
+        IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
+    CheckMenuRadioItem(hLanguageMenu, 
+        0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
+
+    CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED); // Hidden State
+    g_bShowHidden = true;
+
+    // Init Sidebar GDI Objects
+    hDc = GetDC(hWnd);
+
+    g_hDcSidebarBg = CreateCompatibleDC(hDc);
+    g_hDcSidebarBuf = CreateCompatibleDC(hDc);
+    
+    g_hBmpSidebarBg = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_SIDEBAR));
+    g_hBmpSidebarBuf = CreateCompatibleBitmap(hDc, 50, 2000); // 2000 pixels in height, 
+                                                              // which is supposed to be enough
+    SelectObject(g_hDcSidebarBg, g_hBmpSidebarBg);
+    SelectObject(g_hDcSidebarBuf, g_hBmpSidebarBuf);
+
+    g_hDcStart = CreateCompatibleDC(hDc);
+    g_hDcStartHover = CreateCompatibleDC(hDc);
+    g_hDcStop = CreateCompatibleDC(hDc);
+    g_hDcStopHover = CreateCompatibleDC(hDc);
+
+    g_hBmpStart = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_START));
+    g_hBmpStartHover = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_START_HOVER));
+    g_hBmpStop = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_STOP));
+    g_hBmpStopHover = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_STOP_HOVER));
+
+    SelectObject(g_hDcStart, g_hBmpStart);
+    SelectObject(g_hDcStartHover, g_hBmpStartHover);
+    SelectObject(g_hDcStop, g_hBmpStop);
+    SelectObject(g_hDcStopHover, g_hBmpStopHover);
+
+    SelectObject(g_hDcSidebarBuf, GetStockObject(NULL_PEN));
+
+    hBrush = CreateSolidBrush(RGB(18, 98, 184));
+    SelectObject(g_hDcSidebarBuf, hBrush);
+
+    ReleaseDC(hWnd, hDc);
+}
+
 static void DrawSidebar()
 {
     HDC hDcSidebar = GetDC(g_hDlgMain);
@@ -1038,13 +1127,11 @@ static void WINAPI OnTimer(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    NOTIFYICONDATA nti; 
-    HMENU hMainMenu;
-    HMENU hViewMenu;
-    HMENU hOptionsMenu;
-    HMENU hLanguageMenu;
-    HBRUSH hBrush;
-    HDC hDc;
+    // Save hWnd
+    g_hDlgMain = hWnd;
+
+    // Initialize UI
+    InitUI(hWnd);
 
     // Init SQLite
     TCHAR dbPath[MAX_PATH];
@@ -1052,86 +1139,11 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     SQLite::Open(dbPath);
     InitDatabase();
 
-    // Load Icon
-    HICON hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN));
-    SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-
-    // Save hWnd
-    g_hDlgMain = hWnd;
-
-    // Load Tray Icon Menu
-    g_hTrayMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_TRAY)); 
-    g_hTrayMenu = GetSubMenu(g_hTrayMenu, 0);
-
-    // Load Process Menu
-    g_hProcessMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_PROCESS));
-    g_hProcessMenu = GetSubMenu(g_hProcessMenu, 0);
-
-    // Create Tray Icon
-    nti.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN)); 
-    nti.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE; 
-    nti.hWnd = hWnd; 
-    nti.uID = 0;
-    nti.uCallbackMessage = WM_USER_TRAY; 
-    _tcscpy_s(nti.szTip, _countof(nti.szTip), TEXT("Netmon")); 
-
-    Shell_NotifyIcon(NIM_ADD, &nti); 
-
-    // Init main menu
-    hMainMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_MAIN));
-    SetMenu(hWnd, hMainMenu);
-    CreateLanguageMenuItems();
-
-    hViewMenu = GetSubMenu(hMainMenu, 1);
-    hOptionsMenu = GetSubMenu(hMainMenu, 2);
-    hLanguageMenu = GetSubMenu(hOptionsMenu, 0);
-
-    EnableMenuItem(hMainMenu, IDM_FILE_CAPTURE, MF_ENABLED);
-    EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
-    CheckMenuRadioItem(hMainMenu, 
-        IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
-    CheckMenuRadioItem(hLanguageMenu, 
-        0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
-
-    CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED); // Hidden State
-    g_bShowHidden = true;
-
-    // Init Sidebar GDI Objects
-    hDc = GetDC(hWnd);
-
-    g_hDcSidebarBg = CreateCompatibleDC(hDc);
-    g_hDcSidebarBuf = CreateCompatibleDC(hDc);
-    
-    g_hBmpSidebarBg = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_SIDEBAR));
-    g_hBmpSidebarBuf = CreateCompatibleBitmap(hDc, 50, 2000); // 2000 pixels in height, 
-                                                              // which is supposed to be enough
-    SelectObject(g_hDcSidebarBg, g_hBmpSidebarBg);
-    SelectObject(g_hDcSidebarBuf, g_hBmpSidebarBuf);
-
-    g_hDcStart = CreateCompatibleDC(hDc);
-    g_hDcStartHover = CreateCompatibleDC(hDc);
-    g_hDcStop = CreateCompatibleDC(hDc);
-    g_hDcStopHover = CreateCompatibleDC(hDc);
-
-    g_hBmpStart = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_START));
-    g_hBmpStartHover = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_START_HOVER));
-    g_hBmpStop = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_STOP));
-    g_hBmpStopHover = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_STOP_HOVER));
-
-    SelectObject(g_hDcStart, g_hBmpStart);
-    SelectObject(g_hDcStartHover, g_hBmpStartHover);
-    SelectObject(g_hDcStop, g_hBmpStop);
-    SelectObject(g_hDcStopHover, g_hBmpStopHover);
-
-    SelectObject(g_hDcSidebarBuf, GetStockObject(NULL_PEN));
-
-    hBrush = CreateSolidBrush(RGB(18, 98, 184));
-    SelectObject(g_hDcSidebarBuf, hBrush);
-
-    ReleaseDC(hWnd, hDc);
-
-    // Init ListView
+    // Init ListView (should call this after InitDatabase)
     ProcessView::Init(GetDlgItem(hWnd, IDL_PROCESS));
+
+    // Enum Devices (should call this before ProfileInit)
+    EnumDevices();
 
     // Init Profile
     ProfileInit(hWnd);
@@ -1155,12 +1167,6 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     // Init Tab (The names will be updated in UpdateLanguage())
     std::vector<const TCHAR *> names(g_plugins.size(), TEXT(""));
     Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), g_plugins.size(), &names[0]);
-
-    // Set Window Size
-    MoveWindow(hWnd, 100, 100, 721, 446, FALSE);
-
-    // Enum Devices
-    EnumDevices();
 
     // Simulate Selection of the First Item. 
     OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
