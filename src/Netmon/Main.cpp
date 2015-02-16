@@ -720,6 +720,7 @@ static void ResizeChildWindow(HWND hWnd)
         stRect.left, stRect.top, stRect.right - stRect.left, stRect.bottom - stRect.top, 
         SWP_SHOWWINDOW);
 }
+
 static void Exit(HWND hWnd, bool restart)
 {
     // Delete Tray Icon
@@ -774,6 +775,16 @@ static void Exit(HWND hWnd, bool restart)
     // Exit
     DestroyWindow(hWnd);
     PostQuitMessage(0);
+}
+
+static void StopTimer(HWND hWnd)
+{
+    // Normally, you do not need to stop timer. 
+    // The timer is still on even if capture has been stopped.
+    // However, when Netmon is going to be restarted, we have to make sure that
+    // TimerProc will NEVER be executed again before cleaning up
+    KillTimer(hWnd, 1);
+    Sleep(1100);
 }
 
 ///----------------------------------------------------------------------------------------------// 
@@ -1300,6 +1311,7 @@ static void OnReconnect(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnClearAndRestart(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+    StopTimer(hWnd);
     OnStop(hWnd);
 
     for (unsigned int i = 0; i < g_plugins.size(); i++)
@@ -1333,6 +1345,7 @@ static void OnClearAndRestart(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnRestart(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+    StopTimer(hWnd);
     OnStop(hWnd);
     Exit(hWnd, true);
 }
