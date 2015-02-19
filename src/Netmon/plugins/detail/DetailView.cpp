@@ -265,6 +265,8 @@ void DetailView::OnGoto()
             (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
         EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEDOWN), 
             (_curPage + 1 < _model->GetLastPageIndex(_process) + 1) ? TRUE : FALSE);
+
+        SetDlgItemText(_hWnd, IDE_DETAIL_GOTO, TEXT(""));
     }
 }
 
