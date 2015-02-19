@@ -25,33 +25,24 @@
 ///----------------------------------------------------------------------------------------------//
 ///                                    Global Variables                                          //
 ///----------------------------------------------------------------------------------------------//
-extern HINSTANCE     g_hInstance;
-extern NetmonProfile g_profile;
-extern int           g_nAdapters;
-extern TCHAR         g_szAdapterNames[16][256];
+extern HINSTANCE g_hInstance;
+extern Profile   g_profile;
+extern int       g_nAdapters;
+extern TCHAR     g_szAdapterNames[16][256];
 
 ///----------------------------------------------------------------------------------------------// 
 ///                                    Called by Message Handlers                                //
 ///----------------------------------------------------------------------------------------------//
 static void InitProfile(HWND hWnd)
 {
-    TCHAR szAdapter[256];
-    TCHAR szAutoStart[MAX_PATH];
-    BOOL bAutoCapture;
+    const TCHAR *szAdapter = g_profile.GetString(TEXT("Adapter"))->value.data();
+    const TCHAR *szAutoStart = g_profile.GetString(TEXT("AutoStart"))->value.data();
+    bool bAutoCapture = g_profile.GetBool(TEXT("AutoCapture"))->value;
 
-    BOOL bRtViewEnabled;
-    BOOL bMtViewEnabled;
-    BOOL bStViewEnabled;
-    BOOL bDtViewEnabled;
-
-    g_profile.GetAdapter(szAdapter, 256);
-    g_profile.GetAutoStart(szAutoStart, MAX_PATH);
-    g_profile.GetAutoCapture(&bAutoCapture);
-
-    g_profile.GetRtViewEnabled(&bRtViewEnabled);
-    g_profile.GetMtViewEnabled(&bMtViewEnabled);
-    g_profile.GetStViewEnabled(&bStViewEnabled);
-    g_profile.GetDtViewEnabled(&bDtViewEnabled);
+    bool bRtViewEnabled = g_profile.GetBool(TEXT("RtViewEnabled"))->value;
+    bool bMtViewEnabled = g_profile.GetBool(TEXT("MtViewEnabled"))->value;
+    bool bStViewEnabled = g_profile.GetBool(TEXT("StViewEnabled"))->value;
+    bool bDtViewEnabled = g_profile.GetBool(TEXT("DtViewEnabled"))->value;
 
     // - Adapter
     ComboBox_SelectString(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), -1, szAdapter);
@@ -81,9 +72,9 @@ static void InitProfile(HWND hWnd)
                 int iExitCode;
                 if (Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
                 {
-                    if (iExitCode == 0)
+                    if (iExitCode == 0) // Update profile
                     {
-                        g_profile.SetAutoStart(szNetmon); // Update profile
+                        g_profile.SetValue(TEXT("AutoStart"), new ProfileStringItem(szNetmon));
                     }
                     else
                     {
@@ -137,14 +128,13 @@ static void OnOk(HWND hWnd)
     // - Adapter
     TCHAR szAdapter[256];
     ComboBox_GetText(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), szAdapter, 256);
-    g_profile.SetAdapter(szAdapter);
+    g_profile.SetValue(TEXT("Adapter"), new ProfileStringItem(szAdapter));
 
     // - Auto start
     if (Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START)) == BST_CHECKED )
     {
         // Get Netmon's auto start item in registry
-        TCHAR szAutoStart[MAX_PATH];
-        g_profile.GetAutoStart(szAutoStart, MAX_PATH);
+        const TCHAR *szAutoStart = g_profile.GetString(TEXT("AutoStart"))->value.data();
 
         // Get Netmon's actual path
         TCHAR szNetmon[MAX_PATH];
@@ -161,14 +151,14 @@ static void OnOk(HWND hWnd)
             int iExitCode;
             if (Utils::StartProcessAndWait(szRegUpdater, szNetmon, &iExitCode, TRUE))
             {
-                if (iExitCode != 0 )
+                if (iExitCode != 0)
                 {
                     MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
                         TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
-                else
+                else // Update profile
                 {
-                    g_profile.SetAutoStart(szNetmon); // Update profile
+                    g_profile.SetValue(TEXT("AutoStart"), new ProfileStringItem(szNetmon));
                 }
             }
             else
@@ -181,8 +171,7 @@ static void OnOk(HWND hWnd)
     else // "Auto start" not checked
     {
         // Get Netmon's auto start item in registry
-        TCHAR szAutoStart[MAX_PATH];
-        g_profile.GetAutoStart(szAutoStart, MAX_PATH);
+        const TCHAR *szAutoStart = g_profile.GetString(TEXT("AutoStart"))->value.data();
 
         // Delete the auto start item in registry if necessary
         if (szAutoStart[0] != 0 )
@@ -198,9 +187,9 @@ static void OnOk(HWND hWnd)
                     MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
                         TEXT("Netmon"), MB_OK | MB_ICONWARNING);
                 }
-                else
+                else // Update profile
                 {
-                    g_profile.SetAutoStart(TEXT("")); // Update profile
+                    g_profile.SetValue(TEXT("AutoStart"), new ProfileStringItem(TEXT("")));
                 }
             }
             else
@@ -212,24 +201,19 @@ static void OnOk(HWND hWnd)
     }
 
     // - Auto capture
-    g_profile.SetAutoCapture(
-        Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE)) == BST_CHECKED);
+    g_profile.SetValue(TEXT("AutoCapture"), new ProfileBoolItem(
+        Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_CAPTURE)) == BST_CHECKED));
 
     // - Enable views
-    BOOL bRtEnabled = FALSE;
-    BOOL bMtEnabled = FALSE;
-    BOOL bStEnabled = FALSE;
-    BOOL bDtEnabled = FALSE;
+    bool bRtEnabled = g_profile.GetBool(TEXT("RtViewEnabled"))->value;
+    bool bMtEnabled = g_profile.GetBool(TEXT("MtViewEnabled"))->value;
+    bool bStEnabled = g_profile.GetBool(TEXT("StViewEnabled"))->value;
+    bool bDtEnabled = g_profile.GetBool(TEXT("DtViewEnabled"))->value;
 
-    g_profile.GetRtViewEnabled(&bRtEnabled);
-    g_profile.GetMtViewEnabled(&bMtEnabled);
-    g_profile.GetStViewEnabled(&bStEnabled);
-    g_profile.GetDtViewEnabled(&bDtEnabled);
-
-    BOOL bRtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_RTVIEW)) == BST_CHECKED;
-    BOOL bMtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MTVIEW)) == BST_CHECKED;
-    BOOL bStNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_STVIEW)) == BST_CHECKED;
-    BOOL bDtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_DTVIEW)) == BST_CHECKED;
+    bool bRtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_RTVIEW)) == BST_CHECKED;
+    bool bMtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_MTVIEW)) == BST_CHECKED;
+    bool bStNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_STVIEW)) == BST_CHECKED;
+    bool bDtNowEnabled = Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_DTVIEW)) == BST_CHECKED;
 
     // At least one view should be enabled
     if (bRtNowEnabled == FALSE &&
@@ -264,10 +248,10 @@ static void OnOk(HWND hWnd)
     }
 
     // Update Profile
-    g_profile.SetRtViewEnabled(bRtNowEnabled);
-    g_profile.SetMtViewEnabled(bMtNowEnabled);
-    g_profile.SetStViewEnabled(bStNowEnabled);
-    g_profile.SetDtViewEnabled(bDtNowEnabled);
+    g_profile.SetValue(TEXT("RtViewEnabled"), new ProfileBoolItem(bRtNowEnabled));
+    g_profile.SetValue(TEXT("MtViewEnabled"), new ProfileBoolItem(bMtNowEnabled));
+    g_profile.SetValue(TEXT("StViewEnabled"), new ProfileBoolItem(bStNowEnabled));
+    g_profile.SetValue(TEXT("DtViewEnabled"), new ProfileBoolItem(bDtNowEnabled));
 
     // Reboot
     if (bNeedReboot)

@@ -27,7 +27,7 @@ CRITICAL_SECTION ProcessModel::_cs;
 
 #pragma endregion
 
-extern NetmonProfile g_profile;
+extern Profile g_profile;
 
 void ProcessModel::Init()
 {
@@ -205,7 +205,7 @@ void ProcessModel::ShowProcess(int puid)
         // Update Profile
         std::vector<int> hiddenProcesses;
         ExportHiddenProcesses(hiddenProcesses);
-        g_profile.SetHiddenProcesses(hiddenProcesses);
+        g_profile.SetValue(TEXT("HiddenProcess"), new ProfileIntListItem(hiddenProcesses));
     }
 }
 
@@ -235,7 +235,7 @@ void ProcessModel::HideProcess(int puid)
         // Update Profile
         std::vector<int> hiddenProcesses;
         ExportHiddenProcesses(hiddenProcesses);
-        g_profile.SetHiddenProcesses(hiddenProcesses);
+        g_profile.SetValue(TEXT("HiddenProcess"), new ProfileIntListItem(hiddenProcesses));
     }
 }
 

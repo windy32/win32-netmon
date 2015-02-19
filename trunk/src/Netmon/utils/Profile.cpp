@@ -15,317 +15,101 @@
 
 #include "stdafx.h"
 #include "Profile.h"
+#include "Utils.h"
 
-void Profile::Init(const TCHAR *szFileName, const TCHAR *szSectionName)
+// Init
+void Profile::Init(const TCHAR *filename, const TCHAR *sectionName)
 {
-    _tcscpy_s(_szFileName, MAX_PATH, szFileName);
-    _tcscpy_s(_szSectionName, MAX_PATH, szSectionName);
+    _tcscpy_s(_filename, MAX_PATH, filename);
+    _tcscpy_s(_sectionName, MAX_PATH, sectionName);
 }
 
-BOOL Profile::GetString(const TCHAR *szOption, TCHAR *buf, int cchLen)
+// Register default value
+void Profile::RegisterDefault(const TCHAR *option, ProfileValueItem *item)
 {
-    return GetPrivateProfileString(_szSectionName, szOption, 0, buf, cchLen, _szFileName) != 0;
+    _defaults[option] = item;
 }
 
-BOOL Profile::GetInt(const TCHAR *szOption, int *pValue)
+// Load
+void Profile::Load()
 {
-    TCHAR buf[256];
-    if (GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0)
+    // Get full path
+    TCHAR profilePath[MAX_PATH];
+    Utils::GetFilePathInCurrentDir(profilePath, MAX_PATH, TEXT("Netmon.ini"));
+
+    // For each registered default value
+    std::map<std::tstring, ProfileValueItem *>::iterator it;
+    for (it = _defaults.begin(); it != _defaults.end(); ++it)
     {
-        return FALSE; // Key empty or not exist
-    }
-    else // Key not empty
-    {
-        if (_stscanf_s(buf, TEXT("%d"), pValue) == 1) // Numeric
+        const TCHAR *key = it->first.data();
+        ProfileValueItem *defaultValue = it->second;
+
+        TCHAR value[4096];
+        if (GetPrivateProfileString(_sectionName, key, NULL, value, 4096, _filename)) // item exist
         {
-            return TRUE;
+            _values[key] = defaultValue->Parse(value); // save to map
         }
-        return FALSE;
+        else // item does not exist
+        {
+            // write default value to file
+            WritePrivateProfileString(_sectionName, key, defaultValue->ToString().data(), _filename);
+
+            // save to map
+            _values[key] = defaultValue->Parse(defaultValue->ToString());
+        }
     }
 }
 
-BOOL Profile::SetString(const TCHAR *szOption, const TCHAR *szValue)
+// Get values
+ProfileBoolItem *Profile::GetBool(const TCHAR *option)
 {
-    return WritePrivateProfileString(_szSectionName, szOption, szValue, _szFileName) != 0;
+    if (_values.count(option) == 0)
+        return NULL;
+    return dynamic_cast<ProfileBoolItem *>(_values[option]);
 }
 
-BOOL Profile::SetInt(const TCHAR *szOption, int iValue)
+ProfileIntItem *Profile::GetInt(const TCHAR *option)
 {
-    TCHAR buf[256];
-    _stprintf_s(buf, TEXT("%d"), iValue);
-    return WritePrivateProfileString(_szSectionName, szOption, buf, _szFileName) != 0;
+    if (_values.count(option) == 0)
+        return NULL;
+    return dynamic_cast<ProfileIntItem *>(_values[option]);
 }
 
-BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
+ProfileStringItem *Profile::GetString(const TCHAR *option)
 {
-    TCHAR szCurrentExe[MAX_PATH];
-    TCHAR szCurrentDir[MAX_PATH];
-    TCHAR szProfile[MAX_PATH];
-    TCHAR *pFilePart;
-    TCHAR szHiddenProcesses[4000];
+    if (_values.count(option) == 0)
+        return NULL;
+    return dynamic_cast<ProfileStringItem *>(_values[option]);
+}
 
-    // Get full path name of Netmon.exe
-    GetModuleFileName(0, szCurrentExe, MAX_PATH);
+ProfileIntListItem *Profile::GetIntList(const TCHAR *option)
+{
+    if (_values.count(option) == 0)
+        return NULL;
+    return dynamic_cast<ProfileIntListItem *>(_values[option]);
+}
 
-    // Get base directory
-    GetFullPathName(szCurrentExe, MAX_PATH, szCurrentDir, &pFilePart);
-    *pFilePart = TEXT('\0');
-
-    // Get full path name of Netmon.ini
-    _tcscpy_s(szProfile, MAX_PATH, szCurrentDir);
-    _tcscat_s(szProfile, MAX_PATH, TEXT("Netmon.ini"));
-
-    // Init
-    _pf.Init(szProfile, TEXT("Netmon Profile v2"));
-
-    // Load preferences
-    // If the key doesn't exist, a default value is written to the ini file
-    if (_pf.GetString(TEXT("Adapter"), _szAdapter, 256) == FALSE)
+// Set value
+void Profile::SetValue(const TCHAR *option, ProfileValueItem *item)
+{
+    if (_values.count(option) == 0)
     {
-        SetAdapter(szDefaultAdapter);
-    }
-
-    if (_pf.GetString(TEXT("AutoStart"), _szAutoStart, MAX_PATH) == FALSE)
-    {
-        SetAutoStart(TEXT(""));
-    }
-
-    if (_pf.GetInt(TEXT("AutoCapture"), &_bAutoCapture) == FALSE)
-    {
-        SetAutoCapture(FALSE);
-    }
-
-    // Views
-    if (_pf.GetInt(TEXT("RtViewEnabled"), &_bRtViewEnabled) == FALSE)
-    {
-        SetRtViewEnabled(TRUE);
-    }
-
-    if (_pf.GetInt(TEXT("MtViewEnabled"), &_bMtViewEnabled) == FALSE)
-    {
-        SetMtViewEnabled(TRUE);
-    }
-
-    if (_pf.GetInt(TEXT("StViewEnabled"), &_bStViewEnabled) == FALSE)
-    {
-        SetStViewEnabled(FALSE);
-    }
-
-    if (_pf.GetInt(TEXT("DtViewEnabled"), &_bDtViewEnabled) == FALSE)
-    {
-        SetDtViewEnabled(FALSE);
-    }
-
-    // Hidden processes
-    if (_pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 4000) == FALSE)
-    {
-        SetHiddenProcesses(std::vector<int>());
+        TCHAR msg[256];
+        _stprintf_s(msg, 256, TEXT("Invalid profile key \"%s\""), option);
+        MessageBox(NULL, msg, TEXT("Warning"), MB_OK | MB_ICONWARNING);
     }
     else
     {
-        int puid;
-        int offset = 0;
-        while (_stscanf_s(szHiddenProcesses + offset, TEXT("%d"), &puid) == 1)
-        {
-            _hiddenProcesses.push_back(puid);
+        // Type check (skipped)
+        // if (typeid(*_values[option]) != typeid(*item)) ...
 
-            // Offset
-            TCHAR buf[16];
-            _stprintf_s(buf, 16, TEXT("%d"), puid);
-            offset += _tcslen(buf) + 1;
-        }
+        // Delete previous object
+        delete _values[option];
+
+        // Update map
+        _values[option] = item;
+
+        // Update file
+        WritePrivateProfileString(_sectionName, option, item->ToString().data(), _filename);
     }
-
-    if (_pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE)
-    {
-        SetShowHidden(TRUE);
-    }
-
-    // Language
-    if (_pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE)
-    {
-        SetLanguage(TEXT("English"));
-    }
-
-    return TRUE;
-}
-
-BOOL NetmonProfile::GetAdapter(TCHAR *szAdapter, int cchLen)
-{
-    _tcscpy_s(szAdapter, cchLen, _szAdapter);
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetAdapter(const TCHAR *szAdapter)
-{
-    if (_pf.SetString(TEXT("Adapter"), szAdapter) == TRUE)
-    {
-        _tcscpy_s(_szAdapter, 256, szAdapter);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetAutoStart(TCHAR *szAutoStart, int cchLen)
-{
-    _tcscpy_s(szAutoStart, cchLen, _szAutoStart);
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetAutoStart(const TCHAR *szAutoStart)
-{
-    if (_pf.SetString(TEXT("AutoStart"), szAutoStart) == TRUE)
-    {
-        _tcscpy_s(_szAutoStart, MAX_PATH, szAutoStart);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetAutoCapture(BOOL *pAutoCapture)
-{
-    *pAutoCapture = _bAutoCapture;
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetAutoCapture(BOOL bAutoCapture)
-{
-    if (_pf.SetInt(TEXT("AutoCapture"), (int)bAutoCapture) == TRUE)
-    {
-        _bAutoCapture = bAutoCapture;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-// Views
-BOOL NetmonProfile::GetRtViewEnabled(BOOL *pEnable)
-{
-    *pEnable = _bRtViewEnabled;
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetRtViewEnabled(BOOL bEnable)
-{
-    if (_pf.SetInt(TEXT("RtViewEnabled"), (int)bEnable) == TRUE)
-    {
-        _bRtViewEnabled = bEnable;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetMtViewEnabled(BOOL *pEnable)
-{
-    *pEnable = _bMtViewEnabled;
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetMtViewEnabled(BOOL bEnable)
-{
-    if (_pf.SetInt(TEXT("MtViewEnabled"), (int)bEnable) == TRUE)
-    {
-        _bMtViewEnabled = bEnable;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetStViewEnabled(BOOL *pEnable)
-{
-    *pEnable = _bStViewEnabled;
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetStViewEnabled(BOOL bEnable)
-{
-    if (_pf.SetInt(TEXT("StViewEnabled"), (int)bEnable) == TRUE)
-    {
-        _bStViewEnabled = bEnable;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetDtViewEnabled(BOOL *pEnable)
-{
-    *pEnable = _bDtViewEnabled;
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetDtViewEnabled(BOOL bEnable)
-{
-    if (_pf.SetInt(TEXT("DtViewEnabled"), (int)bEnable) == TRUE)
-    {
-        _bDtViewEnabled = bEnable;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetHiddenProcesses(std::vector<int> &processes)
-{
-    processes = _hiddenProcesses;
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetHiddenProcesses(const std::vector<int> &processes)
-{
-    TCHAR buf[1000];
-    TCHAR pid[16];
-
-    // Generate String
-    buf[0] = TEXT('\0');
-    for (unsigned int i = 0; i < processes.size(); i++)
-    {
-        if (i != processes.size() - 1)
-        {
-            _stprintf_s(pid, 16, TEXT("%d "), processes[i]);
-        }
-        else
-        {
-            _stprintf_s(pid, 16, TEXT("%d"), processes[i]);
-        }
-        _tcscat_s(buf, 1000, pid);
-    }
-
-    // Write to File
-    if (_pf.SetString(TEXT("HiddenProcess"), buf) == TRUE )
-    {
-        _hiddenProcesses = processes;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetLanguage(TCHAR *szLanguage, int cchLen)
-{
-    _tcscpy_s(szLanguage, 64, _szLanguage);
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetLanguage(const TCHAR *szLanguage)
-{
-    if (_pf.SetString(TEXT("Language"), szLanguage) == TRUE)
-    {
-        _tcscpy_s(_szLanguage, 64, szLanguage);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-BOOL NetmonProfile::GetShowHidden(BOOL *pShowHidden)
-{
-    *pShowHidden = _bShowHidden;
-    return TRUE;
-}
-
-BOOL NetmonProfile::SetShowHidden(BOOL bShowHidden)
-{
-    if (_pf.SetInt(TEXT("ShowHidden"), (int)bShowHidden) == TRUE)
-    {
-        _bShowHidden = bShowHidden;
-        return TRUE;
-    }
-    return FALSE;
 }

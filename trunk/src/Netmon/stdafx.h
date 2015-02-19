@@ -41,6 +41,16 @@
 #include <math.h>
 #include <time.h>
 
+// we use "tstring" that works with TCHARs
+#include <string>
+#include <xstring>
+
+#ifdef _UNICODE
+    #define tstring wstring
+#else
+    #define tstring string
+#endif
+
 #include <vector>
 #include <map>
 
