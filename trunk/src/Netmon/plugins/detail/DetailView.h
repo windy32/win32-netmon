@@ -32,12 +32,15 @@ private:
     // Model Object
     static DetailModel *_model;
 
+    // Items in current page
+    static std::vector<DetailModel::PacketItem> _items;
+
 private:
     static INT_PTR CALLBACK MyProcEdit(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
     static void UpdateSize(HWND hWnd);
-    static void UpdateContent(bool rebuildList);
+    static void UpdateContent();
 
     static void ListViewInsert(
         int uid, int puid, int dir, int protocol, int size, __int64 time, int port);

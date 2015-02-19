@@ -34,6 +34,9 @@ WNDPROC DetailView::_lpOldProcEdit;
 // Model Object
 DetailModel *DetailView::_model;
 
+// Items in current page
+std::vector<DetailModel::PacketItem> DetailView::_items;
+
 #pragma endregion
 
 DetailView::DetailView(DetailModel *model)
@@ -68,12 +71,12 @@ void DetailView::SetProcess(int puid)
     _process = puid;
     _curPage = 0;
 
-    UpdateContent(true);
+    UpdateContent();
 }
 
 void DetailView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-    UpdateContent(false);
+    UpdateContent();
 }
 
 // ListView Operations
@@ -113,10 +116,8 @@ void DetailView::ListViewInsert(
 // Resize & Update Content
 void DetailView::UpdateSize(HWND hWnd)
 {
-    // Resize
     RECT stRect;
     GetClientRect(_hWnd, &stRect);
-
     int _width  = stRect.right - stRect.left;
     int _height = stRect.bottom - stRect.top;
 
@@ -128,11 +129,8 @@ void DetailView::UpdateSize(HWND hWnd)
     MoveWindow(GetDlgItem(hWnd, IDE_DETAIL_GOTO),     _width - 60,  _height - 34, 50, 24, TRUE);
 }
 
-void DetailView::UpdateContent(bool rebuildList)
+void DetailView::UpdateContent()
 {
-    // Clear List
-    Utils::ListViewClear(_hList);
-
     // Update Status Label
     TCHAR status[256];
     TCHAR buf[MAX_PATH];
@@ -164,17 +162,61 @@ void DetailView::UpdateContent(bool rebuildList)
         std::vector<DetailModel::PacketItem> packets;
         _model->Export(_process, _curPage, packets);
 
-        for (unsigned int i = 0; i < packets.size(); i++)
+        // item[0]  <---> packets[0]   --+
+        // item[1]  <---> packets[1]     | The items are "unchanged"
+        // ...            ...            | if corresponding items are the same
+        // item[k]  <---> packets[k]   --+
+        //                packets[k+1]
+        //                ...
+        //                packets[n]
+        bool unchanged = true;
+        if (packets.size() >= _items.size())
         {
-            ListViewInsert(
-                packets[i].uid, 
-                packets[i].puid, 
-                packets[i].dir,
-                packets[i].protocol,
-                packets[i].size,
-                packets[i].time,
-                packets[i].port);
+            for (unsigned int i = 0; i < _items.size(); i++)
+            {
+                if (_items[i] != packets[i])
+                {
+                    unchanged = false;
+                }
+            }
         }
+        else // packet.size() < _items.size()
+        {
+            unchanged = false;
+        }
+
+        if (unchanged)
+        {
+            for (unsigned int i = _items.size(); i < packets.size(); i++)
+            {
+                ListViewInsert(
+                    packets[i].uid, 
+                    packets[i].puid, 
+                    packets[i].dir,
+                    packets[i].protocol,
+                    packets[i].size,
+                    packets[i].time,
+                    packets[i].port);
+            }
+        }
+        else
+        {
+            Utils::ListViewClear(_hList);
+
+            for (unsigned int i = 0; i < packets.size(); i++)
+            {
+                ListViewInsert(
+                    packets[i].uid, 
+                    packets[i].puid, 
+                    packets[i].dir,
+                    packets[i].protocol,
+                    packets[i].size,
+                    packets[i].time,
+                    packets[i].port);
+            }
+        }
+
+        _items = packets;
     }
 }
 
@@ -182,7 +224,7 @@ void DetailView::UpdateContent(bool rebuildList)
 void DetailView::OnPageUp()
 {
     _curPage -= 1;
-    UpdateContent(true);
+    UpdateContent();
 
     EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
         (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
@@ -193,7 +235,7 @@ void DetailView::OnPageUp()
 void DetailView::OnPageDown()
 {
     _curPage += 1;
-    UpdateContent(true);
+    UpdateContent();
 
     EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
         (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
@@ -217,7 +259,7 @@ void DetailView::OnGoto()
     else
     {
         _curPage = page - 1;
-        UpdateContent(true);
+        UpdateContent();
 
         EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
             (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
@@ -239,7 +281,7 @@ void DetailView::SwitchLanguage(HWND hWnd)
         Language::GetString(IDS_DTVIEW_LIST_PORT));
 
     // List view content & label
-    UpdateContent(true);
+    UpdateContent();
 
     // Button
     SetDlgItemText(hWnd, IDB_DETAIL_GOTO, Language::GetString(IDS_DTVIEW_GOTO));
@@ -273,7 +315,7 @@ INT_PTR DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             Language::GetString(IDS_DTVIEW_LIST_PORT),
             60, 70, 50, 80, 60, 220, 60);
 
-        UpdateContent(true);
+        UpdateContent();
 
         // Start Timer
         SetTimer(hWnd, 0, 1000, DetailView::TimerProc);
