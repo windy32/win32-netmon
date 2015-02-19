@@ -90,34 +90,6 @@ int Utils::InsertProcess(const TCHAR *name)
     return (int)SQLite::GetLastInsertRowId();
 }
 
-/*
-int Utils::InsertProcessActivity(int puid, int startTime, int endTime)
-{
-    TCHAR command[256];
-
-    // Build Comamnd
-    _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into PActivity(ProcessUid, StartTime, EndTime) Values(%d, %d, %d);"), 
-        puid, startTime, endTime);
-
-    SQLite::Exec(command, false);
-
-    // Return the UID of the inserted item
-    return (int)SQLite::GetLastInsertRowId();
-}
-
-void Utils::UpdateProcessActivity(int pauid, int endTime)
-{
-    TCHAR command[256];
-
-    // Build Comamnd
-    _stprintf_s(command, _countof(command), 
-        TEXT("Update PActivity Set EndTime = %d Where UID = %d;"), endTime, pauid);
-
-    SQLite::Exec(command, false);
-}
-*/
-
 bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
 {
     TCHAR command[256];

@@ -94,7 +94,7 @@ static int     g_nLanguage;
 static int     g_iCurLanguage;
 
 // Profile
-NetmonProfile  g_profile;
+Profile        g_profile;
 
 // View Setting
 bool           g_bShowHidden;
@@ -623,12 +623,26 @@ static void EnumDevices()
 
 static void ProfileInit(HWND hWnd)
 {
+    // Set profile defaults
+    g_profile.RegisterDefault(TEXT("Adapter"), new ProfileStringItem(g_szAdapterNames[g_iAdapter]));
+    g_profile.RegisterDefault(TEXT("AutoStart"), new ProfileStringItem(TEXT("")));
+    g_profile.RegisterDefault(TEXT("AutoCapture"), new ProfileBoolItem(true));
+
+    g_profile.RegisterDefault(TEXT("RtViewEnabled"), new ProfileBoolItem(true));
+    g_profile.RegisterDefault(TEXT("MtViewEnabled"), new ProfileBoolItem(true));
+    g_profile.RegisterDefault(TEXT("StViewEnabled"), new ProfileBoolItem(false));
+    g_profile.RegisterDefault(TEXT("DtViewEnabled"), new ProfileBoolItem(false));
+
+    g_profile.RegisterDefault(TEXT("HiddenProcess"), new ProfileIntListItem());
+    g_profile.RegisterDefault(TEXT("ShowHidden"), new ProfileBoolItem(true));
+    g_profile.RegisterDefault(TEXT("Language"), new ProfileStringItem(TEXT("English")));
+
     // Load Netmon.ini
-    g_profile.Load(g_szAdapterNames[g_iAdapter]);
+    g_profile.Load();
 
     // Set Default Language
-    TCHAR szLanguage[64];
-    g_profile.GetLanguage(szLanguage, 64);
+    const TCHAR *szLanguage = g_profile.GetString(TEXT("Language"))->value.data();
+
     for (int i = 0; i < g_nLanguage; i++)
     {
         TCHAR szEnglishName[64];
@@ -648,8 +662,8 @@ static void ProfileInit(HWND hWnd)
     }
 
     // Update Hidden State
-    std::vector<int> hiddenProcesses;
-    g_profile.GetHiddenProcesses(hiddenProcesses);
+    std::vector<int> hiddenProcesses = g_profile.GetIntList(TEXT("HiddenProcess"))->value;
+    
     for (unsigned int i = 0; i < hiddenProcesses.size(); i++)
     {
         ProcessModel::HideProcess(hiddenProcesses[i]);
@@ -657,8 +671,7 @@ static void ProfileInit(HWND hWnd)
     ProcessView::Update(true);
 
     // Select default adapter
-    TCHAR szAdapter[256];
-    g_profile.GetAdapter(szAdapter, 256);
+    const TCHAR *szAdapter = g_profile.GetString(TEXT("Adapter"))->value.data();
 
     for(int i =  0; i < g_nAdapters; i++)
     {
@@ -675,28 +688,23 @@ static void ProfileInit(HWND hWnd)
         IDM_VIEW_ADAPTER_FIRST + g_iAdapter, MF_BYCOMMAND);
 
     // If AutoCaptue = 1, start capture immediately
-    BOOL bAutoCapture;
-    if (g_profile.GetAutoCapture(&bAutoCapture))
+    bool autoCapture = g_profile.GetBool(TEXT("AutoCapture"))->value;
+    if (autoCapture)
     {
-        if (bAutoCapture )
-        {
-            SendMessage(hWnd, WM_COMMAND, IDM_FILE_CAPTURE, 0);
-        }
+        SendMessage(hWnd, WM_COMMAND, IDM_FILE_CAPTURE, 0);
     }
 
     // Set the "Show Hidden Process" option
-    BOOL bShowHidden;
-    if (g_profile.GetShowHidden(&bShowHidden))
-    {
-        if (!bShowHidden) // Hide processes when necessary
-        {
-            ProcessView::HideProcesses();
+    bool showHidden = g_profile.GetBool(TEXT("ShowHidden"))->value;
 
-            HMENU hMenu = GetMenu(hWnd);
-            HMENU hViewMenu = GetSubMenu(hMenu, 1);
-            CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
-            g_bShowHidden = false;
-        }
+    if (!showHidden) // Hide processes when necessary
+    {
+        ProcessView::HideProcesses();
+
+        HMENU hMenu = GetMenu(hWnd);
+        HMENU hViewMenu = GetSubMenu(hMenu, 1);
+        CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
+        g_bShowHidden = false;
     }
 }
 
@@ -942,14 +950,14 @@ static void OnHiddenStateChanged(HWND hWnd)
     {
         ProcessView::HideProcesses();
         CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
-        g_profile.SetShowHidden(FALSE);        
+        g_profile.SetValue(TEXT("ShowHidden"), new ProfileBoolItem(false));
         g_bShowHidden = false;
     }
     else // Hidden ->Visible
     {
         ProcessView::ShowProcesses();
         CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED);
-        g_profile.SetShowHidden(TRUE);        
+        g_profile.SetValue(TEXT("ShowHidden"), new ProfileBoolItem(true));
         g_bShowHidden = true;
     }
 }
@@ -967,7 +975,7 @@ static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
         TCHAR szEnglishName[64];
         TCHAR szNativeName[64];
         Language::GetName(g_iCurLanguage, szEnglishName, 64, szNativeName, 64);
-        g_profile.SetLanguage(szEnglishName);
+        g_profile.SetValue(TEXT("Language"), new ProfileStringItem(szEnglishName));
 
         // Update language menu radio button
         HMENU hOptionsMenu = GetSubMenu(GetMenu(hWnd), 2);
@@ -1193,15 +1201,10 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     ProfileInit(hWnd);
 
     // Init Plugins
-    BOOL bRtViewEnabled = FALSE;
-    BOOL bMtViewEnabled = FALSE;
-    BOOL bStViewEnabled = FALSE;
-    BOOL bDtViewEnabled = FALSE;
-
-    g_profile.GetRtViewEnabled(&bRtViewEnabled);
-    g_profile.GetMtViewEnabled(&bMtViewEnabled);
-    g_profile.GetStViewEnabled(&bStViewEnabled);
-    g_profile.GetDtViewEnabled(&bDtViewEnabled);
+    bool bRtViewEnabled = g_profile.GetBool(TEXT("RtViewEnabled"))->value;
+    bool bMtViewEnabled = g_profile.GetBool(TEXT("MtViewEnabled"))->value;
+    bool bStViewEnabled = g_profile.GetBool(TEXT("StViewEnabled"))->value;
+    bool bDtViewEnabled = g_profile.GetBool(TEXT("DtViewEnabled"))->value;
 
     if (bRtViewEnabled) g_plugins.push_back(new RealtimePlugin());
     if (bMtViewEnabled) g_plugins.push_back(new MonthPlugin());
@@ -1363,15 +1366,10 @@ static void OnClearAndRestart(HWND hWnd, WPARAM wParam, LPARAM lParam)
         StatisticsPlugin *sp = dynamic_cast<StatisticsPlugin *>(p);
         DetailPlugin     *dp = dynamic_cast<DetailPlugin *>    (p);
 
-        BOOL bRtViewEnabled = FALSE;
-        BOOL bMtViewEnabled = FALSE;
-        BOOL bStViewEnabled = FALSE;
-        BOOL bDtViewEnabled = FALSE;
-
-        g_profile.GetRtViewEnabled(&bRtViewEnabled);
-        g_profile.GetMtViewEnabled(&bMtViewEnabled);
-        g_profile.GetStViewEnabled(&bStViewEnabled);
-        g_profile.GetDtViewEnabled(&bDtViewEnabled);
+        bool bRtViewEnabled = g_profile.GetBool(TEXT("RtViewEnabled"))->value;
+        bool bMtViewEnabled = g_profile.GetBool(TEXT("MtViewEnabled"))->value;
+        bool bStViewEnabled = g_profile.GetBool(TEXT("StViewEnabled"))->value;
+        bool bDtViewEnabled = g_profile.GetBool(TEXT("DtViewEnabled"))->value;
 
         // If the plugin is now enabled, and it has been disabled in the preference dialog
         if (rp != NULL && !bRtViewEnabled) rp->ClearDatabase();

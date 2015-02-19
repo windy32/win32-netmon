@@ -421,38 +421,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils\ProcessCache.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\ProcessCache.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\ProcessModel.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\ProcessModel.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\ProcessView.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\ProcessView.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\Profile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\Profile.h"
-				>
-			</File>
-			<File
 				RelativePath=".\utils\SingleLock.cpp"
 				>
 			</File>
@@ -476,6 +444,54 @@
 				RelativePath=".\utils\Utils.h"
 				>
 			</File>
+			<Filter
+				Name="Profile"
+				>
+				<File
+					RelativePath=".\utils\Profile.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\Profile.h"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\ProfileItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\ProfileItem.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Process"
+				>
+				<File
+					RelativePath=".\utils\ProcessCache.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\ProcessCache.h"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\ProcessModel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\ProcessModel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\ProcessView.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\ProcessView.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Main"
