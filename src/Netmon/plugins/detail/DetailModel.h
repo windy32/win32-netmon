@@ -32,6 +32,23 @@ public:
         int size;
         __int64 time;
         int port;
+
+        bool operator==(const struct tagPacketItem &right)
+        {
+            return
+                (this->uid == right.uid) &&
+                (this->puid == right.puid) &&
+                (this->dir == right.dir) &&
+                (this->protocol == right.protocol) &&
+                (this->size == right.size) &&
+                (this->time == right.time) &&
+                (this->port == right.port);
+        }
+
+        bool operator!=(const struct tagPacketItem &right)
+        {
+            return !operator==(right);
+        }
     } PacketItem;
 
 private:
