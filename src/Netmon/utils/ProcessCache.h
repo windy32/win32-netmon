@@ -16,7 +16,9 @@
 #ifndef PROCESS_CACHE_H
 #define PROCESS_CACHE_H
 
-class ProcessCache
+#include "SingleLock.h"
+
+class ProcessCache : public SingleLock
 {
 protected:
     // The process cache that makes looking up process list much more faster.
@@ -45,13 +47,9 @@ protected:
 
     std::map<int, ProcessInfo> _processTable;
 
-    CRITICAL_SECTION _cs;
-
     void rebuildTable(bool dump = true);
 
     static ProcessCache *_instance;
-    ProcessCache();
-    ~ProcessCache();
 
 public:
     static ProcessCache *instance();
