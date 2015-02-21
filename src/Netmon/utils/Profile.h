@@ -27,6 +27,7 @@ private:
 
     std::map<std::tstring, ProfileValueItem *> _defaults;
     std::map<std::tstring, ProfileValueItem *> _values;
+    std::vector<std::tstring> _keyList;
 
 public:
     // Input some information of the profile

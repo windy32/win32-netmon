@@ -33,18 +33,17 @@ void Profile::Init(const TCHAR *filename, const TCHAR *sectionName)
 void Profile::RegisterDefault(const TCHAR *option, ProfileValueItem *item)
 {
     _defaults[option] = item;
+    _keyList.push_back(option);
 }
 
 // Load
 void Profile::Load()
 {
-
     // For each registered default value
-    std::map<std::tstring, ProfileValueItem *>::iterator it;
-    for (it = _defaults.begin(); it != _defaults.end(); ++it)
+    for (unsigned int i = 0; i < _keyList.size(); i++)
     {
-        const TCHAR *key = it->first.data();
-        ProfileValueItem *defaultValue = it->second;
+        const TCHAR *key = _keyList[i].data();
+        ProfileValueItem *defaultValue = _defaults[key];
 
         TCHAR value[4096];
         if (GetPrivateProfileString(_sectionName, key, NULL, value, 4096, _filename)) // item exist
