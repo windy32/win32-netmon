@@ -29,11 +29,7 @@
 #define IDM_VIEW_DETAIL                         40006
 #define IDM_VIEW_SHOW_HIDDEN                    40007
 
-#define IDM_VIEW_ADAPTER_FIRST                  41000
-
 #define IDM_OPTIONS_PREFERENCES                 40008
-
-#define IDM_OPTIONS_LANGUAGE_FIRST              42000
 
 #define IDM_HELP_TOPIC                          40009
 #define IDM_HELP_HOMEPAGE                       40010
@@ -67,3 +63,7 @@
 #define IDS_SIDEBAR                             50017
 #define IDE_THIRD_PARTY                         50018
 #define IDB_CLOSE                               50019
+
+// dynamic menus
+#define IDM_VIEW_ADAPTER_FIRST                  60000
+#define IDM_OPTIONS_LANGUAGE_FIRST              61000

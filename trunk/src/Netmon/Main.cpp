@@ -1668,6 +1668,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     {
         do
         {
+            Sleep(100);
             hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), 
                 PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, 0, 4, 1024, 1024, 1000, NULL);
         }
