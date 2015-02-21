@@ -39,28 +39,35 @@ STRINGTABLE
     IDS_MENU_TRAY_EXIT            "Exit"
     IDS_MENU_PROCESS_SHOW         "Show Process"
     IDS_MENU_PROCESS_HIDE         "Hide Process"
+
     IDS_LANG_NAME_ENG             "English"
     IDS_LANG_NAME_NATIVE          "English"
+
     IDS_TAB_REALTIME              "Realtime"
     IDS_TAB_MONTH                 "Month"
     IDS_TAB_STATISTICS            "Statistics"
     IDS_TAB_DETAIL                "Detail"
+
     IDS_PLIST_UID                 "UID"
     IDS_PLIST_PROCESS             "Process"
     IDS_PLIST_TXRATE              "Tx Rate"
     IDS_PLIST_RXRATE              "Rx Rate"
     IDS_PLIST_FULLPATH            "Full Path"
+
     IDS_ABOUT_NETMON              "Netmon %s"
     IDS_ABOUT_COPYRIGHT           "Copyright (C) 2011 - 2014 F32 <feng32@163.com>"
     IDS_ABOUT_ALL_RIGHTS          "All rights reserved"
     IDS_ABOUT_THIRD_PARTIES       "Third Parties"
     IDS_ABOUT_CLOSE               "Close"
+
     IDS_RTVIEW_TXRATE             "Tx Rate"
     IDS_RTVIEW_RXRATE             "Rx Rate"
+
     IDS_MTVIEW_TEXT_KB_KB         "%s - %s (Incoming: %d KB / Outgoing: %d KB)"
     IDS_MTVIEW_TEXT_KB_MB         "%s - %s (Incoming: %d KB / Outgoing: %d MB)"
     IDS_MTVIEW_TEXT_MB_KB         "%s - %s (Incoming: %d MB / Outgoing: %d KB)"
     IDS_MTVIEW_TEXT_MB_MB         "%s - %s (Incoming: %d MB / Outgoing: %d MB)"
+
     IDS_STVIEW_SUMMARY            "Summary"
     IDS_STVIEW_AVG_TX_PKT_SIZE    "Tx Packet Size (avg)"
     IDS_STVIEW_AVG_RX_PKT_SIZE    "Rx Packet Size (avg)"
@@ -81,6 +88,7 @@ STRINGTABLE
     IDS_STVIEW_RATE               "Rate"
     IDS_STVIEW_TX                 "Tx"
     IDS_STVIEW_RX                 "Rx"
+
     IDS_DTVIEW_LIST_UID           "UID"
     IDS_DTVIEW_LIST_PROCESS       "Process"
     IDS_DTVIEW_LIST_DIR           "Dir"
@@ -92,6 +100,9 @@ STRINGTABLE
     IDS_DTVIEW_LIST_RX            "Rx"
     IDS_DTVIEW_PAGE               "%s - Page %I64d / %I64d - %I64d"
     IDS_DTVIEW_GOTO               "Go to"
+    IDS_DTVIEW_NUM_INCORRECT      "Page number incorrect!"
+    IDS_DTVIEW_NUM_OUT_OF_RANGE   "Page number out of range!"
+
     IDS_ALL_PROCESS               "All Process"
 
     IDS_PREF_DEFAULT_ADAPTER      "Default Adapter"
