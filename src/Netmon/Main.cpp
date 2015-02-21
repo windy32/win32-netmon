@@ -716,9 +716,9 @@ static void ProfileInit(HWND hWnd)
 
     // If AutoCaptue = 1, start capture immediately
     bool autoCapture = g_profile.GetBool(TEXT("AutoCapture"))->value;
-    if (autoCapture)
+    if (g_nAdapters > 0 && autoCapture)
     {
-        SendMessage(hWnd, WM_COMMAND, IDM_FILE_CAPTURE, 0);
+        PostMessage(hWnd, WM_COMMAND, IDM_FILE_CAPTURE, 0);
     }
 
     // Set the "Show Hidden Process" option
@@ -1135,7 +1135,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     // Initialize UI
     InitUI(hWnd);
 
-    // Init SQLite
+    // Init Database
     TCHAR dbPath[MAX_PATH];
     Utils::GetFilePathInCurrentDir(dbPath, MAX_PATH, TEXT("Netmon.db"));
     SQLite::Open(dbPath);
@@ -1147,7 +1147,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     // Enum Devices (should call this before ProfileInit)
     EnumDevices();
 
-    // Init Profile
+    // Init Profile (should call this before plugins loaded)
     ProfileInit(hWnd);
 
     // Init Plugins
