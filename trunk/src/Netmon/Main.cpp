@@ -623,6 +623,9 @@ static void EnumDevices()
 
 static void ProfileInit(HWND hWnd)
 {
+    // Initialize
+    g_profile.Init(TEXT("Netmon.ini"), TEXT("Netmnon Profile v2"));
+
     // Set profile defaults
     g_profile.RegisterDefault(TEXT("Adapter"), new ProfileStringItem(g_szAdapterNames[g_iAdapter]));
     g_profile.RegisterDefault(TEXT("AutoStart"), new ProfileStringItem(TEXT("")));
