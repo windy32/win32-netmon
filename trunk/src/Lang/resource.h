@@ -103,4 +103,7 @@
 #define IDS_TRAY_RECONNECT_TITLE                40093
 #define IDS_TRAY_RECONNECT_DESC                 40094
 
+#define IDS_DTVIEW_NUM_INCORRECT                40095
+#define IDS_DTVIEW_NUM_OUT_OF_RANGE             40096
+
 // Remember to update "Language.h"
