@@ -626,7 +626,7 @@ static void ProfileInit(HWND hWnd)
     // Set profile defaults
     g_profile.RegisterDefault(TEXT("Adapter"), new ProfileStringItem(g_szAdapterNames[g_iAdapter]));
     g_profile.RegisterDefault(TEXT("AutoStart"), new ProfileStringItem(TEXT("")));
-    g_profile.RegisterDefault(TEXT("AutoCapture"), new ProfileBoolItem(true));
+    g_profile.RegisterDefault(TEXT("AutoCapture"), new ProfileBoolItem(false));
 
     g_profile.RegisterDefault(TEXT("RtViewEnabled"), new ProfileBoolItem(true));
     g_profile.RegisterDefault(TEXT("MtViewEnabled"), new ProfileBoolItem(true));
