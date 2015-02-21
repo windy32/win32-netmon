@@ -250,11 +250,13 @@ void DetailView::OnGoto()
 
     if (!translated ) 
     {
-        MessageBox(_hWnd, TEXT("Page number incorrect!"), TEXT("Error"), MB_ICONWARNING | MB_OK);
+        MessageBox(_hWnd, Language::GetString(IDS_DTVIEW_NUM_INCORRECT),
+            TEXT("Error"), MB_ICONWARNING | MB_OK);
     }
     else if (page <= 0 || page > _model->GetLastPageIndex(_process) + 1 )
     {
-        MessageBox(_hWnd, TEXT("Page number out of range!"), TEXT("Error"), MB_ICONWARNING | MB_OK);
+        MessageBox(_hWnd, Language::GetString(IDS_DTVIEW_NUM_OUT_OF_RANGE),
+            TEXT("Error"), MB_ICONWARNING | MB_OK);
     }
     else
     {
