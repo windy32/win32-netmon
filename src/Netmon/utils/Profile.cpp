@@ -20,7 +20,12 @@
 // Init
 void Profile::Init(const TCHAR *filename, const TCHAR *sectionName)
 {
-    _tcscpy_s(_filename, MAX_PATH, filename);
+    // Get full path
+    TCHAR fullPath[MAX_PATH];
+    Utils::GetFilePathInCurrentDir(fullPath, MAX_PATH, filename);
+
+    // Save
+    _tcscpy_s(_filename, MAX_PATH, fullPath);
     _tcscpy_s(_sectionName, MAX_PATH, sectionName);
 }
 
@@ -33,9 +38,6 @@ void Profile::RegisterDefault(const TCHAR *option, ProfileValueItem *item)
 // Load
 void Profile::Load()
 {
-    // Get full path
-    TCHAR profilePath[MAX_PATH];
-    Utils::GetFilePathInCurrentDir(profilePath, MAX_PATH, TEXT("Netmon.ini"));
 
     // For each registered default value
     std::map<std::tstring, ProfileValueItem *>::iterator it;
