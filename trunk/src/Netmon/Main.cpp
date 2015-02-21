@@ -261,7 +261,7 @@ static void UpdateMenuLanguage()
     HMENU hMenuOptions = GetSubMenu(hMenuMain, 2);
     HMENU hMenuHelp    = GetSubMenu(hMenuMain, 3);
 
-    HMENU hMenuViewAdapter     = GetSubMenu(hMenuView, 5);
+    HMENU hMenuViewAdapter     = GetSubMenu(hMenuView, g_plugins.size() + 1);
     HMENU hMenuOptionsLanguage = GetSubMenu(hMenuOptions, 0);
 
     // Menu bar
@@ -283,17 +283,14 @@ static void UpdateMenuLanguage()
         Language::GetString(IDS_MENU_FILE_EXIT));
 
     // View
-    Utils::SetMenuString(hMenuView, 0, MF_BYPOSITION, IDM_VIEW_REALTIME,
-        Language::GetString(IDS_MENU_VIEW_REALTIME));
-    Utils::SetMenuString(hMenuView, 1, MF_BYPOSITION, IDM_VIEW_MONTH,
-        Language::GetString(IDS_MENU_VIEW_MONTH));
-    Utils::SetMenuString(hMenuView, 2, MF_BYPOSITION, IDM_VIEW_STATISTICS,
-        Language::GetString(IDS_MENU_VIEW_STATISTICS));
-    Utils::SetMenuString(hMenuView, 3, MF_BYPOSITION, IDM_VIEW_DETAIL,
-        Language::GetString(IDS_MENU_VIEW_DETAIL));
-    Utils::SetMenuString(hMenuView, 5, MF_BYPOSITION, (UINT_PTR)hMenuViewAdapter, 
+    for (unsigned int i = 0; i < g_plugins.size(); i++)
+    {
+        Utils::SetMenuString(hMenuView, i, MF_BYPOSITION, IDM_VIEW_FIRST + i, g_plugins[i]->GetName());
+    }
+
+    Utils::SetMenuString(hMenuView, g_plugins.size() + 1, MF_BYPOSITION, (UINT_PTR)hMenuViewAdapter,
         Language::GetString(IDS_MENU_VIEW_ADAPTER));
-    Utils::SetMenuString(hMenuView, 7, MF_BYPOSITION, IDM_VIEW_SHOW_HIDDEN,
+    Utils::SetMenuString(hMenuView, g_plugins.size() + 3, MF_BYPOSITION, IDM_VIEW_SHOW_HIDDEN,
         Language::GetString(IDS_MENU_VIEW_SHOW_HIDDEN));
 
     // Options
@@ -397,6 +394,64 @@ static void InitDatabase()
     }
 }
 
+static void CreateViewMenuItems()
+{
+    HMENU hMenuMain = GetMenu(g_hDlgMain);
+    HMENU hMenuView = GetSubMenu(hMenuMain, 1);
+
+    // Get Device Names
+    for (unsigned int i = 0; i < g_plugins.size(); i++)
+    {
+        const TCHAR *name = g_plugins[i]->GetName();
+
+        // Create menu item
+        if (i == 0)
+        {
+            ModifyMenu(hMenuView, 0, MF_BYPOSITION | MF_STRING, IDM_VIEW_FIRST + 0, name);
+        }
+        else
+        {
+            InsertMenu(hMenuView, i, MF_BYPOSITION | MF_STRING, IDM_VIEW_FIRST + i, name);
+        }
+    }
+}
+
+static void CreateAdapterMenuItems()
+{
+    HMENU hMenuMain = GetMenu(g_hDlgMain);
+    HMENU hMenuView = GetSubMenu(hMenuMain, 1);
+    HMENU hMenuAdapter = GetSubMenu(hMenuView, g_plugins.size() + 1);
+
+    if (g_nAdapters == 0)
+    {
+        DeleteMenu(hMenuAdapter, 0, MF_BYPOSITION);
+        // DeleteMenu(hMenuView, g_plugins.size() + 1, MF_BYPOSITION);
+    }
+    else
+    {
+        // Update menu
+        for (int i = 0; i < g_nAdapters; i++)
+        {
+            if (i == 0 )
+            {
+                ModifyMenu(hMenuAdapter, 0, MF_BYPOSITION | MF_STRING, 
+                    IDM_VIEW_ADAPTER_FIRST + 0, g_szAdapterNames[0]);
+            }
+            else
+            {
+                AppendMenu(hMenuAdapter, MF_STRING, 
+                    IDM_VIEW_ADAPTER_FIRST + i, g_szAdapterNames[i]);
+            }
+        }
+
+        // Check Default Adapter
+        CheckMenuRadioItem(hMenuMain,
+            IDM_VIEW_ADAPTER_FIRST, 
+            IDM_VIEW_ADAPTER_FIRST + g_nAdapters - 1, 
+            IDM_VIEW_ADAPTER_FIRST + g_iAdapter, MF_BYCOMMAND);
+    }
+}
+
 static void CreateLanguageMenuItems()
 {
     HMENU hMenuMain = GetMenu(g_hDlgMain);
@@ -404,7 +459,7 @@ static void CreateLanguageMenuItems()
     HMENU hMenuLanguage = GetSubMenu(hMenuOptions, 0);
 
     // Get Device Names
-    for(int i = 0; i < g_nLanguage; i++)
+    for (int i = 0; i < g_nLanguage; i++)
     {
         // Build menu item string
         TCHAR szEnglishName[256];
@@ -412,7 +467,7 @@ static void CreateLanguageMenuItems()
         TCHAR szMenuItem[256];
         Language::GetName(i, szEnglishName, 256, szNativeName, 256);
 
-        if (_tcscmp(szEnglishName, szNativeName) == 0 )
+        if (_tcscmp(szEnglishName, szNativeName) == 0)
         {
             _stprintf_s(szMenuItem, 256, szEnglishName);
         }
@@ -422,7 +477,7 @@ static void CreateLanguageMenuItems()
         }
 
         // Create menu item
-        if (i == 0 )
+        if (i == 0)
         {
             ModifyMenu(hMenuLanguage, 
                 0, MF_BYPOSITION | MF_STRING, IDM_OPTIONS_LANGUAGE_FIRST + 0, szMenuItem);
@@ -554,10 +609,6 @@ static void DrawSidebar()
 
 static void EnumDevices()
 {
-    HMENU hMenuMain = GetMenu(g_hDlgMain);
-    HMENU hMenuView = GetSubMenu(hMenuMain, 1);
-    HMENU hMenuAdapter = GetSubMenu(hMenuView, 5);
-
     PcapNetFilter filter;
 
     // Init Filter
@@ -569,7 +620,6 @@ static void EnumDevices()
             TEXT("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
-        DeleteMenu(hMenuAdapter, 0, MF_BYPOSITION);
         return;
     }
 
@@ -583,39 +633,18 @@ static void EnumDevices()
             TEXT("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
-        DeleteMenu(hMenuView, 5, MF_BYPOSITION);
-
         filter.End();
         return;
     }
 
-    // Get Device Names
+    // Save Device Names
     for(int i = 0; i < g_nAdapters; i++)
     {
-        TCHAR *name = filter.GetName(i);
-
-        // Save device name
         if (i < _countof(g_szAdapterNames))
         {
-            _tcscpy_s(g_szAdapterNames[i], 256, name);
-        }
-
-        // Update menu
-        if (i == 0 )
-        {
-            ModifyMenu(hMenuAdapter, 0, MF_BYPOSITION | MF_STRING, IDM_VIEW_ADAPTER_FIRST, name);
-        }
-        else
-        {
-            AppendMenu(hMenuAdapter, MF_STRING, IDM_VIEW_ADAPTER_FIRST + i, name);
+            _tcscpy_s(g_szAdapterNames[i], 256, filter.GetName(i));
         }
     }
-
-    // Check First Item
-    CheckMenuRadioItem(GetMenu(g_hDlgMain), 
-        IDM_VIEW_ADAPTER_FIRST, 
-        IDM_VIEW_ADAPTER_FIRST + g_nAdapters - 1, 
-        IDM_VIEW_ADAPTER_FIRST, MF_BYCOMMAND);
 
     // End
     filter.End();
@@ -685,11 +714,6 @@ static void ProfileInit(HWND hWnd)
         }
     }
 
-    CheckMenuRadioItem(GetMenu(hWnd), 
-        IDM_VIEW_ADAPTER_FIRST, 
-        IDM_VIEW_ADAPTER_FIRST + g_nAdapters - 1, 
-        IDM_VIEW_ADAPTER_FIRST + g_iAdapter, MF_BYCOMMAND);
-
     // If AutoCaptue = 1, start capture immediately
     bool autoCapture = g_profile.GetBool(TEXT("AutoCapture"))->value;
     if (autoCapture)
@@ -703,10 +727,7 @@ static void ProfileInit(HWND hWnd)
     if (!showHidden) // Hide processes when necessary
     {
         ProcessView::HideProcesses();
-
-        HMENU hMenu = GetMenu(hWnd);
-        HMENU hViewMenu = GetSubMenu(hMenu, 1);
-        CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
+        CheckMenuItem(GetMenu(hWnd), IDM_VIEW_SHOW_HIDDEN, MF_BYCOMMAND | MF_UNCHECKED);
         g_bShowHidden = false;
     }
 }
@@ -794,7 +815,7 @@ static void StopTimer(HWND hWnd)
     Sleep(1100);
 }
 
-///----------------------------------------------------------------------------------------------// 
+///----------------------------------------------------------------------------------------------//
 ///                                    L2 Message Handlers                                       //
 ///----------------------------------------------------------------------------------------------//
 static void OnHomepage()
@@ -815,38 +836,16 @@ static void OnAbout(HWND hWnd)
 static void OnSelChanged(HWND hWnd, HWND hTab)
 {
     // Get the Index of the Selected Tab.
-    int i = TabCtrl_GetCurSel(hTab); 
+    int i = TabCtrl_GetCurSel(hTab);
+    int n = g_plugins.size(); // total number of tabs
 
     // Get dialog procedure ptr and template name
     DLGPROC proc = g_plugins[i]->GetDialogProc();
     const TCHAR *name = g_plugins[i]->GetTemplateName();
 
-    RealtimePlugin   *rt = dynamic_cast<RealtimePlugin *>  (g_plugins[i]);
-    MonthPlugin      *mt = dynamic_cast<MonthPlugin *>     (g_plugins[i]);
-    StatisticsPlugin *st = dynamic_cast<StatisticsPlugin *>(g_plugins[i]);
-    DetailPlugin     *dt = dynamic_cast<DetailPlugin *>    (g_plugins[i]);
-
-    // Check MenuItem
-    if (rt != NULL)
-    {
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
-    }
-    else if (mt != NULL)
-    {
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
-    }
-    else if (st != NULL)
-    {
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
-    }
-    else if (dt != NULL)
-    {
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
-    }
+    // Update menu
+    HMENU hViewMenu = GetSubMenu(GetMenu(hWnd), 1);
+    CheckMenuRadioItem(hViewMenu, 0, n - 1, i, MF_BYPOSITION);
 
     // Destroy the Current Child Dialog
     if (g_hCurPage != NULL) 
@@ -865,66 +864,15 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
 
 static void OnViewSwitch(HWND hWnd, WPARAM wParam)
 {
-    HWND hTab = GetDlgItem(hWnd, IDT_VIEW);
+    int index = wParam - IDM_VIEW_FIRST;
+    TabCtrl_SetCurSel(GetDlgItem(hWnd, IDT_VIEW), index);
 
-    if (wParam == IDM_VIEW_REALTIME)
-    {
-        for (unsigned int i = 0; i < g_plugins.size(); i++)
-        {
-            RealtimePlugin *rt = dynamic_cast<RealtimePlugin *>(g_plugins[i]);
-            if (rt != NULL)
-            {
-                TabCtrl_SetCurSel(hTab, i);
-                break;
-            }
-        }
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_REALTIME, MF_BYCOMMAND);
-    }
-    else if (wParam == IDM_VIEW_MONTH)
-    {
-        for (unsigned int i = 0; i < g_plugins.size(); i++)
-        {
-            MonthPlugin *mt = dynamic_cast<MonthPlugin *>(g_plugins[i]);
-            if (mt != NULL)
-            {
-                TabCtrl_SetCurSel(hTab, i);
-                break;
-            }
-        }
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_MONTH, MF_BYCOMMAND);
-    }
-    else if (wParam == IDM_VIEW_STATISTICS)
-    {
-        for (unsigned int i = 0; i < g_plugins.size(); i++)
-        {
-            StatisticsPlugin *st = dynamic_cast<StatisticsPlugin *>(g_plugins[i]);
-            if (st != NULL)
-            {
-                TabCtrl_SetCurSel(hTab, i);
-                break;
-            }
-        }
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_STATISTICS, MF_BYCOMMAND);
-    }
-    else if (wParam == IDM_VIEW_DETAIL)
-    {
-        for (unsigned int i = 0; i < g_plugins.size(); i++)
-        {
-            DetailPlugin *dt = dynamic_cast<DetailPlugin *>(g_plugins[i]);
-            if (dt != NULL)
-            {
-                TabCtrl_SetCurSel(hTab, i);
-                break;
-            }
-        }
-        CheckMenuRadioItem(GetMenu(hWnd), 
-            IDM_VIEW_REALTIME, IDM_VIEW_DETAIL, IDM_VIEW_DETAIL, MF_BYCOMMAND);
-    }
+    // Update menu
+    HMENU hViewMenu = GetSubMenu(GetMenu(hWnd), 1);
+    CheckMenuRadioItem(hViewMenu, 0, g_plugins.size() - 1, index, MF_BYPOSITION);
 
-    OnSelChanged(hWnd, hTab);
+    // Update view
+    OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
 }
 
 static void OnAdapterSelected(HWND hWnd, WPARAM wParam)
@@ -946,20 +894,19 @@ static void OnAdapterSelected(HWND hWnd, WPARAM wParam)
 static void OnHiddenStateChanged(HWND hWnd)
 {
     HMENU hMenu = GetMenu(hWnd);
-    HMENU hViewMenu = GetSubMenu(hMenu, 1);
+    UINT uMenuState = LOWORD(GetMenuState(hMenu, IDM_VIEW_SHOW_HIDDEN, MF_BYCOMMAND));
 
-    UINT uMenuState = LOWORD(GetMenuState(hViewMenu, 7, MF_BYPOSITION));
     if (uMenuState & MF_CHECKED) // Visible -> Hidden
     {
         ProcessView::HideProcesses();
-        CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_UNCHECKED);
+        CheckMenuItem(hMenu, IDM_VIEW_SHOW_HIDDEN, MF_BYCOMMAND | MF_UNCHECKED);
         g_profile.SetValue(TEXT("ShowHidden"), new ProfileBoolItem(false));
         g_bShowHidden = false;
     }
     else // Hidden ->Visible
     {
         ProcessView::ShowProcesses();
-        CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED);
+        CheckMenuItem(hMenu, IDM_VIEW_SHOW_HIDDEN, MF_BYCOMMAND | MF_CHECKED);
         g_profile.SetValue(TEXT("ShowHidden"), new ProfileBoolItem(true));
         g_bShowHidden = true;
     }
@@ -1214,12 +1161,11 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (bStViewEnabled) g_plugins.push_back(new StatisticsPlugin());
     if (bDtViewEnabled) g_plugins.push_back(new DetailPlugin());
 
-    // Init Menu Items for Views
-    HMENU hMenuMain = GetMenu(g_hDlgMain);
-    if (!bRtViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_REALTIME,   MF_GRAYED);
-    if (!bMtViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_MONTH,      MF_GRAYED);
-    if (!bStViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_STATISTICS, MF_GRAYED);
-    if (!bDtViewEnabled) EnableMenuItem(hMenuMain, IDM_VIEW_DETAIL,     MF_GRAYED);
+    // Init Menu Items for Views (should call this after plugins loaded)
+    CreateViewMenuItems();
+
+    // Init Menu Items for Adapters (should call this after plugins loaded)
+    CreateAdapterMenuItems();
 
     // Init Tab (The names will be updated in UpdateLanguage())
     std::vector<const TCHAR *> names(g_plugins.size(), TEXT(""));
@@ -1262,50 +1208,47 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     {
         OnExit(hWnd);
     }
-    else if (wParam == IDM_TRAY_SHOW_WINDOW )
+    else if (wParam == IDM_TRAY_SHOW_WINDOW)
     {
         OnShowWindow(hWnd);
     }
-    else if (wParam == IDM_FILE_CAPTURE )
+    else if (wParam == IDM_FILE_CAPTURE)
     {
         OnCapture(hWnd);
     }
-    else if (wParam == IDM_FILE_STOP )
+    else if (wParam == IDM_FILE_STOP)
     {
         OnStop(hWnd);
     }
-    else if (wParam == IDM_VIEW_REALTIME   ||
-             wParam == IDM_VIEW_MONTH      ||
-             wParam == IDM_VIEW_STATISTICS ||
-             wParam == IDM_VIEW_DETAIL )
+    else if (wParam >= IDM_VIEW_FIRST && wParam < IDM_VIEW_ADAPTER_FIRST) // dyanmic
     {
         OnViewSwitch(hWnd, wParam);
     }
-    else if (wParam >= IDM_VIEW_ADAPTER_FIRST && wParam < IDM_OPTIONS_LANGUAGE_FIRST )
+    else if (wParam >= IDM_VIEW_ADAPTER_FIRST && wParam < IDM_OPTIONS_LANGUAGE_FIRST) // dyanmic
     {
         OnAdapterSelected(hWnd, wParam);
     }
-    else if (wParam == IDM_VIEW_SHOW_HIDDEN )
+    else if (wParam == IDM_VIEW_SHOW_HIDDEN)
     {
         OnHiddenStateChanged(hWnd);
     }
-    else if (wParam >= IDM_OPTIONS_LANGUAGE_FIRST )
+    else if (wParam >= IDM_OPTIONS_LANGUAGE_FIRST) // dynamic
     {
         OnLanguageSelected(hWnd, wParam);
     }
-    else if (wParam == IDM_OPTIONS_PREFERENCES )
+    else if (wParam == IDM_OPTIONS_PREFERENCES)
     {
         OnPreferences(hWnd);
     }
-    else if (wParam == IDM_HELP_HOMEPAGE )
+    else if (wParam == IDM_HELP_HOMEPAGE)
     {
         OnHomepage();
     }
-    else if (wParam == IDM_HELP_TOPIC )
+    else if (wParam == IDM_HELP_TOPIC)
     {
         OnHelp();
     }
-    else if (wParam == IDM_HELP_ABOUT || wParam == IDM_TRAY_ABOUT )
+    else if (wParam == IDM_HELP_ABOUT || wParam == IDM_TRAY_ABOUT)
     {
         OnAbout(hWnd);
     }

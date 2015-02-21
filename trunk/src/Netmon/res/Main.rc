@@ -69,10 +69,7 @@ IDM_MAIN MENU
     }
     POPUP "View"
     {
-        MENUITEM "Realtime", IDM_VIEW_REALTIME
-        MENUITEM "Month", IDM_VIEW_MONTH
-        MENUITEM "Statistics", IDM_VIEW_STATISTICS
-        MENUITEM "Detail", IDM_VIEW_DETAIL
+        MENUITEM "First View" IDM_VIEW_FIRST
         MENUITEM SEPARATOR
         POPUP "Adapter"
         {
