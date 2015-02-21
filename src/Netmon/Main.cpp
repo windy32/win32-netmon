@@ -1346,16 +1346,85 @@ static void OnPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnSize(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+    static bool firstRun = true;
+    static int initWindowWidth = 0;
+    static int initWindowHeight = 0;
+    static int prevListHeight = 0;
+    static int prevViewHeight = 0;
+
     // Resize Sidebar, ListView and Tab Control
     int clientWidth = lParam & 0xFFFF;
     int clientHeight = lParam >> 16;
-    
-    MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 
-        50 - 1, 0, 
-        clientWidth - 50 + 2, 60 + (clientHeight - 240) / 2, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 
-        50 + 6, 60 + 6 + (clientHeight - 240) / 2, 
-        clientWidth - 50 - 12, clientHeight - 60 - 12 - (clientHeight - 240) / 2, TRUE);
+
+    // The following events are observed on startup:
+    //
+    // OnSize: client_width = 839, client_height = 408, width = 855, height = 446 ...
+    // OnSize: client_width = 839, client_height = 388, width = 855, height = 446
+    //
+    // The window size remains the same, but client rectangle becomes smaller
+    // However, both events should be regarded as "first run"
+    if (firstRun)
+    {
+        // Get current window size
+        RECT rect;
+        GetWindowRect(hWnd, &rect);
+
+        // Save initial window size
+        if (initWindowWidth == 0)
+        {
+            initWindowWidth = rect.right - rect.left;
+            initWindowHeight = rect.bottom - rect.top;
+        }
+        else
+        {
+            if ((rect.right - rect.left) == initWindowWidth &&
+                (rect.bottom - rect.top) == initWindowHeight)
+            {
+                // still first run
+            }
+            else
+            {
+                firstRun = false;
+            }
+        }
+    }
+
+    if (firstRun)
+    {
+        MoveWindow(GetDlgItem(hWnd, IDL_PROCESS),
+            50 - 1, 0,
+            clientWidth - 50 + 2,
+            138,
+            TRUE);
+        MoveWindow(GetDlgItem(hWnd, IDT_VIEW), 
+            50 + 6, 138 + 6,
+            clientWidth - 50 - 12,
+            clientHeight - 138 - 12,
+            TRUE);
+
+        prevListHeight = 138;
+        prevViewHeight = clientHeight - 138 - 12;
+    }
+    else // Resize (keep the height of the tab control)
+    {
+        // Resize
+        MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 
+            50 - 1, 
+            0,
+            clientWidth - 50 + 2,
+            clientHeight - prevViewHeight - 12,
+            TRUE);
+        MoveWindow(GetDlgItem(hWnd, IDT_VIEW),
+            50 + 6,
+            clientHeight - prevViewHeight - 6,
+            clientWidth - 50 - 12,
+            prevViewHeight,
+            TRUE);
+
+        prevListHeight = clientHeight - prevViewHeight - 12;
+        prevViewHeight = prevViewHeight;
+    }
+
     g_iSidebarWidth = 50;
     g_iSidebarHeight = clientHeight;
 
@@ -1465,8 +1534,7 @@ static void OnMouseMove(HWND hWnd, WPARAM wParam, LPARAM lParam)
         int clientWidth = stClientRect.right - stClientRect.left;
         int clientHeight = stClientRect.bottom - stClientRect.top;
 
-        int listHeight = min(y, clientHeight - 255);
-        listHeight = max(134, listHeight);
+        int listHeight = max(138, min(clientHeight - 230, y));
         int tabHeight = clientHeight - listHeight - 12;
 
         MoveWindow(GetDlgItem(hWnd, IDL_PROCESS), 
