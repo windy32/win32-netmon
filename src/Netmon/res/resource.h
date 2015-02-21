@@ -65,5 +65,6 @@
 #define IDB_CLOSE                               50019
 
 // dynamic menus
-#define IDM_VIEW_ADAPTER_FIRST                  60000
-#define IDM_OPTIONS_LANGUAGE_FIRST              61000
+#define IDM_VIEW_FIRST                          60000
+#define IDM_VIEW_ADAPTER_FIRST                  61000
+#define IDM_OPTIONS_LANGUAGE_FIRST              62000
