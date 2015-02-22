@@ -200,7 +200,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         processUID = ProcessModel::GetProcessUid(processName);
 
         // - Insert Into Process Table
-        if (processUID == -1 )
+        if (processUID == -1)
         {
             processUID = Utils::InsertProcess(processName, processFullPath);
         }

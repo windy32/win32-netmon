@@ -90,6 +90,18 @@ int Utils::InsertProcess(const TCHAR *name, const TCHAR *fullPath)
     return (int)SQLite::GetLastInsertRowId();
 }
 
+void Utils::UpdateFullPath(int puid, const TCHAR *fullPath)
+{
+    TCHAR command[512];
+
+    // Build Command
+    _stprintf_s(command, _countof(command), 
+        TEXT("Update Process Set FullPath = \'%s\' Where UID = %d;"), fullPath, puid);
+
+    // Insert
+    SQLite::Exec(command, false);
+}
+
 bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
 {
     TCHAR command[256];

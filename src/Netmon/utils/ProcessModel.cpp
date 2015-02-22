@@ -127,6 +127,12 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
             item.rxRate = 0;
             item.prevTxRate = 0;
             item.prevRxRate = 0;
+
+            // Update full path when necessary, but avoid comparing to frequently
+            if (_tcscmp(item.fullPath, pi->fullPath) != 0)
+            {
+                Utils::UpdateFullPath(item.puid, item.fullPath);
+            }
         }
 
         if (pi->dir == DIR_UP)
