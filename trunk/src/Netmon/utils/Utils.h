@@ -29,6 +29,7 @@ public:
     // Database operations
     static int GetProcessUid(const TCHAR *name);
     static int InsertProcess(const TCHAR *name, const TCHAR *fullPath);
+    static void UpdateFullPath(int puid, const TCHAR *fullPath);
     static bool GetProcessName(int puid, TCHAR *buf, int len);
     static void InsertPacket(PacketInfoEx *pi);
 
