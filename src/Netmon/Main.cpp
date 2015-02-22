@@ -202,7 +202,7 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         // - Insert Into Process Table
         if (processUID == -1 )
         {
-            processUID = Utils::InsertProcess(processName);
+            processUID = Utils::InsertProcess(processName, processFullPath);
         }
 
         // - Fill PacketInfoEx
@@ -383,14 +383,15 @@ static void InitDatabase()
         SQLite::Exec(TEXT("Create Table Process(")
                      TEXT("    UID            Integer,")
                      TEXT("    Name           Varchar(260),")
+                     TEXT("    FullPath       Varchar(260),")
                      TEXT("    ")
                      TEXT("    Primary Key (UID)")
                      TEXT(");"), true);
 
         // Add some init data
-        Utils::InsertProcess(TEXT("Unknown"));
-        Utils::InsertProcess(TEXT("System"));
-        Utils::InsertProcess(TEXT("svchost.exe"));
+        Utils::InsertProcess(TEXT("Unknown"), TEXT("-"));
+        Utils::InsertProcess(TEXT("System"), TEXT("-"));
+        Utils::InsertProcess(TEXT("svchost.exe"), TEXT("-"));
     }
 }
 
@@ -489,6 +490,7 @@ static void CreateLanguageMenuItems()
     }
 }
 
+
 static void InitUI(HWND hWnd)
 {
     NOTIFYICONDATA nti; 
@@ -527,15 +529,15 @@ static void InitUI(HWND hWnd)
     // Init main menu
     hMainMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_MAIN));
     SetMenu(hWnd, hMainMenu);
-    CreateLanguageMenuItems();
+
+    EnableMenuItem(hMainMenu, IDM_FILE_CAPTURE, MF_ENABLED);
+    EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
 
     hViewMenu = GetSubMenu(hMainMenu, 1);
     hOptionsMenu = GetSubMenu(hMainMenu, 2);
     hLanguageMenu = GetSubMenu(hOptionsMenu, 0);
 
-    EnableMenuItem(hMainMenu, IDM_FILE_CAPTURE, MF_ENABLED);
-    EnableMenuItem(hMainMenu, IDM_FILE_STOP, MF_GRAYED);
-
+    CreateLanguageMenuItems();
     CheckMenuRadioItem(hLanguageMenu, 
         0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
 
