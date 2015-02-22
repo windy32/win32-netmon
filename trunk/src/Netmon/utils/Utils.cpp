@@ -130,11 +130,6 @@ void Utils::InsertPacket(PacketInfoEx *pi)
     SQLite::Exec(command, true);
 }
 
-void Utils::DeleteAllPackets()
-{
-    SQLite::Exec(TEXT("Delete From Packet;"), false);
-}
-
 // Time
 int Utils::GetNumDays(int exMonth)
 {

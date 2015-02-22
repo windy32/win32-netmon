@@ -31,7 +31,6 @@ public:
     static int InsertProcess(const TCHAR *name, const TCHAR *fullPath);
     static bool GetProcessName(int puid, TCHAR *buf, int len);
     static void InsertPacket(PacketInfoEx *pi);
-    static void DeleteAllPackets();
 
     // Time operations
     static int GetNumDays(int exMonth);
