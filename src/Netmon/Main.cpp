@@ -541,7 +541,7 @@ static void InitUI(HWND hWnd)
     CheckMenuRadioItem(hLanguageMenu, 
         0, g_nLanguage - 1, g_iCurLanguage, MF_BYPOSITION);
 
-    CheckMenuItem(hViewMenu, 7, MF_BYPOSITION | MF_CHECKED); // Hidden State
+    CheckMenuItem(hMainMenu, IDM_VIEW_SHOW_HIDDEN, MF_BYCOMMAND | MF_CHECKED); // Hidden State
     g_bShowHidden = true;
 
     // Init Sidebar GDI Objects
