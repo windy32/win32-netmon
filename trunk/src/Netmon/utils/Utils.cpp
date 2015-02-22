@@ -75,13 +75,13 @@ int Utils::GetProcessUid(const TCHAR *name)
     return -1;
 }
 
-int Utils::InsertProcess(const TCHAR *name)
+int Utils::InsertProcess(const TCHAR *name, const TCHAR *fullPath)
 {
-    TCHAR command[256];
+    TCHAR command[512];
 
     // Build Command
     _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into Process(Name) Values(\'%s\');"), name);
+        TEXT("Insert Into Process(Name, FullPath) Values(\'%s\', '%s');"), name, fullPath);
 
     // Insert
     SQLite::Exec(command, false);

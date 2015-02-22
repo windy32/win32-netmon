@@ -37,6 +37,7 @@ void ProcessModel::Init()
     SQLiteRow row;
     row.InsertType(SQLiteRow::TYPE_INT32);
     row.InsertType(SQLiteRow::TYPE_STRING);
+    row.InsertType(SQLiteRow::TYPE_STRING);
 
     SQLite::Select(command, &row, InitCallback);
 
@@ -60,7 +61,7 @@ void ProcessModel::InitCallback(SQLiteRow *row)
 
     // - name & fullPath
     _tcscpy_s(item.name, MAX_PATH, row->GetDataStr(1));
-    _tcscpy_s(item.fullPath, MAX_PATH, TEXT("-"));
+    _tcscpy_s(item.fullPath, MAX_PATH, row->GetDataStr(2));
 
     // Add Process
     _processes.push_back(item);
@@ -81,7 +82,7 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
 {
     int index = GetProcessIndex(pi->puid);
 
-    if (index == -1 ) // A new process
+    if (index == -1) // A new process
     {
         // Insert a ProcessItem
         ProcessItem item;
@@ -115,7 +116,7 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
         // Update the ProcessItem that already Exists
         ProcessItem &item = _processes[index];
 
-        if (!item.active )
+        if (!item.active)
         {
             item.active = true;
             item.pid = pi->pid; // The first pid is logged
@@ -128,11 +129,11 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
             item.prevRxRate = 0;
         }
 
-        if (pi->dir == DIR_UP )
+        if (pi->dir == DIR_UP)
         {
             item.txRate += pi->size;
         }
-        else if (pi->dir == DIR_DOWN )
+        else if (pi->dir == DIR_DOWN)
         {
             item.rxRate += pi->size;
         }
@@ -248,8 +249,8 @@ void ProcessModel::Export(std::vector<ProcessModel::ProcessItem> &items)
 
 void ProcessModel::ExportHiddenState(std::vector<bool> &states)
 {
-    states.clear();
     Lock();
+    states.clear();
     for (unsigned int i = 0; i < _processes.size(); i++)
     {
         states.push_back(_processes[i].hidden);
@@ -259,8 +260,8 @@ void ProcessModel::ExportHiddenState(std::vector<bool> &states)
 
 void ProcessModel::ExportHiddenProcesses(std::vector<int> &processes)
 {
-    processes.clear();
     Lock();
+    processes.clear();
     for (unsigned int i = 0; i < _processes.size(); i++)
     {
         if (_processes[i].hidden)
@@ -361,7 +362,7 @@ bool ProcessModel::IsProcessActive(int puid)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if (_processes[i].puid == puid )
+        if (_processes[i].puid == puid)
         {
             active = _processes[i].active;
             break;
