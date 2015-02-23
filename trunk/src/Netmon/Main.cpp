@@ -278,61 +278,44 @@ static void UpdateMenuLanguage()
     HMENU hMenuOptionsLanguage = GetSubMenu(hMenuOptions, 0);
 
     // Menu bar
-    Utils::SetMenuString(hMenuMain, 0, MF_BYPOSITION, (UINT_PTR)hMenuFile,
-        Language::GetString(IDS_MENU_FILE));
-    Utils::SetMenuString(hMenuMain, 1, MF_BYPOSITION, (UINT_PTR)hMenuView,
-        Language::GetString(IDS_MENU_VIEW));
-    Utils::SetMenuString(hMenuMain, 2, MF_BYPOSITION, (UINT_PTR)hMenuOptions,
-        Language::GetString(IDS_MENU_OPTIONS));
-    Utils::SetMenuString(hMenuMain, 3, MF_BYPOSITION, (UINT_PTR)hMenuHelp,
-        Language::GetString(IDS_MENU_HELP));
+    Utils::SetMenuString(hMenuMain, 0, TRUE, Language::GetString(IDS_MENU_FILE));
+    Utils::SetMenuString(hMenuMain, 1, TRUE, Language::GetString(IDS_MENU_VIEW));
+    Utils::SetMenuString(hMenuMain, 2, TRUE, Language::GetString(IDS_MENU_OPTIONS));
+    Utils::SetMenuString(hMenuMain, 3, TRUE, Language::GetString(IDS_MENU_HELP));
 
     // File
-    Utils::SetMenuString(hMenuFile, 0, MF_BYPOSITION, IDM_FILE_CAPTURE, 
-        Language::GetString(IDS_MENU_FILE_CAPTURE));
-    Utils::SetMenuString(hMenuFile, 1, MF_BYPOSITION, IDM_FILE_STOP,
-        Language::GetString(IDS_MENU_FILE_STOP));
-    Utils::SetMenuString(hMenuFile, 3, MF_BYPOSITION, IDM_FILE_EXIT,
-        Language::GetString(IDS_MENU_FILE_EXIT));
+    Utils::SetMenuString(hMenuFile, 0, TRUE, Language::GetString(IDS_MENU_FILE_CAPTURE));
+    Utils::SetMenuString(hMenuFile, 1, TRUE, Language::GetString(IDS_MENU_FILE_STOP));
+    Utils::SetMenuString(hMenuFile, 3, TRUE, Language::GetString(IDS_MENU_FILE_EXIT));
 
     // View
     for (unsigned int i = 0; i < g_plugins.size(); i++)
     {
-        Utils::SetMenuString(hMenuView, i, MF_BYPOSITION, IDM_VIEW_FIRST + i, g_plugins[i]->GetName());
+        Utils::SetMenuString(hMenuView, i, TRUE, g_plugins[i]->GetName());
     }
 
-    Utils::SetMenuString(hMenuView, g_plugins.size() + 1, MF_BYPOSITION, (UINT_PTR)hMenuViewAdapter,
+    Utils::SetMenuString(hMenuMain, g_plugins.size() + 1, TRUE, 
         Language::GetString(IDS_MENU_VIEW_ADAPTER));
-    Utils::SetMenuString(hMenuView, g_plugins.size() + 3, MF_BYPOSITION, IDM_VIEW_SHOW_HIDDEN,
+    Utils::SetMenuString(hMenuView, g_plugins.size() + 3, TRUE,
         Language::GetString(IDS_MENU_VIEW_SHOW_HIDDEN));
 
     // Options
-    Utils::SetMenuString(hMenuOptions, 0, MF_BYPOSITION, (UINT_PTR)hMenuOptionsLanguage,
-        Language::GetString(IDS_MENU_OPTIONS_LANGUAGE));
-    Utils::SetMenuString(hMenuOptions, 1, MF_BYPOSITION, IDM_OPTIONS_PREFERENCES,
-        Language::GetString(IDS_MENU_OPTIONS_PREFERENCES));
+    Utils::SetMenuString(hMenuOptions, 0, TRUE, Language::GetString(IDS_MENU_OPTIONS_LANGUAGE));
+    Utils::SetMenuString(hMenuOptions, 1, TRUE, Language::GetString(IDS_MENU_OPTIONS_PREFERENCES));
 
     // Help
-    Utils::SetMenuString(hMenuHelp, 0, MF_BYPOSITION, IDM_HELP_TOPIC,
-        Language::GetString(IDS_MENU_HELP_TOPIC));
-    Utils::SetMenuString(hMenuHelp, 1, MF_BYPOSITION, IDM_HELP_HOMEPAGE,
-        Language::GetString(IDS_MENU_HELP_HOMEPAGE));
-    Utils::SetMenuString(hMenuHelp, 3, MF_BYPOSITION, IDM_HELP_ABOUT,
-        Language::GetString(IDS_MENU_HELP_ABOUT));
+    Utils::SetMenuString(hMenuHelp, 0, TRUE, Language::GetString(IDS_MENU_HELP_TOPIC));
+    Utils::SetMenuString(hMenuHelp, 1, TRUE, Language::GetString(IDS_MENU_HELP_HOMEPAGE));
+    Utils::SetMenuString(hMenuHelp, 3, TRUE, Language::GetString(IDS_MENU_HELP_ABOUT));
 
     // Tray
-    Utils::SetMenuString(g_hTrayMenu, 0, MF_BYPOSITION, IDM_TRAY_SHOW_WINDOW,
-        Language::GetString(IDS_MENU_TRAY_SHOW_WINDOW));
-    Utils::SetMenuString(g_hTrayMenu, 1, MF_BYPOSITION, IDM_TRAY_ABOUT,
-        Language::GetString(IDS_MENU_TRAY_ABOUT));
-    Utils::SetMenuString(g_hTrayMenu, 2, MF_BYPOSITION, IDM_TRAY_EXIT,
-        Language::GetString(IDS_MENU_TRAY_EXIT));
+    Utils::SetMenuString(g_hTrayMenu, 0, TRUE, Language::GetString(IDS_MENU_TRAY_SHOW_WINDOW));
+    Utils::SetMenuString(g_hTrayMenu, 1, TRUE, Language::GetString(IDS_MENU_TRAY_ABOUT));
+    Utils::SetMenuString(g_hTrayMenu, 2, TRUE, Language::GetString(IDS_MENU_TRAY_EXIT));
 
     // Process
-    Utils::SetMenuString(g_hProcessMenu, 0, MF_BYPOSITION, IDM_PROCESS_SHOW, 
-        Language::GetString(IDS_MENU_PROCESS_SHOW));
-    Utils::SetMenuString(g_hProcessMenu, 1, MF_BYPOSITION, IDM_PROCESS_HIDE, 
-        Language::GetString(IDS_MENU_PROCESS_HIDE));
+    Utils::SetMenuString(g_hProcessMenu, 0, TRUE, Language::GetString(IDS_MENU_PROCESS_SHOW));
+    Utils::SetMenuString(g_hProcessMenu, 1, TRUE, Language::GetString(IDS_MENU_PROCESS_HIDE));
 
     // Refresh menu bar
     DrawMenuBar(g_hDlgMain);
@@ -439,7 +422,6 @@ static void CreateAdapterMenuItems()
     if (g_nAdapters == 0)
     {
         DeleteMenu(hMenuAdapter, 0, MF_BYPOSITION);
-        // DeleteMenu(hMenuView, g_plugins.size() + 1, MF_BYPOSITION);
     }
     else
     {

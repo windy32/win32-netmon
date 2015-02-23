@@ -543,12 +543,15 @@ void Utils::GetVersionString(TCHAR *buf, int cchLen)
 }
 
 // Menu
-void Utils::SetMenuString(
-    HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem)
+void Utils::SetMenuString(HMENU hMenu, UINT uItem, BOOL fByPosition, LPCTSTR szText)
 {
-    UINT uMenuState = GetMenuState(hMnu, uPosition, uFlags);
-    ModifyMenu(hMnu, uPosition, 
-        (uFlags | uMenuState | MF_STRING) & (~MF_SEPARATOR), uIDNewItem, lpNewItem);
+    MENUITEMINFO info;
+    info.cbSize = sizeof(info);
+    info.fMask = MIIM_STRING;
+    info.fType = MFT_STRING;
+    info.dwTypeData = (LPTSTR)szText;
+
+    SetMenuItemInfo(hMenu, uItem, fByPosition, &info);
 }
 
 // Process
