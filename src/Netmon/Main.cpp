@@ -22,11 +22,12 @@
 #include "utils/SQLite.h"
 #include "utils/ProcessModel.h"
 #include "utils/ProcessView.h"
-#include "utils/PcapNetFilter.h"
 #include "utils/PortCache.h"
 #include "utils/ProcessCache.h"
 #include "utils/Language.h"
 #include "utils/Profile.h"
+
+#include "traffic-src/PcapSource.h"
 
 #include "DlgPreferences.h"
 #include "DlgAbout.h"
@@ -112,26 +113,26 @@ static bool    g_bHideWindow = false;
 ///----------------------------------------------------------------------------------------------//
 static DWORD WINAPI CaptureThread(LPVOID lpParam)
 {
-    PcapNetFilter filter;
+    PcapSource source;
     PacketInfo pi;
     PacketInfoEx pie;
 
     PortCache pc;
 
     // Init Filter ------------------------------------------------------------
-    if (!filter.Init())
+    if (!source.Initialize())
     {
         return 1;
     }
 
     // Find Devices -----------------------------------------------------------
-    if (!filter.FindDevices())
+    if (!source.EnumDevices())
     {
         return 2;
     }
 
     // Select a Device --------------------------------------------------------
-    if (!filter.Select(g_iAdapter))
+    if (!source.SelectDevice(g_iAdapter))
     {
         return 3;
     }
@@ -145,16 +146,31 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         TCHAR processFullPath[MAX_PATH] = TEXT("-");
 
         // - Get a Packet (Process UID or PID is not Provided Here)
-        if (!filter.Capture(&pi, &g_bCapture))
+        bool timeout = false;
+        if (!source.Capture(&pi, &timeout))
         {
-            PostMessage(g_hDlgMain, WM_RECONNECT, 0, 0);
-            break;
-        }
-
-        // - Stop is Clicked
-        if (!g_bCapture )
-        {
-            break;
+            if (timeout) // Timeout
+            {
+                if (!g_bCapture) // Stop when user clicks "Stop"
+                {
+                    break;
+                }
+                else // Just try again
+                {
+                    continue;
+                }
+            }
+            else // Error
+            {
+                if (source.Reconnect(g_iAdapter))
+                {
+                    continue; // Auto-reconnect succeeded
+                }
+                else // Need manual reconnect
+                {
+                    PostMessage(g_hDlgMain, WM_RECONNECT, 0, 0);
+                }
+            }
         }
 
         // - Get PID
@@ -242,9 +258,6 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         }
 #endif
     }
-
-    // End --------------------------------------------------------------------
-    filter.End();
 
     return 0;
 }
@@ -611,10 +624,10 @@ static void DrawSidebar()
 
 static void EnumDevices()
 {
-    PcapNetFilter filter;
+    PcapSource source;
 
     // Init Filter
-    if (!filter.Init())
+    if (!source.Initialize())
     {
         MessageBox(g_hDlgMain, 
             TEXT("Cannot initizlize WinPcap library.\n")
@@ -626,30 +639,26 @@ static void EnumDevices()
     }
 
     // Find Devices
-    g_nAdapters = filter.FindDevices();
+    g_nAdapters = source.EnumDevices();
 
-    if (g_nAdapters <= 0 )
+    if (g_nAdapters <= 0)
     {
         MessageBox(g_hDlgMain, 
             TEXT("No network adapters has been found on this machine."), 
             TEXT("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
-        filter.End();
-        return;
     }
-
-    // Save Device Names
-    for(int i = 0; i < g_nAdapters; i++)
+    else // Save Device Names
     {
-        if (i < _countof(g_szAdapterNames))
+        for(int i = 0; i < g_nAdapters; i++)
         {
-            _tcscpy_s(g_szAdapterNames[i], 256, filter.GetName(i));
+            if (i < _countof(g_szAdapterNames))
+            {
+                source.GetDeviceName(i, g_szAdapterNames[i], 256);
+            }
         }
     }
-
-    // End
-    filter.End();
 }
 
 static void ProfileInit(HWND hWnd)
