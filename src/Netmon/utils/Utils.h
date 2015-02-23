@@ -84,8 +84,7 @@ public:
     static void GetVersionString(TCHAR *buf, int cchLen);
 
     // Menu
-    static void SetMenuString(
-        HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem);
+    static void SetMenuString(HMENU hMenu, UINT uItem, BOOL fByPosition, LPCTSTR szText);
 
     // Process
     static BOOL StartProcess(
