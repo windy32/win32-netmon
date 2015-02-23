@@ -1149,6 +1149,13 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     bool bStViewEnabled = g_profile.GetBool(TEXT("StViewEnabled"))->value;
     bool bDtViewEnabled = g_profile.GetBool(TEXT("DtViewEnabled"))->value;
 
+    // We do not want all views disabled
+    if (!bRtViewEnabled && !bMtViewEnabled && !bStViewEnabled && !bDtViewEnabled)
+    {
+        g_profile.SetValue(TEXT("RtViewEnabled"), new ProfileBoolItem(true));
+        bRtViewEnabled = true;
+    }
+
     if (bRtViewEnabled) g_plugins.push_back(new RealtimePlugin());
     if (bMtViewEnabled) g_plugins.push_back(new MonthPlugin());
     if (bStViewEnabled) g_plugins.push_back(new StatisticsPlugin());
