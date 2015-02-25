@@ -377,7 +377,6 @@ void MonthView::DrawGraph()
     }
 
     BitBlt(_hdcBuf, x1, y2 + 6, 7, 7, _hdcPage, 0, 0, SRCCOPY);
-    // BitBlt(_hdcBuf, x2 - 21, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
     if (_curMonth == _model->GetLastMonth(_process)) // No next month
     {
@@ -389,7 +388,6 @@ void MonthView::DrawGraph()
     }
 
     BitBlt(_hdcBuf, x1 + 12, y2 + 6, 7, 7, _hdcPage, 0, 0, SRCCOPY);
-    // BitBlt(_hdcBuf, x2 - 9, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
     // Write to Screen
     BitBlt(_hdcTarget, 0, 0, _width, _height, _hdcBuf, 0, 0, SRCCOPY);
