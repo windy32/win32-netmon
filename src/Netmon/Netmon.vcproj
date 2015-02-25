@@ -393,6 +393,14 @@
 			Name="Utils"
 			>
 			<File
+				RelativePath=".\utils\Date.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\Date.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utils\Language.cpp"
 				>
 			</File>

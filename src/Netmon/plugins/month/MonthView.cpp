@@ -24,12 +24,12 @@
 #pragma region Members of MonthView
 
 // Settings
-int MonthView::_curMonth;
+ShortDate MonthView::_curMonth;
 
 // GDI Objects
-HFONT MonthView::_hFontDays;
-HFONT MonthView::_hFontDesc;
-HPEN  MonthView::_hPenVertical;
+HFONT   MonthView::_hFontDays;
+HFONT   MonthView::_hFontDesc;
+HPEN    MonthView::_hPenVertical;
 
 HDC     MonthView::_hdcTarget;
 HDC     MonthView::_hdcBuf;
@@ -57,7 +57,14 @@ MonthView::MonthView(MonthModel *model)
     _hdcBuf = 0;  // the device context
     _hbmpBuf = 0; // and the bitmap are not deleted when user goes to another tab
 
-    _curMonth = model->GetLastMonth();
+    _curMonth = model->GetLastMonth(PROCESS_ALL);
+
+    // No packet has been captured for any process
+    if (_curMonth == ShortDate::Null)
+    {
+        Date date(time(0));
+        _curMonth = ShortDate(date.year, date.month);
+    }
 }
 
 MonthView::~MonthView()
@@ -76,13 +83,14 @@ void MonthView::SetProcess(int puid)
 {
     _process = puid;
 
-    if (_curMonth > _model->GetLastMonth())
+    if (_curMonth > _model->GetLastMonth(puid))
     {
-        _curMonth = _model->GetLastMonth();
+        _curMonth = _model->GetLastMonth(puid);
     }
 
     DrawGraph();
 }
+
 void MonthView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
     DrawGraph();
@@ -98,9 +106,11 @@ void MonthView::DrawGraph()
 
     // Export Model Info
     MonthModel::MonthItem item;
+
+    // If date not exist, item is not updated, all fields are 0 bytes
     _model->Export(_process, _curMonth, item);
 
-    int numDays = Utils::GetNumDays(_curMonth);
+    int numDays = Date::GetTotalDays(_curMonth.year, _curMonth.month);
 
     // Rectangle for Graph
     int x1 = 8;
@@ -118,12 +128,12 @@ void MonthView::DrawGraph()
 
     for(int i = 0; i < numDays; i++)
     {
-        if (item.dayTx[i] > maxTraffic )
+        if (item.dayTx[i] > maxTraffic)
         {
             maxTraffic = item.dayTx[i];
         }
 
-        if (item.dayRx[i] > maxTraffic )
+        if (item.dayRx[i] > maxTraffic)
         {
             maxTraffic = item.dayRx[i];
         }
@@ -224,13 +234,13 @@ void MonthView::DrawGraph()
     SelectObject(_hdcBuf, _hFontDays);
     SetTextAlign(_hdcBuf, TA_CENTER);
 
-    for(int i = 0; i < numDays; i++)
+    for (int i = 0; i < numDays; i++)
     {
         TCHAR szDay[32];
         _stprintf_s(szDay, _countof(szDay), TEXT("%d"), i + 1);
 
         // Set Color, Sundays are Red
-        if (Utils::GetWeekDay(_curMonth, i + 1) == 0 )
+        if (Date(_curMonth.year, _curMonth.month, i + 1).wday == 0)
         {
             SetTextColor(_hdcBuf, RGB(0xDF, 0x00, 0x24));
         }
@@ -298,7 +308,7 @@ void MonthView::DrawGraph()
 
     TCHAR szText[256];
     TCHAR szYearMonth[256];
-    Language::GetYearMonthString(szYearMonth, 256, _curMonth / 12 + 1970, _curMonth % 12);
+    Language::GetYearMonthString(szYearMonth, 256, _curMonth.year + 1900, _curMonth.month);
 
     TCHAR processName[MAX_PATH];
     if (_process == -1)
@@ -339,7 +349,7 @@ void MonthView::DrawGraph()
     TextOut(_hdcBuf, x1 + 1, y2 + 2, szText, _tcslen(szText));
 
     // Draw PageUp / PageDown Icon
-    if (_curMonth == _model->GetFirstMonth() ) // No previous month
+    if (_curMonth == _model->GetFirstMonth(_process)) // No previous month
     {
         SelectObject(_hdcPage, _hbmpPageUpLight);
     }
@@ -350,7 +360,7 @@ void MonthView::DrawGraph()
 
     BitBlt(_hdcBuf, x2 - 21, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
-    if (_curMonth == _model->GetLastMonth() ) // No next month
+    if (_curMonth == _model->GetLastMonth(_process)) // No next month
     {
         SelectObject(_hdcPage, _hbmpPageDownLight);
     }
@@ -428,7 +438,7 @@ INT_PTR MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         int _height = stRect.bottom - stRect.top;
 
         // Rectangle for Graph
-        int numDays = Utils::GetNumDays(_curMonth);
+        int numDays = Date::GetTotalDays(_curMonth.year, _curMonth.month);
 
         int x1 = 8;
         int y1 = 19;
@@ -447,18 +457,18 @@ INT_PTR MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (xPos >= x2 - 21 && xPos <= x2 - 21 + 7 &&
             yPos >= y2 + 4  && yPos <= y2 + 4  + 7 )
         {
-            if (_curMonth > _model->GetFirstMonth()) // Previous month
+            if (_curMonth > _model->GetFirstMonth(_process)) // Previous month
             {
-                _curMonth -= 1;
+                _curMonth = _curMonth.PrevMonth();
                 DrawGraph();
             }
         }
         else if (xPos >= x2 - 9 && xPos <= x2 - 9 + 7 &&
                  yPos >= y2 + 4 && yPos <= y2 + 4 + 7 )
         {
-            if (_curMonth < _model->GetLastMonth()) // Next month
+            if (_curMonth < _model->GetLastMonth(_process)) // Next month
             {
-                _curMonth += 1;
+                _curMonth = _curMonth.NextMonth();
                 DrawGraph();
             }
         }
