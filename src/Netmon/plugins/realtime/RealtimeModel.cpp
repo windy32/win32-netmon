@@ -35,7 +35,7 @@ void RealtimeModel::Fill()
     // When time timeOffset < 20, there should be two element in rate_20s
     // ...
 
-    // If the system time is reset, it will crash here, so we have to fix
+    // If the system time is moved backward, it will crash here, so we have to fix
     if (time(0) < _startTime)
     {
         // Reset start time
@@ -73,41 +73,51 @@ void RealtimeModel::Fill()
     {
         RtModelItem &item = it->second;
 
-        if (item.rate_tx_1s.size() > 8 * 1024) // Remove at least 4 KB one time
+        // If the system time is moved forward too much, timeOffset will be very large
+        // In this case, there's no need to first push_back all the items and then erase them
+        //            ---------------------- add_size -----------
+        //           /  current vector                           \
+        // +--------o==================o--------------------------+
+        // ^        ^                  ^                          ^
+        // 0        removed            current_size        new_size (e.g., size_1s)
+        unsigned int add_size_1s  = size_1s  - item.removed_1s;
+        unsigned int add_size_10s = size_10s - item.removed_10s;
+        unsigned int add_size_60s = size_60s - item.removed_60s;
+
+        if (add_size_1s > 8 * 1024) // only keep the last 4k elements
         {
-            item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 4 * 1024);
-            item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 4 * 1024);
-            item.removed_1s += 4 * 1024;
+            item.rate_tx_1s.resize(4 * 1024, 0);
+            item.rate_rx_1s.resize(4 * 1024, 0);
+            item.removed_1s = size_1s - 4 * 1024;
         }
-        while (item.rate_tx_1s.size() < size_1s - item.removed_1s)
+        else // push_back
         {
-            item.rate_tx_1s.push_back(0);
-            item.rate_rx_1s.push_back(0);
+            item.rate_tx_1s.insert(item.rate_tx_1s.end(), add_size_1s - item.rate_tx_1s.size(), 0);
+            item.rate_rx_1s.insert(item.rate_rx_1s.end(), add_size_1s - item.rate_rx_1s.size(), 0);
         }
 
-        if (item.rate_tx_10s.size() > 8 * 1024)
+        if (add_size_10s > 8 * 1024) // only keep the last 4k elements
         {
-            item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 4 * 1024);
-            item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 4 * 1024);
-            item.removed_10s += 4 * 1024;
+            item.rate_tx_10s.resize(4 * 1024, 0);
+            item.rate_rx_10s.resize(4 * 1024, 0);
+            item.removed_10s = size_10s - 4 * 1024;
         }
-        while ( item.rate_tx_10s.size() < size_10s - item.removed_10s)
+        else // push_back
         {
-            item.rate_tx_10s.push_back(0);
-            item.rate_rx_10s.push_back(0);
-        }
-
-        if (item.rate_tx_60s.size() > 8 * 1024)
-        {
-            item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 4 * 1024);
-            item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 4 * 1024);
-            item.removed_60s += 4 * 1024;
+            item.rate_tx_10s.insert(item.rate_tx_10s.end(), add_size_10s - item.rate_tx_10s.size(), 0);
+            item.rate_rx_10s.insert(item.rate_rx_10s.end(), add_size_10s - item.rate_rx_10s.size(), 0);
         }
 
-        while (item.rate_tx_60s.size() < size_60s - item.removed_60s)
+        if (add_size_60s > 8 * 1024) // only keep the last 4k elements
         {
-            item.rate_tx_60s.push_back(0);
-            item.rate_rx_60s.push_back(0);
+            item.rate_tx_60s.resize(4 * 1024, 0);
+            item.rate_rx_60s.resize(4 * 1024, 0);
+            item.removed_60s = size_60s - 4 * 1024;
+        }
+        else // push_back, and then remove_front
+        {
+            item.rate_tx_60s.insert(item.rate_tx_60s.end(), add_size_60s - item.rate_tx_60s.size(), 0);
+            item.rate_rx_60s.insert(item.rate_rx_60s.end(), add_size_60s - item.rate_rx_60s.size(), 0);
         }
     }
 
