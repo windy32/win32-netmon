@@ -364,7 +364,7 @@ void MonthView::DrawGraph()
             processName, szYearMonth, (int)(item.sumRx >> 20), (int)(item.sumTx >> 20));
     }
 
-    TextOut(_hdcBuf, x1 + 1, y2 + 2, szText, _tcslen(szText));
+    TextOut(_hdcBuf, x1 + 28, y2 + 2, szText, _tcslen(szText));
 
     // Draw PageUp / PageDown Icon
     if (_curMonth == _model->GetFirstMonth(_process)) // No previous month
@@ -376,7 +376,8 @@ void MonthView::DrawGraph()
         SelectObject(_hdcPage, _hbmpPageUpDark);
     }
 
-    BitBlt(_hdcBuf, x2 - 21, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
+    BitBlt(_hdcBuf, x1, y2 + 6, 7, 7, _hdcPage, 0, 0, SRCCOPY);
+    // BitBlt(_hdcBuf, x2 - 21, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
     if (_curMonth == _model->GetLastMonth(_process)) // No next month
     {
@@ -387,7 +388,8 @@ void MonthView::DrawGraph()
         SelectObject(_hdcPage, _hbmpPageDownDark);
     }
 
-    BitBlt(_hdcBuf, x2 - 9, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
+    BitBlt(_hdcBuf, x1 + 12, y2 + 6, 7, 7, _hdcPage, 0, 0, SRCCOPY);
+    // BitBlt(_hdcBuf, x2 - 9, y2 + 4, 7, 7, _hdcPage, 0, 0, SRCCOPY);
 
     // Write to Screen
     BitBlt(_hdcTarget, 0, 0, _width, _height, _hdcBuf, 0, 0, SRCCOPY);
@@ -455,25 +457,16 @@ INT_PTR MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         int _width  = stRect.right - stRect.left;
         int _height = stRect.bottom - stRect.top;
 
-        // Rectangle for Graph
-        int numDays = Date::GetTotalDays(_curMonth.year, _curMonth.month);
-
         int x1 = 8;
         int y1 = 19;
-        int x2 = _width - 48;
         int y2 = _height - 26;
-
-        int colWidth = (_width - 8 - 48) / numDays;
-        colWidth = min(22, colWidth);
-
-        x2 = x1 + colWidth * numDays;
 
         // Page State
         int xPos = GET_X_LPARAM(lParam); 
         int yPos = GET_Y_LPARAM(lParam);
 
-        if (xPos >= x2 - 21 && xPos <= x2 - 21 + 7 &&
-            yPos >= y2 + 4  && yPos <= y2 + 4  + 7 )
+        if (xPos >= x1 && xPos <= x1 + 7 &&
+            yPos >= y2 + 6  && yPos <= y2 + 6 + 7 )
         {
             if (_curMonth > _model->GetFirstMonth(_process)) // Previous month
             {
@@ -481,8 +474,8 @@ INT_PTR MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 DrawGraph();
             }
         }
-        else if (xPos >= x2 - 9 && xPos <= x2 - 9 + 7 &&
-                 yPos >= y2 + 4 && yPos <= y2 + 4 + 7 )
+        else if (xPos >= x1 + 12 && xPos <= x1 + 12 + 7 &&
+                 yPos >= y2 + 6 && yPos <= y2 + 6 + 7 )
         {
             if (_curMonth < _model->GetLastMonth(_process)) // Next month
             {
