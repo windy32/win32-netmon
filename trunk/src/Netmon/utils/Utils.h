@@ -34,6 +34,7 @@ public:
     static void InsertPacket(PacketInfoEx *pi);
 
     // Time operations
+/*
     static int GetNumDays(int exMonth);
 
     static int GetExMonth();
@@ -45,6 +46,7 @@ public:
     static int GetDay();
     static int GetDay(time_t tTime);
     static int GetWeekDay(int exMonth, int mday);
+*/
 
     // ListView
     static void ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...);

@@ -26,7 +26,7 @@ void Utils::InnerListViewInsert(HWND hList, int index, int numColumns, va_list a
     // Get arguments
     TCHAR *szColumns[MAX_ARG];
 
-    for(int i = 0; i < numColumns; i++)
+    for (int i = 0; i < numColumns; i++)
     {
         szColumns[i] = va_arg(argList, TCHAR *);
     }
@@ -44,7 +44,7 @@ void Utils::InnerListViewInsert(HWND hList, int index, int numColumns, va_list a
     stItem.iItem = ListView_InsertItem(hList, &stItem);
 
     // - Insert Sub Items
-    for(int i = 1; i < numColumns; i++)
+    for (int i = 1; i < numColumns; i++)
     {
         stItem.pszText = szColumns[i];
         stItem.iSubItem = i;
@@ -143,6 +143,7 @@ void Utils::InsertPacket(PacketInfoEx *pi)
 }
 
 // Time
+/*
 int Utils::GetNumDays(int exMonth)
 {
     int iYear  = 1970 + exMonth / 12;
@@ -228,6 +229,7 @@ int Utils::GetWeekDay(int exMonth, int mday)
 
     return tmTime.tm_wday; // 0 to 6
 }
+*/
 
 // ListView
 void Utils::ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...)

@@ -105,8 +105,6 @@ public:
     // 2. Returns false and timeout = true, if no packet captured in this period, should call again
     // 3. Returns false and timeout = false, if some error occurred
     virtual bool Capture(PacketInfo *pi, bool *timeout) = 0;
-
-    //bool ReConnect(int i);
 };
 
 #endif

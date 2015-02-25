@@ -17,7 +17,8 @@
 #define MONTH_MODEL_H
 
 #include "../abstract/Model.h"
-#include "../../Utils/SQLite.h"
+#include "../../utils/SQLite.h"
+#include "../../utils/Date.h"
 
 class MonthModel : public Model
 {
@@ -43,18 +44,13 @@ public:
     } MonthItem;
 
     // 2. The Item of a Process ------------------------------
-    typedef struct tagMtModelItem
-    {
-        static int firstMonth; // Jan 1970 = 0, Feb 1970 = 1 ...
-        std::vector<MonthItem> months;
-    } MtModelItem;
+    typedef std::map<ShortDate, MonthItem> MtModelItem;
 
 private:
     std::map<int, MtModelItem> _items;
     bool _clear_flag;
 
 private:
-    void Fill();
     void InitDatabase();
     void ReadDatabase();
     static void ReadDatabaseCallback(SQLiteRow *row, void *context);
@@ -67,7 +63,7 @@ public:
     void InsertPacket(PacketInfoEx *pi);
 
     // Export Model Info
-    void Export(int process, int curMonth, MonthItem &item);
+    void Export(int process, const ShortDate &date, MonthItem &item);
 
     // Save Database (in case of crash)
     void SaveDatabase();
@@ -75,8 +71,8 @@ public:
     // Clear Database
     void ClearDatabase();
 
-    int GetFirstMonth();
-    int GetLastMonth();
+    ShortDate GetFirstMonth(int puid);
+    ShortDate GetLastMonth(int puid);
 };
 
 #endif

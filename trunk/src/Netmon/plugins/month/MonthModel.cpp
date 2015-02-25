@@ -18,8 +18,6 @@
 #include "../../Utils/Utils.h"
 #include "../../Utils/ProcessModel.h"
 
-int MonthModel::MtModelItem::firstMonth = -1;
-
 MonthModel::MonthModel()
 {
     _items[PROCESS_ALL] = MtModelItem();
@@ -41,25 +39,6 @@ MonthModel::~MonthModel()
     {
         SaveDatabase();
     }
-}
-
-void MonthModel::Fill()
-{
-    Lock();
-
-    // Calculate the desired length of the vectors
-    int exMonth = Utils::GetExMonth();
-    int length = exMonth - MtModelItem::firstMonth + 1;
-
-    // Fill vectors
-    for(std::map<int, MtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
-    {
-        while( (int)it->second.months.size() < length)
-        {
-            it->second.months.push_back(MonthItem());
-        }
-    }
-    Unlock();
 }
 
 void MonthModel::InitDatabase()
@@ -99,12 +78,6 @@ void MonthModel::ReadDatabase()
 
     // Select
     SQLite::Select(command, &row, ReadDatabaseCallback, this);
-
-    // Set current month as first month when no data is available
-    if (MtModelItem::firstMonth == -1 )
-    {
-        MtModelItem::firstMonth = Utils::GetExMonth();
-    }
 }
 
 void MonthModel::ReadDatabaseCallback(SQLiteRow *row, void *context)
@@ -112,45 +85,40 @@ void MonthModel::ReadDatabaseCallback(SQLiteRow *row, void *context)
     MonthModel *model = (MonthModel *)context;
 
     int puid        = row->GetDataInt32(0);
-    int date        = row->GetDataInt32(1); // Higher 16 bit for exMonth (Jan 1970 = 0), 
-                                            // lower 16 bit for mday
+    int time        = row->GetDataInt32(1); // 32 bit time_t
     __int64 txBytes = row->GetDataInt64(2);
     __int64 rxBytes = row->GetDataInt64(3);
 
-    int mDay = Utils::GetMdayByDate(date);
-    int exMonth = Utils::GetExMonthByDate(date);
+    Date date(time);
+    ShortDate sdate = date.ToShortDate();
 
     // Insert an MtViewItem if PUID not Exist
-    if (model->_items.count(puid) == 0 )
+    if (model->_items.count(puid) == 0)
     {
         model->_items[puid] = MtModelItem();
-        MtModelItem::firstMonth = Utils::GetExMonthByDate(date);
     }
 
-    // Fill Vectors
-    model->Fill();
-
-    while (exMonth - MtModelItem::firstMonth > (int)model->_items[puid].months.size() - 1)
+    // Insert an MonthItem if Date not Exist
+    if (model->_items[puid].count(sdate) == 0)
     {
-        model->_items[puid].months.push_back(MonthItem());
+        model->_items[puid][sdate] = MonthItem();
     }
-
-    while (exMonth - MtModelItem::firstMonth > (int)model->_items[PROCESS_ALL].months.size() - 1)
+    if (model->_items[PROCESS_ALL].count(sdate) == 0)
     {
-        model->_items[PROCESS_ALL].months.push_back(MonthItem());
+        model->_items[PROCESS_ALL][sdate] = MonthItem();
     }
 
     // Update Traffic
-    MonthItem &mItem = model->_items[puid].months[exMonth - MtModelItem::firstMonth];
-    MonthItem &mItemAll = model->_items[PROCESS_ALL].months[exMonth - MtModelItem::firstMonth];
+    MonthItem &mItem = model->_items[puid][sdate];
+    MonthItem &mItemAll = model->_items[PROCESS_ALL][sdate];
 
-    mItem.dayTx[mDay - 1] = txBytes;
-    mItem.dayRx[mDay - 1] = rxBytes;
+    mItem.dayTx[date.mday - 1] = txBytes;
+    mItem.dayRx[date.mday - 1] = rxBytes;
     mItem.sumTx += txBytes;
     mItem.sumRx += rxBytes;
 
-    mItemAll.dayTx[mDay - 1] += txBytes;
-    mItemAll.dayRx[mDay - 1] += rxBytes;
+    mItemAll.dayTx[date.mday - 1] += txBytes;
+    mItemAll.dayRx[date.mday - 1] += rxBytes;
     mItemAll.sumTx += txBytes;
     mItemAll.sumRx += rxBytes;
 }
@@ -164,30 +132,30 @@ void MonthModel::SaveDatabase()
 
     // Insert records
     std::map<int, MtModelItem>::iterator it;
-    for(it = _items.begin(); it != _items.end(); ++it) // Loop of Process
+    for (it = _items.begin(); it != _items.end(); ++it) // Loop of Process
     {
         int puid = it->first;
-
-        if (puid == PROCESS_ALL )
+        if (puid == PROCESS_ALL)
         {
             continue;
         }
 
-        for(int i = 0; i < (int)it->second.months.size(); i++) // Loop of Month Array
+        std::map<ShortDate, MonthItem>::iterator i;
+        for (i = it->second.begin(); i != it->second.end(); ++i) // Loop of Pages
         {
-            int exMonth = MtModelItem::firstMonth + i;
-            int numDays = Utils::GetNumDays(exMonth);
+            ShortDate sdate = i->first;
+            MonthItem item = i->second;
+            int totalDays = Date::GetTotalDays(sdate.year, sdate.month);
 
-            for(int j = 0; j < numDays; j++) // Loop of Month
+            for (int j = 0; j < totalDays; j++) // Loop of Days
             {
-                int date = (exMonth << 16) + (j + 1); // j + 1: [1, 31]
+                Date date(sdate.year, sdate.month, j + 1);
 
                 // Build Command
                 TCHAR command[256];
-
                 _stprintf_s(command, _countof(command), 
                     TEXT("Insert Into Traffic Values(%d, %d, %I64d, %I64d, 0, 0);"), 
-                    puid, date, it->second.months[i].dayTx[j], it->second.months[i].dayRx[j]);
+                    puid, date.ToInt32(), item.dayTx[j], item.dayRx[j]);
 
                 // Insert
                 SQLite::Exec(command, true);
@@ -208,68 +176,91 @@ void MonthModel::ClearDatabase()
 
 void MonthModel::InsertPacket(PacketInfoEx *pi)
 {
-    // Insert an MtViewItem if PUID not Exist
     Lock();
-    if (_items.count(pi->puid) == 0 )
+
+    // Create date object
+    Date date(pi->time_s);
+    ShortDate sdate(date.year, date.month);
+
+    // Insert an MtViewItem if PUID not Exist
+    if (_items.count(pi->puid) == 0)
     {
         _items[pi->puid] = MtModelItem();
     }
-    Unlock();
 
-    // Fill
-    Fill();
-
-    // Update Traffic
-    int mDay = Utils::GetDay((time_t)pi->time_s);
-
-    Lock();
-
-    MonthItem &mItem = _items[pi->puid].months[Utils::GetExMonth() - MtModelItem::firstMonth];
-    MonthItem &mItemAll = _items[PROCESS_ALL].months[Utils::GetExMonth() - MtModelItem::firstMonth];
-
-    if (pi->dir == DIR_UP )
+    // Insert an MonthItem if Date not Exist
+    if (_items[pi->puid].count(sdate) == 0)
     {
-        mItem.dayTx[mDay - 1] += pi->size;
+        _items[pi->puid][sdate] = MonthItem();
+    }
+    if (_items[PROCESS_ALL].count(sdate) == 0)
+    {
+        _items[PROCESS_ALL][sdate] = MonthItem();
+    }
+
+    MonthItem &mItem = _items[pi->puid][sdate];
+    MonthItem &mItemAll = _items[PROCESS_ALL][sdate];
+
+    if (pi->dir == DIR_UP)
+    {
+        mItem.dayTx[date.mday - 1] += pi->size;
         mItem.sumTx += pi->size;
 
-        mItemAll.dayTx[mDay - 1] += pi->size;
+        mItemAll.dayTx[date.mday - 1] += pi->size;
         mItemAll.sumTx += pi->size;
     }
-    else if (pi->dir == DIR_DOWN )
+    else if (pi->dir == DIR_DOWN)
     {
-        mItem.dayRx[mDay - 1] += pi->size;
+        mItem.dayRx[date.mday - 1] += pi->size;
         mItem.sumRx += pi->size;
 
-        mItemAll.dayRx[mDay - 1] += pi->size;
+        mItemAll.dayRx[date.mday - 1] += pi->size;
         mItemAll.sumRx += pi->size;
     }
 
     Unlock();
 }
 
-void MonthModel::Export(int process, int curMonth, MonthItem &item)
+void MonthModel::Export(int process, const ShortDate &sdate, MonthItem &item)
 {
-    Fill();
     Lock();
     if (_items.count(process) != 0)
     {
-        item = _items[process].months[curMonth - MtModelItem::firstMonth];
+        item = _items[process][sdate];
     }
     Unlock();
 }
 
-int MonthModel::GetFirstMonth()
+ShortDate MonthModel::GetFirstMonth(int puid)
 {
-    return MtModelItem::firstMonth;
-}
-
-int MonthModel::GetLastMonth()
-{
-    Fill();
+    ShortDate sdate = ShortDate::Null; // Default: nothing exist (which is unlikely to happen)
 
     Lock();
-    int size = _items[PROCESS_ALL].months.size();
+    std::map<ShortDate, MonthItem> &item = _items[puid];
+    std::map<ShortDate, MonthItem>::iterator it = item.begin();
+
+    if (it != item.end()) // There is at least one key-value pair
+    {
+        sdate = it->first;
+    }
     Unlock();
 
-    return MtModelItem::firstMonth + size - 1;
+    return sdate;
+}
+
+ShortDate MonthModel::GetLastMonth(int puid)
+{
+    ShortDate sdate = ShortDate::Null; // Default: nothing exist (which is unlikely to happen)
+
+    Lock();
+    std::map<ShortDate, MonthItem> &item = _items[puid];
+    std::map<ShortDate, MonthItem>::reverse_iterator it = item.rbegin();
+
+    if (it != item.rend()) // There is at least one key-value pair
+    {
+        sdate = it->first;
+    }
+    Unlock();
+
+    return sdate;
 }

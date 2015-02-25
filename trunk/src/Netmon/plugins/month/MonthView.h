@@ -23,7 +23,7 @@ class MonthView : public View
 {
 protected:
     // Settings
-    static int _curMonth;
+    static ShortDate _curMonth;
 
     // GDI Objects
     static HDC     _hdcTarget;
