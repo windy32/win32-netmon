@@ -28,6 +28,7 @@
 #include "utils/Profile.h"
 
 #include "traffic-src/PcapSource.h"
+#include "traffic-src/VirtualSource.h"
 
 #include "DlgPreferences.h"
 #include "DlgAbout.h"
@@ -113,7 +114,8 @@ static bool    g_bHideWindow = false;
 ///----------------------------------------------------------------------------------------------//
 static DWORD WINAPI CaptureThread(LPVOID lpParam)
 {
-    PcapSource source;
+    VirtualSource source;
+    //PcapSource source;
     PacketInfo pi;
     PacketInfoEx pie;
 

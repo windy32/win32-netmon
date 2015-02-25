@@ -29,6 +29,8 @@ public:
     virtual bool SelectDevice(int index);
 
     virtual bool Capture(PacketInfo *pi, bool *timeout);
+
+    bool Reconnect(int index) { return true; };
 };
 
 #endif

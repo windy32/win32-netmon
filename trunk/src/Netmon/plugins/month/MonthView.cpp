@@ -258,7 +258,7 @@ void MonthView::DrawGraph()
     SetTextAlign(_hdcBuf, TA_LEFT);
     SetTextColor(_hdcBuf, RGB(0x00, 0x00, 0x00));
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         _stprintf_s(yAxisTextFormat, _countof(yAxisTextFormat), 
             TEXT("%%.%dlf MB"), scalePrecision[i]);
@@ -272,7 +272,7 @@ void MonthView::DrawGraph()
     // - Rx
     SetDCBrushColor(_hdcBuf, RGB(0x22, 0x8B, 0x22));
 
-    for(int i = 0; i < numDays; i++)
+    for (int i = 0; i < numDays; i++)
     {
         double rxTraffic = (item.dayRx[i] >> 10) / (scaleTraffic * 1024.0);
         int yPos = 

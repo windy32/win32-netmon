@@ -34,6 +34,32 @@ void RealtimeModel::Fill()
     // When time timeOffset < 10, there should be one element in rate_10s
     // When time timeOffset < 20, there should be two element in rate_20s
     // ...
+
+    // If the system time is reset, it will crash here, so we have to fix
+    if (time(0) < _startTime)
+    {
+        // Reset start time
+        _startTime = (int)time(0);
+
+        // Clear all items
+        for(std::map<int, RtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
+        {
+            RtModelItem &item = it->second;
+
+            item.rate_tx_1s.clear();
+            item.rate_tx_10s.clear();
+            item.rate_tx_60s.clear();
+
+            item.rate_rx_1s.clear();
+            item.rate_rx_10s.clear();
+            item.rate_rx_60s.clear();
+
+            item.removed_1s = 0;
+            item.removed_10s = 0;
+            item.removed_60s = 0;
+        }
+    }
+
     int timeOffset = (int)time(0) - _startTime;
 
     unsigned int size_1s  = (unsigned int)(timeOffset + 1);
@@ -47,37 +73,38 @@ void RealtimeModel::Fill()
     {
         RtModelItem &item = it->second;
 
-        if (item.rate_tx_1s.size() > 8 * 1024 ) // Remove at least 4 KB one time
+        if (item.rate_tx_1s.size() > 8 * 1024) // Remove at least 4 KB one time
         {
             item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 4 * 1024);
             item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 4 * 1024);
             item.removed_1s += 4 * 1024;
         }
-        while( item.rate_tx_1s.size() < size_1s - item.removed_1s )
+        while (item.rate_tx_1s.size() < size_1s - item.removed_1s)
         {
             item.rate_tx_1s.push_back(0);
             item.rate_rx_1s.push_back(0);
         }
 
-        if (item.rate_tx_10s.size() > 8 * 1024 )
+        if (item.rate_tx_10s.size() > 8 * 1024)
         {
             item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 4 * 1024);
             item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 4 * 1024);
             item.removed_10s += 4 * 1024;
         }
-        while( item.rate_tx_10s.size() < size_10s - item.removed_10s )
+        while ( item.rate_tx_10s.size() < size_10s - item.removed_10s)
         {
             item.rate_tx_10s.push_back(0);
             item.rate_rx_10s.push_back(0);
         }
 
-        if (item.rate_tx_60s.size() > 8 * 1024 )
+        if (item.rate_tx_60s.size() > 8 * 1024)
         {
             item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 4 * 1024);
             item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 4 * 1024);
             item.removed_60s += 4 * 1024;
         }
-        while( item.rate_tx_60s.size() < size_60s - item.removed_60s )
+
+        while (item.rate_tx_60s.size() < size_60s - item.removed_60s)
         {
             item.rate_tx_60s.push_back(0);
             item.rate_rx_60s.push_back(0);
