@@ -114,8 +114,8 @@ static bool    g_bHideWindow = false;
 ///----------------------------------------------------------------------------------------------//
 static DWORD WINAPI CaptureThread(LPVOID lpParam)
 {
-    VirtualSource source;
-    //PcapSource source;
+    // VirtualSource source;
+    PcapSource source;
     PacketInfo pi;
     PacketInfoEx pie;
 
