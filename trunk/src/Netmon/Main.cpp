@@ -294,7 +294,7 @@ static void UpdateMenuLanguage()
         Utils::SetMenuString(hMenuView, i, TRUE, g_plugins[i]->GetName());
     }
 
-    Utils::SetMenuString(hMenuMain, g_plugins.size() + 1, TRUE, 
+    Utils::SetMenuString(hMenuView, g_plugins.size() + 1, TRUE, 
         Language::GetString(IDS_MENU_VIEW_ADAPTER));
     Utils::SetMenuString(hMenuView, g_plugins.size() + 3, TRUE,
         Language::GetString(IDS_MENU_VIEW_SHOW_HIDDEN));
