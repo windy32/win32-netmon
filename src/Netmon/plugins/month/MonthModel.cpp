@@ -151,11 +151,6 @@ void MonthModel::SaveDatabase()
             {
                 Date date(sdate.year, sdate.month, j + 1);
 
-                if (sdate.month == -1)
-                {
-                    int stopHere = 0;
-                }
-
                 // Build Command
                 TCHAR command[256];
                 _stprintf_s(command, _countof(command), 
