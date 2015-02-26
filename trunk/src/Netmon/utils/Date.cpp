@@ -48,6 +48,11 @@ ShortDate ShortDate::NextMonth()
     return prev;
 }
 
+int ShortDate::DiffFrom(const ShortDate &target) const
+{
+    return abs((year - target.year) * 12 + (month - target.month));
+}
+
 bool ShortDate::operator<(const ShortDate &right) const
 {
     return (year < right.year) || (year == right.year && month < right.month);

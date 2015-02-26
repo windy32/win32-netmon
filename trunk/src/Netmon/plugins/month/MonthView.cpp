@@ -82,10 +82,12 @@ MonthView::~MonthView()
 void MonthView::SetProcess(int puid)
 {
     _process = puid;
+    _curMonth = _model->GetClosestMonth(puid, _curMonth);
 
-    if (_curMonth > _model->GetLastMonth(puid))
+    if (_curMonth == ShortDate::Null)
     {
-        _curMonth = _model->GetLastMonth(puid);
+        Date now(time(0));
+        _curMonth = ShortDate(now.year, now.month);
     }
 
     DrawGraph();
