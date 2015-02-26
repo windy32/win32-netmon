@@ -73,6 +73,7 @@ public:
 
     ShortDate GetFirstMonth(int puid);
     ShortDate GetLastMonth(int puid);
+    ShortDate GetClosestMonth(int puid, const ShortDate &target);
 };
 
 #endif

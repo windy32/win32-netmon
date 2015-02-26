@@ -151,6 +151,11 @@ void MonthModel::SaveDatabase()
             {
                 Date date(sdate.year, sdate.month, j + 1);
 
+                if (sdate.month == -1)
+                {
+                    int stopHere = 0;
+                }
+
                 // Build Command
                 TCHAR command[256];
                 _stprintf_s(command, _countof(command), 
@@ -259,6 +264,42 @@ ShortDate MonthModel::GetLastMonth(int puid)
     if (it != item.rend()) // There is at least one key-value pair
     {
         sdate = it->first;
+    }
+    Unlock();
+
+    return sdate;
+}
+
+ShortDate MonthModel::GetClosestMonth(int puid, const ShortDate &target)
+{
+    ShortDate sdate; // Default: nothing exist (which is unlikely to happen)
+
+    Lock();
+    std::map<ShortDate, MonthItem> &item = _items[puid];
+    std::map<ShortDate, MonthItem>::iterator it = item.begin();
+
+    if (it == item.end()) // There's no month items
+    {
+        sdate = ShortDate::Null;
+    }
+    else // There are some items, pick the one which is closest to target
+    {
+        int minDiff = INT_MAX;
+        ShortDate minDate;
+
+        for (it = item.begin(); it != item.end(); ++it)
+        {
+            ShortDate month = it->first;
+            int diff = target.DiffFrom(month);
+
+            if (diff < minDiff)
+            {
+                minDiff = diff;
+                minDate = month;
+            }
+        }
+        
+        sdate = minDate;
     }
     Unlock();
 

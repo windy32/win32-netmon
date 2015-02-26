@@ -17,6 +17,7 @@ public:
 public:
     ShortDate PrevMonth();
     ShortDate NextMonth();
+    int DiffFrom(const ShortDate &target) const;
 
 public:
     bool operator<(const ShortDate &right) const;
