@@ -226,9 +226,9 @@ void RealtimeView::DrawGraph()
 
     // - X Axis
     //      A labels is 120 pixels to one another.
-    //      For ZOOM_1S , it's 1 minutes
-    //      For ZOOM_10S, it's 20 minutes
-    //      For ZOOM_60S, is's 2 hours
+    //      For ZOOM_1S , it's 1 minute
+    //      For ZOOM_10S, it's 10 minutes
+    //      For ZOOM_60S, is's 1 hour
     TCHAR xAxisTextArray[3][5][16] = 
     {
         {TEXT("00:00:00"), TEXT("00:01:00"), TEXT("00:02:00"), TEXT("00:03:00"), TEXT("00:04:00")},
