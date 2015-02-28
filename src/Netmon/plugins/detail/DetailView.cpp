@@ -71,12 +71,12 @@ void DetailView::SetProcess(int puid)
     _process = puid;
     _curPage = 0;
 
-    UpdateContent();
+    UpdateContent(true);
 }
 
 void DetailView::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-    UpdateContent();
+    UpdateContent(false);
 }
 
 // ListView Operations
@@ -129,7 +129,7 @@ void DetailView::UpdateSize(HWND hWnd)
     MoveWindow(GetDlgItem(hWnd, IDE_DETAIL_GOTO),     _width - 60,  _height - 34, 50, 24, TRUE);
 }
 
-void DetailView::UpdateContent()
+void DetailView::UpdateContent(bool forceRebuild)
 {
     // Update Status Label
     TCHAR status[256];
@@ -157,66 +157,115 @@ void DetailView::UpdateContent()
         (_curPage + 1 < _model->GetLastPageIndex(_process) + 1) ? TRUE : FALSE);
 
     // Update ListView
-    if (true) // if need_update()
+    // --------------------------
+    // Callers of UpdateContent()
+    // 1. SetProcess              (have to rebuild list)
+    // 2. TimerProc               (depends)
+    //                            (if new packets arrive in current page, then need to rebuild list)
+    // 3. OnPageUp                (have to rebuild list)
+    // 4. OnPageDown              (have to rebuild list)
+    // 5. OnGoto                  (have to rebuild list)
+    // 6. SwitchLanguage          (have to rebuild list)
+    // 7. DlgProc (WM_INITDIALOG) (have to rebuild list)
+    if (forceRebuild)
     {
         std::vector<DetailModel::PacketItem> packets;
         _model->Export(_process, _curPage, packets);
 
-        // item[0]  <---> packets[0]   --+
-        // item[1]  <---> packets[1]     | The items are "unchanged"
-        // ...            ...            | if corresponding items are the same
-        // item[k]  <---> packets[k]   --+
-        //                packets[k+1]
-        //                ...
-        //                packets[n]
-        bool unchanged = true;
-        if (packets.size() >= _items.size())
-        {
-            for (unsigned int i = 0; i < _items.size(); i++)
-            {
-                if (_items[i] != packets[i])
-                {
-                    unchanged = false;
-                }
-            }
-        }
-        else // packet.size() < _items.size()
-        {
-            unchanged = false;
-        }
+        Utils::ListViewClear(_hList);
 
-        if (unchanged)
+        for (unsigned int i = 0; i < packets.size(); i++)
         {
-            for (unsigned int i = _items.size(); i < packets.size(); i++)
-            {
-                ListViewInsert(
-                    packets[i].uid, 
-                    packets[i].puid, 
-                    packets[i].dir,
-                    packets[i].protocol,
-                    packets[i].size,
-                    packets[i].time,
-                    packets[i].port);
-            }
-        }
-        else
-        {
-            Utils::ListViewClear(_hList);
-
-            for (unsigned int i = 0; i < packets.size(); i++)
-            {
-                ListViewInsert(
-                    packets[i].uid, 
-                    packets[i].puid, 
-                    packets[i].dir,
-                    packets[i].protocol,
-                    packets[i].size,
-                    packets[i].time,
-                    packets[i].port);
-            }
+            ListViewInsert(
+                packets[i].uid, 
+                packets[i].puid, 
+                packets[i].dir,
+                packets[i].protocol,
+                packets[i].size,
+                packets[i].time,
+                packets[i].port);
         }
 
         _items = packets;
+    }
+    else // called by TimerProc
+    {
+        if (_items.size() == 100)
+        {
+            // If current page has been full, there's no need to update list
+        }
+        else // New packets may arrive in current page
+        {
+            __int64 totalItems = _model->GetPacketCount(_process);
+            int itemsInLastPage = (totalItems == 0) ? 0 : 
+                (totalItems - 1) % 100 + 1;
+
+            if (_items.size() == itemsInLastPage)
+            {
+                // There's also no need to update list
+            }
+            else
+            {
+                std::vector<DetailModel::PacketItem> packets;
+                _model->Export(_process, _curPage, packets);
+
+                // item[0]  <---> packets[0]   --+
+                // item[1]  <---> packets[1]     | The items are "unchanged"
+                // ...            ...            | if corresponding items are the same
+                // item[k]  <---> packets[k]   --+
+                //                packets[k+1]
+                //                ...
+                //                packets[n]
+                bool unchanged = true;
+                if (packets.size() >= _items.size())
+                {
+                    for (unsigned int i = 0; i < _items.size(); i++)
+                    {
+                        if (_items[i] != packets[i])
+                        {
+                            unchanged = false;
+                        }
+                    }
+                }
+                else // packet.size() < _items.size()
+                {
+                    unchanged = false;
+                }
+
+                if (unchanged)
+                {
+                    for (unsigned int i = _items.size(); i < packets.size(); i++)
+                    {
+                        ListViewInsert(
+                            packets[i].uid, 
+                            packets[i].puid, 
+                            packets[i].dir,
+                            packets[i].protocol,
+                            packets[i].size,
+                            packets[i].time,
+                            packets[i].port);
+                    }
+                }
+                else
+                {
+                    Utils::ListViewClear(_hList);
+
+                    for (unsigned int i = 0; i < packets.size(); i++)
+                    {
+                        ListViewInsert(
+                            packets[i].uid, 
+                            packets[i].puid, 
+                            packets[i].dir,
+                            packets[i].protocol,
+                            packets[i].size,
+                            packets[i].time,
+                            packets[i].port);
+                    }
+                }
+
+                _items = packets;
+            }
+        }
     }
 }
 
@@ -224,7 +273,7 @@ void DetailView::UpdateContent()
 void DetailView::OnPageUp()
 {
     _curPage -= 1;
-    UpdateContent();
+    UpdateContent(true);
 
     EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
         (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
@@ -235,7 +284,7 @@ void DetailView::OnPageUp()
 void DetailView::OnPageDown()
 {
     _curPage += 1;
-    UpdateContent();
+    UpdateContent(true);
 
     EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
         (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
@@ -248,12 +297,12 @@ void DetailView::OnGoto()
     BOOL translated;
     int page = GetDlgItemInt(_hWnd, IDE_DETAIL_GOTO, &translated, TRUE);
 
-    if (!translated ) 
+    if (!translated) 
     {
         MessageBox(_hWnd, Language::GetString(IDS_DTVIEW_NUM_INCORRECT),
             TEXT("Error"), MB_ICONWARNING | MB_OK);
     }
-    else if (page <= 0 || page > _model->GetLastPageIndex(_process) + 1 )
+    else if (page <= 0 || page > _model->GetLastPageIndex(_process) + 1)
     {
         MessageBox(_hWnd, Language::GetString(IDS_DTVIEW_NUM_OUT_OF_RANGE),
             TEXT("Error"), MB_ICONWARNING | MB_OK);
@@ -261,7 +310,7 @@ void DetailView::OnGoto()
     else
     {
         _curPage = page - 1;
-        UpdateContent();
+        UpdateContent(true);
 
         EnableWindow(GetDlgItem(_hWnd, IDB_DETAIL_PAGEUP), 
             (_curPage + 1 > _model->GetFirstPageIndex(_process) + 1) ? TRUE : FALSE);
@@ -285,7 +334,7 @@ void DetailView::SwitchLanguage(HWND hWnd)
         Language::GetString(IDS_DTVIEW_LIST_PORT));
 
     // List view content & label
-    UpdateContent();
+    UpdateContent(true);
 
     // Button
     SetDlgItemText(hWnd, IDB_DETAIL_GOTO, Language::GetString(IDS_DTVIEW_GOTO));
@@ -322,7 +371,7 @@ INT_PTR DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         // Clear items
         _items.clear();
 
-        UpdateContent();
+        UpdateContent(true);
 
         // Start Timer
         SetTimer(hWnd, 0, 1000, DetailView::TimerProc);
