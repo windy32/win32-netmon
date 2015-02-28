@@ -319,6 +319,9 @@ INT_PTR DetailView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             Language::GetString(IDS_DTVIEW_LIST_PORT),
             60, 70, 50, 80, 60, 220, 60);
 
+        // Clear items
+        _items.clear();
+
         UpdateContent();
 
         // Start Timer
