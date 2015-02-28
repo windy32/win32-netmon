@@ -124,7 +124,7 @@ void DetailView::UpdateSize(HWND hWnd)
     MoveWindow(GetDlgItem(hWnd, IDL_DETAIL),   10, 10, _width - 20, _height - 50, TRUE);
     MoveWindow(GetDlgItem(hWnd, IDB_DETAIL_PAGEUP),   10,  _height - 34,  50, 24, TRUE);
     MoveWindow(GetDlgItem(hWnd, IDB_DETAIL_PAGEDOWN), 70,  _height - 34,  50, 24, TRUE);
-    MoveWindow(GetDlgItem(hWnd, IDL_DETAIL_STATUS),   130, _height - 30, 300, 20, TRUE);
+    MoveWindow(GetDlgItem(hWnd, IDL_DETAIL_STATUS),   130, _height - 30, 450, 20, TRUE);
     MoveWindow(GetDlgItem(hWnd, IDB_DETAIL_GOTO),     _width - 150, _height - 34, 80, 24, TRUE);
     MoveWindow(GetDlgItem(hWnd, IDE_DETAIL_GOTO),     _width - 60,  _height - 34, 50, 24, TRUE);
 }
