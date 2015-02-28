@@ -40,7 +40,7 @@ private:
     static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
     static void UpdateSize(HWND hWnd);
-    static void UpdateContent();
+    static void UpdateContent(bool forceRebuild);
 
     static void ListViewInsert(
         int uid, int puid, int dir, int protocol, int size, __int64 time, int port);
