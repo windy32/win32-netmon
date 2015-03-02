@@ -78,16 +78,18 @@ void RealtimeModel::Fill()
 
         // If the system time is moved forward too much, timeOffset will be very large
         // In this case, there's no need to first push_back all the items and then erase them
-        //                               ------- add_size -------
-        //              current vector  /                        \
+        //              -------------- new_size ---------------
+        //             /                                       \
+        //            /                  ------- add_size -------
+        //           /  current vector  /                        \
         // +--------o==================o--------------------------+
         // ^        ^                  ^                          ^
         // 0        removed            current_size        new_size (e.g., size_1s)
-        int add_size_1s  = size_1s  - item.removed_1s - (int)item.rate_rx_1s.size();
+        int add_size_1s  = size_1s  - item.removed_1s  - (int)item.rate_rx_1s.size();
         int add_size_10s = size_10s - item.removed_10s - (int)item.rate_rx_10s.size();
         int add_size_60s = size_60s - item.removed_60s - (int)item.rate_rx_60s.size();
 
-        if (add_size_1s > 8 * 1024) // only keep the last 4k elements
+        if (add_size_1s > 8 * 1024) // avoid add_size too large
         {
             item.rate_tx_1s.clear();
             item.rate_rx_1s.clear();
@@ -99,9 +101,15 @@ void RealtimeModel::Fill()
         {
             item.rate_tx_1s.insert(item.rate_tx_1s.end(), add_size_1s, 0);
             item.rate_rx_1s.insert(item.rate_rx_1s.end(), add_size_1s, 0);
+
+            while (item.rate_tx_1s.size() > 8 * 1024)
+            {
+                item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 4 * 1024);
+                item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 4 * 1024);
+            }
         }
 
-        if (add_size_10s > 8 * 1024) // only keep the last 4k elements
+        if (add_size_10s > 8 * 1024) // avoid add_size too large
         {
             item.rate_tx_10s.clear();
             item.rate_rx_10s.clear();
@@ -113,9 +121,15 @@ void RealtimeModel::Fill()
         {
             item.rate_tx_10s.insert(item.rate_tx_10s.end(), add_size_10s, 0);
             item.rate_rx_10s.insert(item.rate_rx_10s.end(), add_size_10s, 0);
+
+            while (item.rate_tx_10s.size() > 8 * 1024)
+            {
+                item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 4 * 1024);
+                item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 4 * 1024);
+            }
         }
 
-        if (add_size_60s > 8 * 1024) // only keep the last 4k elements
+        if (add_size_60s > 8 * 1024) // avoid add_size too large
         {
             item.rate_tx_60s.clear();
             item.rate_rx_60s.clear();
@@ -127,6 +141,12 @@ void RealtimeModel::Fill()
         {
             item.rate_tx_60s.insert(item.rate_tx_60s.end(), add_size_60s, 0);
             item.rate_rx_60s.insert(item.rate_rx_60s.end(), add_size_60s, 0);
+
+            while (item.rate_tx_60s.size() > 8 * 1024)
+            {
+                item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 4 * 1024);
+                item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 4 * 1024);
+            }
         }
     }
 
