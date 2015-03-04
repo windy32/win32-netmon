@@ -80,7 +80,7 @@ void RealtimeView::DrawGraph()
     int _height = stRect.bottom - stRect.top;
 
     // - Rectangle for Graph
-    int x1 = 34;
+    int x1 = 50;
     int y1 = 10;
     int x2 = _width - 10;
     int y2 = _height - 26;
@@ -131,7 +131,7 @@ void RealtimeView::DrawGraph()
         (_zoomFactor == ZOOM_1S)  ? maxRate :
         (_zoomFactor == ZOOM_10S) ? maxRate / 10 : maxRate / 60;
 
-    maxRate = maxRate / 1024 + 1; // Unit is now KB/s
+    maxRate = maxRate / 1000 + 1; // Unit is now KB/s
 
     // Decide Scale
     //    1.  [     0 KB/s,     10 KB/s]     10,      8,      6,     4,     2,    0
@@ -149,6 +149,7 @@ void RealtimeView::DrawGraph()
     //    11. (   800 KB/s,   1000 KB/s]   1000,    800,    600,   400,   200,    0
     //
     //    12. (  1000 KB/s,   2000 KB/s]   2000,   1500,   1000,   500,     0
+    //    -------------------------------------------------------------------------
     //    13. (  2000 KB/s,   4000 KB/s]   4000,   3000,   2000,  1000,     0
     //    14. (  4000 KB/s,   5000 KB/s]   5000,   4000,   3000,  2000,  1000,    0
     //    15. (  5000 KB/s,   8000 KB/s]   8000,   6000,   4000,  2000,     0
@@ -159,8 +160,22 @@ void RealtimeView::DrawGraph()
     //    19. ( 40000 KB/s,  50000 KB/s]  50000,  40000,  30000, 20000, 10000,    0
     //    20. ( 50000 KB/s,  80000 KB/s]  80000,  60000,  40000, 20000,     0
     //    21. ( 80000 KB/s, 100000 KB/s] 100000,  80000,  60000, 40000, 20000,    0
-
+    //
     //    22. (100000 KB/s, 200000 KB/s] 200000, 150000, 100000, 50000,     0
+    //    -------------------------------------------------------------------------
+    //    13. (  2 MB/s,   4 MB/s]   4,   3,   2,  1,  0
+    //    14. (  4 MB/s,   5 MB/s]   5,   4,   3,  2,  1, 0
+    //    15. (  5 MB/s,   8 MB/s]   8,   6,   4,  2,  0
+    //    16. (  8 MB/s,  10 MB/s]  10,   8,   6,  4,  2, 0
+    //
+    //    17. ( 10 MB/s,  20 MB/s]  20,  15,  10,  5,  0
+    //    18. ( 20 MB/s,  40 MB/s]  40,  30,  20, 10,  0
+    //    19. ( 40 MB/s,  50 MB/s]  50,  40,  30, 20, 10, 0
+    //    20. ( 50 MB/s,  80 MB/s]  80,  60,  40, 20,  0
+    //    21. ( 80 MB/s, 100 MB/s] 100,  80,  60, 40, 20, 0
+
+    //    22. (100 MB/s, 200 MB/s] 200, 150, 100, 50,  0
+    //    -------------------------------------------------------------------------
     //    ( ...Higher rates are not currently supported )
     const int rates[22] = {
         10, 
@@ -192,7 +207,7 @@ void RealtimeView::DrawGraph()
         }
     }
 
-    if (numSegment == 0) // Higher than 5000 KB/s
+    if (numSegment == 0) // Higher than 200 MB/s
     {
         scaleRate = rates[22 - 1];
         numSegment = segments[22 - 1];
@@ -211,7 +226,14 @@ void RealtimeView::DrawGraph()
     {
         for(int i = 0; i < 5; i++)
         {
-            _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d"), scaleRate * (4 - i) / 4);
+            if (scaleRate < 4000)
+            {
+                _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d KB/s"), scaleRate * (4 - i) / 4);
+            }
+            else
+            {
+                _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d MB/s"), scaleRate * (4 - i) / 4 / 1000);
+            }
             TextOut(_hdcBuf, x1 - 6, y1 + (y2 - y1 - 4) * i / 4 - 3, yAxisText, _tcslen(yAxisText));
         }
     }
@@ -219,7 +241,14 @@ void RealtimeView::DrawGraph()
     {
         for(int i = 0; i < 6; i++)
         {
-            _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d"), scaleRate * (5 - i) / 5);
+            if (scaleRate < 4000)
+            {
+                _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d KB/s"), scaleRate * (5 - i) / 5);
+            }
+            else
+            {
+                _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d MB/s"), scaleRate * (5 - i) / 5 / 1000);
+            }
             TextOut(_hdcBuf, x1 - 6, y1 + (y2 - y1 - 4) * i / 5 - 3, yAxisText, _tcslen(yAxisText));
         }
     }
