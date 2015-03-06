@@ -612,7 +612,7 @@ INT_PTR RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         int _height = stRect.bottom - stRect.top;
 
         // Zoom Factor
-        int x1 = 34;
+        int x1 = 50;
         int y1 = 10;
         int x2 = _width - 10;
         int y2 = _height - 26;
