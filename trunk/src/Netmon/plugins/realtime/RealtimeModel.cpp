@@ -106,6 +106,7 @@ void RealtimeModel::Fill()
             {
                 item.rate_tx_1s.erase(item.rate_tx_1s.begin(), item.rate_tx_1s.begin() + 4 * 1024);
                 item.rate_rx_1s.erase(item.rate_rx_1s.begin(), item.rate_rx_1s.begin() + 4 * 1024);
+                item.removed_1s += 4 * 1024;
             }
         }
 
@@ -126,6 +127,7 @@ void RealtimeModel::Fill()
             {
                 item.rate_tx_10s.erase(item.rate_tx_10s.begin(), item.rate_tx_10s.begin() + 4 * 1024);
                 item.rate_rx_10s.erase(item.rate_rx_10s.begin(), item.rate_rx_10s.begin() + 4 * 1024);
+                item.removed_10s += 4 * 1024;
             }
         }
 
@@ -146,6 +148,7 @@ void RealtimeModel::Fill()
             {
                 item.rate_tx_60s.erase(item.rate_tx_60s.begin(), item.rate_tx_60s.begin() + 4 * 1024);
                 item.rate_rx_60s.erase(item.rate_rx_60s.begin(), item.rate_rx_60s.begin() + 4 * 1024);
+                item.removed_60s += 4 * 1024;
             }
         }
     }
