@@ -99,8 +99,11 @@ void RealtimeModel::Fill()
         }
         else // push_back
         {
-            item.rate_tx_1s.insert(item.rate_tx_1s.end(), (std::vector<int>::size_type)add_size_1s, 0);
-            item.rate_rx_1s.insert(item.rate_rx_1s.end(), (std::vector<int>::size_type)add_size_1s, 0);
+            for (int i = 0; i < add_size_1s; i++)
+            {
+                item.rate_tx_1s.push_back(0);
+                item.rate_rx_1s.push_back(0);
+            }
 
             while (item.rate_tx_1s.size() > 8 * 1024)
             {
@@ -120,8 +123,11 @@ void RealtimeModel::Fill()
         }
         else // push_back
         {
-            item.rate_tx_10s.insert(item.rate_tx_10s.end(), (std::vector<int>::size_type)add_size_10s, 0);
-            item.rate_rx_10s.insert(item.rate_rx_10s.end(), (std::vector<int>::size_type)add_size_10s, 0);
+            for (int i = 0; i < add_size_10s; i++)
+            {
+                item.rate_tx_10s.push_back(0);
+                item.rate_rx_10s.push_back(0);
+            }
 
             while (item.rate_tx_10s.size() > 8 * 1024)
             {
@@ -141,8 +147,11 @@ void RealtimeModel::Fill()
         }
         else // push_back, and then remove_front
         {
-            item.rate_tx_60s.insert(item.rate_tx_60s.end(), (std::vector<int>::size_type)add_size_60s, 0);
-            item.rate_rx_60s.insert(item.rate_rx_60s.end(), (std::vector<int>::size_type)add_size_60s, 0);
+            for (int i = 0; i < add_size_60s; i++)
+            {
+                item.rate_tx_60s.push_back(0);
+                item.rate_rx_60s.push_back(0);
+            }
 
             while (item.rate_tx_60s.size() > 8 * 1024)
             {
