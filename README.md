@@ -1,5 +1,4 @@
 # win32-netmon
-A light-weight network monitor for Windows
 
 Netmon is a light-weight network monitor that works on Windows operating systems, which provides different types of statistics for each process.
 
