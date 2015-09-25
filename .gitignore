@@ -1,0 +1,13 @@
+src/Debug/*
+src/Release/*
+src/Netmon/Debug/*
+src/Netmon/Release/*
+src/RegUpdater/Debug/*
+src/RegUpdater/Release/*
+src/Lang/CHS/Debug/*
+src/Lang/ENU/Debug/*
+src/Lang/CHS/Release/*
+src/Lang/ENU/Release/*
+*.user
+*.ncb
+*.suo
