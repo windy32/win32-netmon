@@ -22,7 +22,7 @@ STRINGTABLE
     IDS_MENU_FILE_EXIT            "退出"
     IDS_MENU_VIEW                 "视图"
     IDS_MENU_VIEW_REALTIME        "实时流量"
-    IDS_MENU_VIEW_MONTH           "每日流量"
+    IDS_MENU_VIEW_MONTH           "每月流量"
     IDS_MENU_VIEW_STATISTICS      "统计数据"
     IDS_MENU_VIEW_DETAIL          "报文记录"
     IDS_MENU_VIEW_ADAPTER         "适配器"
