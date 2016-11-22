@@ -15,16 +15,13 @@
 
 #pragma once
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-
-#pragma region TCP/UDP Table Size Definition
-
-#define  ANY_SIZE 1024
-
-#pragma endregion
-
-#include <winsock2.h>
-#include <windows.h>
+#endif
+#include <Windows.h>
+#include <WinSock2.h>
+#endif
 #include <windowsx.h>
 #include <commctrl.h>
 #include <shellapi.h>
