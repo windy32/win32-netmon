@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Netmon</ProjectName>
+    <ProjectGuid>{AF84916B-6157-44BC-A49C-D4A96F91A788}</ProjectGuid>
+    <RootNamespace>Netmon</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.25420.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;iphlpapi.lib;ws2_32.lib;psapi.lib;uxtheme.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;iphlpapi.lib;ws2_32.lib;psapi.lib;uxtheme.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="DlgAbout.cpp" />
+    <ClCompile Include="DlgPreferences.cpp" />
+    <ClCompile Include="Main.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="plugins\abstract\Model.cpp" />
+    <ClCompile Include="plugins\abstract\View.cpp" />
+    <ClCompile Include="plugins\detail\Detail.cpp" />
+    <ClCompile Include="plugins\detail\DetailModel.cpp" />
+    <ClCompile Include="plugins\detail\DetailView.cpp" />
+    <ClCompile Include="plugins\month\Month.cpp" />
+    <ClCompile Include="plugins\month\MonthModel.cpp" />
+    <ClCompile Include="plugins\month\MonthView.cpp" />
+    <ClCompile Include="plugins\realtime\Realtime.cpp" />
+    <ClCompile Include="plugins\realtime\RealtimeModel.cpp" />
+    <ClCompile Include="plugins\realtime\RealtimeView.cpp" />
+    <ClCompile Include="plugins\statistics\GdiWidget\GdiWidget.cpp" />
+    <ClCompile Include="plugins\statistics\GdiWidget\GwGroupbox.cpp" />
+    <ClCompile Include="plugins\statistics\GdiWidget\GwHistogram.cpp" />
+    <ClCompile Include="plugins\statistics\GdiWidget\GwLabel.cpp" />
+    <ClCompile Include="plugins\statistics\GdiWidget\GwLogHistogram.cpp" />
+    <ClCompile Include="plugins\statistics\GdiWidget\GwPieChart.cpp" />
+    <ClCompile Include="plugins\statistics\Statistics.cpp" />
+    <ClCompile Include="plugins\statistics\StatisticsModel.cpp" />
+    <ClCompile Include="plugins\statistics\StatisticsView.cpp" />
+    <ClCompile Include="sqlite\sqlite3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="traffic-src\PcapSource.cpp" />
+    <ClCompile Include="traffic-src\VirtualSource.cpp" />
+    <ClCompile Include="utils\Date.cpp" />
+    <ClCompile Include="utils\Language.cpp" />
+    <ClCompile Include="utils\PortCache.cpp" />
+    <ClCompile Include="utils\ProcessCache.cpp" />
+    <ClCompile Include="utils\ProcessModel.cpp" />
+    <ClCompile Include="utils\ProcessView.cpp" />
+    <ClCompile Include="utils\Profile.cpp" />
+    <ClCompile Include="utils\ProfileItem.cpp" />
+    <ClCompile Include="utils\SingleLock.cpp" />
+    <ClCompile Include="utils\SQLite.cpp" />
+    <ClCompile Include="utils\Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DlgAbout.h" />
+    <ClInclude Include="DlgPreferences.h" />
+    <ClInclude Include="plugins\abstract\Model.h" />
+    <ClInclude Include="plugins\abstract\View.h" />
+    <ClInclude Include="plugins\detail\Detail.h" />
+    <ClInclude Include="plugins\detail\DetailModel.h" />
+    <ClInclude Include="plugins\detail\DetailView.h" />
+    <ClInclude Include="plugins\month\Month.h" />
+    <ClInclude Include="plugins\month\MonthModel.h" />
+    <ClInclude Include="plugins\month\MonthView.h" />
+    <ClInclude Include="plugins\Plugin.h" />
+    <ClInclude Include="plugins\realtime\Realtime.h" />
+    <ClInclude Include="plugins\realtime\RealtimeModel.h" />
+    <ClInclude Include="plugins\realtime\RealtimeView.h" />
+    <ClInclude Include="plugins\statistics\GdiWidget\GdiWidget.h" />
+    <ClInclude Include="plugins\statistics\GdiWidget\GwGroupbox.h" />
+    <ClInclude Include="plugins\statistics\GdiWidget\GwHistogram.h" />
+    <ClInclude Include="plugins\statistics\GdiWidget\GwLabel.h" />
+    <ClInclude Include="plugins\statistics\GdiWidget\GwLogHistogram.h" />
+    <ClInclude Include="plugins\statistics\GdiWidget\GwPieChart.h" />
+    <ClInclude Include="plugins\statistics\Statistics.h" />
+    <ClInclude Include="plugins\statistics\StatisticsModel.h" />
+    <ClInclude Include="plugins\statistics\StatisticsView.h" />
+    <ClInclude Include="res\resource.h" />
+    <ClInclude Include="sqlite\sqlite3.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="traffic-src\PcapSource.h" />
+    <ClInclude Include="traffic-src\TrafficSource.h" />
+    <ClInclude Include="traffic-src\VirtualSource.h" />
+    <ClInclude Include="utils\Date.h" />
+    <ClInclude Include="utils\Language.h" />
+    <ClInclude Include="utils\Packet.h" />
+    <ClInclude Include="utils\PortCache.h" />
+    <ClInclude Include="utils\ProcessCache.h" />
+    <ClInclude Include="utils\ProcessModel.h" />
+    <ClInclude Include="utils\ProcessView.h" />
+    <ClInclude Include="utils\Profile.h" />
+    <ClInclude Include="utils\ProfileItem.h" />
+    <ClInclude Include="utils\SingleLock.h" />
+    <ClInclude Include="utils\SQLite.h" />
+    <ClInclude Include="utils\Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\Main.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
