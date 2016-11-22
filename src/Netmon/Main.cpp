@@ -1294,7 +1294,8 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     HBRUSH hBrush;
     HDC hDc;
 
-    // Init SQLite
+	LOGT(_T("初始化数据库"));
+	// Init SQLite
     TCHAR dbPath[MAX_PATH]={ 0 };
     Utils::GetFilePathInCurrentDir(dbPath, MAX_PATH, _T("Netmon.db"));
     SQLite::Open(dbPath);
@@ -1308,15 +1309,18 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     g_hDlgMain = hWnd;
 
     // Load Tray Icon Menu
+	LOGT(_T("初始化托盘菜单"));
     g_hTrayMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_TRAY)); 
     g_hTrayMenu = GetSubMenu(g_hTrayMenu, 0);
 
     // Load Process Menu
-    g_hProcessMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_PROCESS));
+	LOGT(_T("初始化进程菜单"));
+	g_hProcessMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_PROCESS));
     g_hProcessMenu = GetSubMenu(g_hProcessMenu, 0);
 
-    // Create Tray Icon
-    nti.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN)); 
+	// Create Tray Icon
+	LOGT(_T("创建托盘图标"));
+	nti.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(ICO_MAIN));
     nti.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE; 
     nti.hWnd = hWnd; 
     nti.uID = 0;
@@ -1325,11 +1329,13 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     Shell_NotifyIcon(NIM_ADD, &nti); 
 
-    // Init main menu
+	LOGT(_T("初始化主菜单"));
+	// Init main menu
     hMainMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDM_MAIN));
     SetMenu(hWnd, hMainMenu);
     CreateLanguageMenuItems();
 
+	//将各个子菜单和对应的控件关联起来
     hViewMenu = GetSubMenu(hMainMenu, 1);
     hOptionsMenu = GetSubMenu(hMainMenu, 2);
     hLanguageMenu = GetSubMenu(hOptionsMenu, 0);
@@ -1379,26 +1385,31 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     ReleaseDC(hWnd, hDc);
 
     // Init ListView
+	LOGT(_T("初始化列表控件"));
     ProcessView::Init(GetDlgItem(hWnd, IDL_PROCESS));
 
     // Init Tab
-    Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), 
+	LOGT(_T("初始化页面控件"));
+	Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW),
         4, _T("Realtime"), _T("Month"), _T("Statistics"), _T("Detail"));
 
     // Set Window Size
     MoveWindow(hWnd, 100, 100, 721, 446, FALSE);
 
     // Enum Devices
-    EnumDevices();
+	LOGT(_T("枚举网络适配器"));
+	EnumDevices();
 
     // Init Models
+	LOGT(_T("初始化页面控件的后台数据"));
     g_rtModel = new RealtimeModel();
     g_mtModel = new MonthModel();
     g_stModel = new StatisticsModel();
     g_dtModel = new DetailModel();
 
     // Init Views
-    g_rtView.Init(g_rtModel);
+	LOGT(_T("初始化页面控件的子页面"));
+	g_rtView.Init(g_rtModel);
     g_mtView.Init(g_mtModel);
     g_stView.Init(g_stModel);
     g_dtView.Init(g_dtModel);
@@ -1407,9 +1418,11 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     OnSelChanged(hWnd, GetDlgItem(hWnd, IDT_VIEW));
 
     // Start the Timer that Updates Process List
-    SetTimer(hWnd, 1, 1000, OnTimer);
+	LOGT(_T("开启定时器，定时刷新后台数据"));
+	SetTimer(hWnd, 1, 1000, OnTimer);
 
     // Check Data for MonthView
+	LOGT(_T("检测MonthView（每月流量）视图控件的后台数据"));
     if( Utils::GetExMonth() < g_mtModel->GetFirstMonth())
     {
         MessageBox(g_hDlgMain, 
@@ -1421,10 +1434,12 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     }
 
     // Init profile
+	LOGT(_T("初始化配置文件"));
     ProfileInit(hWnd);
 
     // Update language
-    UpdateLanguage();
+	LOGT(_T("刷新界面语言"));
+	UpdateLanguage();
 
     // Show window if option "-h" is not present
     if (!g_bHideWindow)
@@ -1445,7 +1460,8 @@ static void OnQueryEndSession(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnEndSession(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    OnExit(hWnd);
+	LOGT(_T("退出会话"));
+	OnExit(hWnd);
 }
 
 static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
@@ -1862,8 +1878,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     }
     else // Select English as default if available
     {
-        TCHAR szEnglishName[64];
-        TCHAR szNativeName[64];
+		TCHAR szEnglishName[64] = { 0 };
+        TCHAR szNativeName[64] = { 0 };
         for (int i = 0; i < g_nLanguage; i++)
         {
             Language::GetName(i, szEnglishName, 64, szNativeName, 64);
