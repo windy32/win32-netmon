@@ -36,6 +36,10 @@
 #include "views/StatisticsView.h"
 #include "views/DetailView.h"
 
+//引入第三方日志库
+#include "log4z/log4z.h"
+using namespace zsummer::log4z;
+
 #define WM_USER_TRAY (WM_USER + 1)
 #define WM_RECONNECT (WM_USER + 2)
 
@@ -1815,6 +1819,10 @@ static INT_PTR CALLBACK ProcDlgMain(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 ///----------------------------------------------------------------------------------------------//
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow)
 {
+	ILog4zManager::getRef().setLoggerPath(LOG4Z_MAIN_LOGGER_ID, "NetMonLog");
+	ILog4zManager::getRef().start();
+	ILog4zManager::getRef().setLoggerLevel(LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_TRACE);
+
     MSG stMsg;
 
     g_hInstance = hInstance;
@@ -1871,6 +1879,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     // Close the Named-Pipe
     CloseHandle(hPipe);
 
+	ILog4zManager::getRef().stop();
     // Exit
     return 0;
 }

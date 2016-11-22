@@ -19,6 +19,9 @@
     <Filter Include="Dlg">
       <UniqueIdentifier>{6f759d13-383d-4b93-bde4-fb9660ec9b0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Log4z">
+      <UniqueIdentifier>{9fb2fe17-9098-4529-997b-301f946061c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sqlite\sqlite3.c">
@@ -110,6 +113,9 @@
     </ClCompile>
     <ClCompile Include="Dlg\DlgPreferences.cpp">
       <Filter>Dlg</Filter>
+    </ClCompile>
+    <ClCompile Include="log4z\log4z.cpp">
+      <Filter>Log4z</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="Dlg\DlgPreferences.h">
       <Filter>Dlg</Filter>
+    </ClInclude>
+    <ClInclude Include="log4z\log4z.h">
+      <Filter>Log4z</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
