@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SQLite">
+      <UniqueIdentifier>{c4a4f202-c9ed-4536-ad52-562b36b52366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model &amp; View">
+      <UniqueIdentifier>{e10e024d-3e06-44de-8854-f5bca6b5afe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GdiWidget">
+      <UniqueIdentifier>{d1f26fac-76aa-4b40-b569-b059b912cf6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{0858e3f7-5d08-4553-a902-c7d59d6da548}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{4f3653bd-a53a-4f4e-980c-f0da395a8460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dlg">
+      <UniqueIdentifier>{6f759d13-383d-4b93-bde4-fb9660ec9b0c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="sqlite\sqlite3.c">
+      <Filter>SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="views\DetailModel.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\DetailView.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\MonthModel.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\MonthView.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\NetModel.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\NetView.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\RealtimeModel.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\RealtimeView.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\StatisticsModel.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="views\StatisticsView.cpp">
+      <Filter>Model &amp; View</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiWidget\GdiWidget.cpp">
+      <Filter>GdiWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiWidget\GwGroupbox.cpp">
+      <Filter>GdiWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiWidget\GwHistogram.cpp">
+      <Filter>GdiWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiWidget\GwLabel.cpp">
+      <Filter>GdiWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiWidget\GwLogHistogram.cpp">
+      <Filter>GdiWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiWidget\GwPieChart.cpp">
+      <Filter>GdiWidget</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Language.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\PcapNetFilter.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\PortCache.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ProcessCache.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ProcessModel.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ProcessView.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Profile.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\SQLite.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\Utils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Dlg\DlgAbout.cpp">
+      <Filter>Dlg</Filter>
+    </ClCompile>
+    <ClCompile Include="Dlg\DlgPreferences.cpp">
+      <Filter>Dlg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sqlite\sqlite3.h">
+      <Filter>SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="views\DetailModel.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\DetailView.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\MonthModel.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\MonthView.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\NetModel.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\NetView.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\RealtimeModel.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\RealtimeView.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\StatisticsModel.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="views\StatisticsView.h">
+      <Filter>Model &amp; View</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiWidget\GdiWidget.h">
+      <Filter>GdiWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiWidget\GwGroupbox.h">
+      <Filter>GdiWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiWidget\GwHistogram.h">
+      <Filter>GdiWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiWidget\GwLabel.h">
+      <Filter>GdiWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiWidget\GwLogHistogram.h">
+      <Filter>GdiWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiWidget\GwPieChart.h">
+      <Filter>GdiWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Language.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Packet.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\PcapNetFilter.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\PortCache.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ProcessCache.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ProcessModel.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ProcessView.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Profile.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\SQLite.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\Utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="res\resource.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg\DlgAbout.h">
+      <Filter>Dlg</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg\DlgPreferences.h">
+      <Filter>Dlg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\Main.rc">
+      <Filter>Main</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
