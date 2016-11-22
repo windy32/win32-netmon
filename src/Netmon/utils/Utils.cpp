@@ -26,7 +26,7 @@ void Utils::InnerListViewInsert(HWND hList, int index, int numColumns, va_list a
     // Get arguments
     TCHAR *szColumns[MAX_ARG];
 
-    for (int i = 0; i < numColumns; i++)
+    for(int i = 0; i < numColumns; i++)
     {
         szColumns[i] = va_arg(argList, TCHAR *);
     }
@@ -44,7 +44,7 @@ void Utils::InnerListViewInsert(HWND hList, int index, int numColumns, va_list a
     stItem.iItem = ListView_InsertItem(hList, &stItem);
 
     // - Insert Sub Items
-    for (int i = 1; i < numColumns; i++)
+    for(int i = 1; i < numColumns; i++)
     {
         stItem.pszText = szColumns[i];
         stItem.iSubItem = i;
@@ -67,7 +67,7 @@ int Utils::GetProcessUid(const TCHAR *name)
     row.InsertType(SQLiteRow::TYPE_INT32);
 
     // Select
-    if (SQLite::Select(command, &row))
+    if( SQLite::Select(command, &row))
     {
         return row.GetDataInt32(0);
     }
@@ -75,13 +75,13 @@ int Utils::GetProcessUid(const TCHAR *name)
     return -1;
 }
 
-int Utils::InsertProcess(const TCHAR *name, const TCHAR *fullPath)
+int Utils::InsertProcess(const TCHAR *name)
 {
-    TCHAR command[512];
+    TCHAR command[256];
 
     // Build Command
     _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into Process(Name, FullPath) Values(\'%s\', '%s');"), name, fullPath);
+        TEXT("Insert Into Process(Name) Values(\'%s\');"), name);
 
     // Insert
     SQLite::Exec(command, false);
@@ -90,17 +90,33 @@ int Utils::InsertProcess(const TCHAR *name, const TCHAR *fullPath)
     return (int)SQLite::GetLastInsertRowId();
 }
 
-void Utils::UpdateFullPath(int puid, const TCHAR *fullPath)
+/*
+int Utils::InsertProcessActivity(int puid, int startTime, int endTime)
 {
-    TCHAR command[512];
+    TCHAR command[256];
 
-    // Build Command
+    // Build Comamnd
     _stprintf_s(command, _countof(command), 
-        TEXT("Update Process Set FullPath = \'%s\' Where UID = %d;"), fullPath, puid);
+        TEXT("Insert Into PActivity(ProcessUid, StartTime, EndTime) Values(%d, %d, %d);"), 
+        puid, startTime, endTime);
 
-    // Insert
+    SQLite::Exec(command, false);
+
+    // Return the UID of the inserted item
+    return (int)SQLite::GetLastInsertRowId();
+}
+
+void Utils::UpdateProcessActivity(int pauid, int endTime)
+{
+    TCHAR command[256];
+
+    // Build Comamnd
+    _stprintf_s(command, _countof(command), 
+        TEXT("Update PActivity Set EndTime = %d Where UID = %d;"), endTime, pauid);
+
     SQLite::Exec(command, false);
 }
+*/
 
 bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
 {
@@ -115,7 +131,7 @@ bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
     row.InsertType(SQLiteRow::TYPE_STRING);
 
     // Select
-    if (SQLite::Select(command, &row))
+    if( SQLite::Select(command, &row))
     {
         _tcscpy_s(buf, len, row.GetDataStr(0));
         return true;
@@ -132,18 +148,22 @@ void Utils::InsertPacket(PacketInfoEx *pi)
     __int64 i64time = ((__int64)(pi->time_s) << 32) + (__int64)(pi->time_us);
 
     _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into Packet(ProcessUID, Direction, ")
+        TEXT("Insert Into Packet(PActivityUid, ProcessUid, AdapterUid, Direction, ")
         TEXT("NetProtocol, TraProtocol, Size, Time, Port) ")
-        TEXT("Values(%d, %d, %d, %d, %d, %I64d, %d);"), 
-        pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, 
+        TEXT("Values(%d, %d, Null, %d, %d, %d, %d, %I64d, %d);"), 
+        pi->pauid, pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, 
         pi->size, i64time, pi->remote_port);
 
     // Insert
     SQLite::Exec(command, true);
 }
 
+void Utils::DeleteAllPackets()
+{
+    SQLite::Exec(TEXT("Delete From Packet;"), false);
+}
+
 // Time
-/*
 int Utils::GetNumDays(int exMonth)
 {
     int iYear  = 1970 + exMonth / 12;
@@ -152,7 +172,7 @@ int Utils::GetNumDays(int exMonth)
     int iDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     // Leap Year
-    if ((iYear % 4 == 0) && (iYear % 100 != 0 || iYear % 400 == 0))
+    if( (iYear % 4 == 0) && (iYear % 100 != 0 || iYear % 400 == 0))
     {
         iDays[1] = 29;
     }
@@ -229,7 +249,6 @@ int Utils::GetWeekDay(int exMonth, int mday)
 
     return tmTime.tm_wday; // 0 to 6
 }
-*/
 
 // ListView
 void Utils::ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...)
@@ -256,7 +275,7 @@ void Utils::ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...)
     va_end(argList);
 
     // Init ListView
-    if (bCheckBox )
+    if( bCheckBox )
     {
         ListView_SetExtendedListViewStyle(hList, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT);
     }
@@ -362,7 +381,7 @@ void Utils::ListViewUpdate(HWND hList, int index, int numColumns, ...)
     // - Update Sub Items
     for(int i = 0; i < numColumns; i++)
     {
-        if (bUpdate[i] )
+        if( bUpdate[i] )
         {
             stItem.pszText = szColumns[i];
             stItem.iSubItem = i;
@@ -404,7 +423,7 @@ void Utils::TabInit(HWND hTab, int numTabs, ...)
     tci.mask = TCIF_TEXT; 
  
     // Insert Tabs
-    for (int i = 0; i < numTabs; i++)
+    for (int i = 0; i < numTabs; i++) 
     {
         tci.pszText = va_arg(argList, TCHAR *);
 
@@ -412,17 +431,6 @@ void Utils::TabInit(HWND hTab, int numTabs, ...)
     }
 
     va_end(argList);
-}
-
-void Utils::TabInit(HWND hTab, int numTabs, const TCHAR *names[])
-{
-    for (int i = 0; i < numTabs; i++)
-    {
-        TCITEM tci;
-        tci.mask = TCIF_TEXT;
-        tci.pszText = (TCHAR *)names[i];
-        TabCtrl_InsertItem(hTab, i, &tci);
-    }
 }
 
 void Utils::TabSetText(HWND hTab, int numTabs, ...)
@@ -443,17 +451,6 @@ void Utils::TabSetText(HWND hTab, int numTabs, ...)
     }
 
     va_end(argList);
-}
-
-void Utils::TabSetText(HWND hTab, int numTabs, const TCHAR *names[])
-{
-    for (int i = 0; i < numTabs; i++)
-    {
-        TCITEM tci;
-        tci.mask = TCIF_TEXT; 
-        tci.pszText = (TCHAR *)names[i];
-        TabCtrl_SetItem(hTab, i, &tci);
-    }
 }
 
 // GDI
@@ -545,40 +542,16 @@ void Utils::GetVersionString(TCHAR *buf, int cchLen)
 }
 
 // Menu
-void Utils::SetMenuString(HMENU hMenu, UINT uItem, BOOL fByPosition, LPCTSTR szText)
+void Utils::SetMenuString(
+    HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem)
 {
-    MENUITEMINFO info;
-    info.cbSize = sizeof(info);
-    info.fMask = MIIM_STRING;
-    info.fType = MFT_STRING;
-    info.dwTypeData = (LPTSTR)szText;
-
-    SetMenuItemInfo(hMenu, uItem, fByPosition, &info);
+    UINT uMenuState = LOWORD(GetMenuState(hMnu, uPosition, uFlags));
+    ModifyMenu(hMnu, uPosition, 
+        (uFlags | uMenuState | MF_STRING) & 
+        (~MF_SEPARATOR) & (~MF_USECHECKBITMAPS) & (~MF_OWNERDRAW), uIDNewItem, lpNewItem);
 }
 
 // Process
-BOOL Utils::StartProcess(const TCHAR *szFile, const TCHAR *szParam, BOOL bRunAs)
-{
-    SHELLEXECUTEINFO sei = { sizeof(SHELLEXECUTEINFO) };
-
-    sei.fMask = SEE_MASK_NOCLOSEPROCESS;
-    if (bRunAs )
-    {
-        sei.lpVerb = TEXT("runas");
-    }
-    sei.lpFile = szFile;
-    sei.lpParameters = szParam;
-    sei.nShow = SW_SHOWNORMAL;
-
-    if (ShellExecuteEx(&sei) && sei.hProcess != 0)
-    {
-        CloseHandle(sei.hProcess);
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
 BOOL Utils::StartProcessAndWait(
     const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs)
 {
@@ -586,7 +559,7 @@ BOOL Utils::StartProcessAndWait(
     DWORD dwExitCode;
 
     sei.fMask = SEE_MASK_NOCLOSEPROCESS;
-    if (bRunAs )
+    if( bRunAs )
     {
         sei.lpVerb = TEXT("runas");
     }
@@ -594,7 +567,7 @@ BOOL Utils::StartProcessAndWait(
     sei.lpParameters = szParam;
     sei.nShow = SW_SHOWNORMAL;
 
-    if (ShellExecuteEx(&sei) && sei.hProcess != 0 )
+    if( ShellExecuteEx(&sei) && sei.hProcess != 0 )
     {
         // Wait until finish
         WaitForSingleObject(sei.hProcess, INFINITE);

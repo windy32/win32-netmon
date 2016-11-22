@@ -19,6 +19,16 @@
 
 ProcessCache *ProcessCache::_instance = NULL;
 
+ProcessCache::ProcessCache()
+{
+    InitializeCriticalSection(&_cs);
+}
+
+ProcessCache::~ProcessCache()
+{
+    DeleteCriticalSection(&_cs);
+}
+
 ProcessCache *ProcessCache::instance()
 {
     if (_instance == NULL)
@@ -28,7 +38,7 @@ ProcessCache *ProcessCache::instance()
 
 void ProcessCache::GetName(int pid, TCHAR *buf, int cchLen)
 {
-    Lock();
+    EnterCriticalSection(&_cs);
 
     if (_processTable.count(pid) == 0)
     {
@@ -36,12 +46,12 @@ void ProcessCache::GetName(int pid, TCHAR *buf, int cchLen)
     }
     _tcscpy_s(buf, cchLen, _processTable[pid].name);
 
-    Unlock();
+    LeaveCriticalSection(&_cs);
 }
 
 void ProcessCache::GetFullPath(int pid, TCHAR *buf, int cchLen)
 {
-    Lock();
+    EnterCriticalSection(&_cs);
 
     if (_processTable.count(pid) == 0)
     {
@@ -49,13 +59,13 @@ void ProcessCache::GetFullPath(int pid, TCHAR *buf, int cchLen)
     }
     _tcscpy_s(buf, cchLen, _processTable[pid].path);
 
-    Unlock();
+    LeaveCriticalSection(&_cs);
 }
 
 BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
 {
     BOOL result;
-    Lock();
+    EnterCriticalSection(&_cs);
 
     if (rebuild)
     {
@@ -64,7 +74,7 @@ BOOL ProcessCache::IsProcessAlive(int pid, const TCHAR *name, bool rebuild)
     result = (_processTable.count(pid) > 0 && _tcscmp(_processTable[pid].name, name) == 0) ? 
         TRUE : FALSE;
 
-    Unlock();
+    LeaveCriticalSection(&_cs);
     return result;
 }
 

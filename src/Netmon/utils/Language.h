@@ -22,18 +22,18 @@ class Language
 {
 protected:
     enum 
-    {
+    { 
         // Length of a string table (see "Netmon/Lang/resource.h")
         STRING_TABLE_MIN  = 40000,
-        STRING_TABLE_MAX  = 40096,
+        STRING_TABLE_MAX  = 40095,
         STRING_TABLE_SIZE = STRING_TABLE_MAX - STRING_TABLE_MIN + 1
     };
 
     class StringTable
     {
     protected:
-        enum
-        {
+        enum 
+        { 
             MAX_LEN = 256 // Max length of a string
         };
         TCHAR _table[STRING_TABLE_SIZE][MAX_LEN];

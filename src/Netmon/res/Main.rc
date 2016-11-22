@@ -14,27 +14,27 @@
 // Bitmap resources
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_ABOUT_SIDEBAR  BITMAP         ".\\AboutSidebar.bmp"
+IDB_ABOUT_SIDEBAR  BITMAP         ".\\res\\AboutSidebar.bmp"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_PAGEDN_DK      BITMAP         ".\\PageDownDark.bmp"
+IDB_PAGEDN_DK      BITMAP         ".\\res\\PageDownDark.bmp"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_PAGEDN_LT      BITMAP         ".\\PageDownLight.bmp"
+IDB_PAGEDN_LT      BITMAP         ".\\res\\PageDownLight.bmp"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_PAGEUP_DK      BITMAP         ".\\PageUpDark.bmp"
+IDB_PAGEUP_DK      BITMAP         ".\\res\\PageUpDark.bmp"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_PAGEUP_LT      BITMAP         ".\\PageUpLight.bmp"
+IDB_PAGEUP_LT      BITMAP         ".\\res\\PageUpLight.bmp"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDB_SIDEBAR        BITMAP         ".\\Sidebar.bmp"
+IDB_SIDEBAR        BITMAP         ".\\res\\Sidebar.bmp"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
@@ -69,7 +69,10 @@ IDM_MAIN MENU
     }
     POPUP "View"
     {
-        MENUITEM "First View" IDM_VIEW_FIRST
+        MENUITEM "Realtime", IDM_VIEW_REALTIME
+        MENUITEM "Month", IDM_VIEW_MONTH
+        MENUITEM "Statistics", IDM_VIEW_STATISTICS
+        MENUITEM "Detail", IDM_VIEW_DETAIL
         MENUITEM SEPARATOR
         POPUP "Adapter"
         {
@@ -144,11 +147,11 @@ STYLE DS_SETFONT | WS_VISIBLE | WS_CHILDWINDOW | WS_SYSMENU
 FONT 9, "MS Shell Dlg 2", 0, 0, 0
 {
     CONTROL         "", IDL_DETAIL, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_REPORT, 6, 6, 318, 108
-    PUSHBUTTON      "Go to", IDB_DETAIL_GOTO, 240, 120, 49, 14, WS_DISABLED
-    PUSHBUTTON      "<<", IDB_DETAIL_PAGEUP, 6, 120, 36, 14, WS_DISABLED
-    PUSHBUTTON      ">>", IDB_DETAIL_PAGEDOWN, 48, 120, 36, 14, WS_DISABLED
-    LTEXT           "Page 0 / 0 - 0", IDL_DETAIL_STATUS, 90, 122, 114, 12, SS_LEFT
-    EDITTEXT        IDE_DETAIL_GOTO, 294, 120, 32, 12, ES_AUTOHSCROLL
+    PUSHBUTTON      "Go to", IDB_GOTO, 240, 120, 49, 14, WS_DISABLED
+    PUSHBUTTON      "<<", IDB_PAGEUP, 6, 120, 36, 14, WS_DISABLED
+    PUSHBUTTON      ">>", IDB_PAGEDOWN, 48, 120, 36, 14, WS_DISABLED
+    LTEXT           "Page 0 / 0 - 0", IDL_STATUS, 90, 122, 114, 12, SS_LEFT
+    EDITTEXT        IDE_GOTO, 294, 120, 32, 12, ES_AUTOHSCROLL
 }
 
 
@@ -176,22 +179,23 @@ FONT 9, "MS Shell Dlg 2", 0, 0, 0
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-DLG_PREFERENCES DIALOGEX 493, 100, 245, 153
+DLG_PREFERENCES DIALOGEX 493, 100, 245, 149
 STYLE DS_SETFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
 CAPTION "Netmon"
 FONT 9, "MS Shell Dlg 2", 0, 0, 0
 {
     COMBOBOX        IDC_PREF_DEFAULT_ADAPTER, 72, 10, 162, 12, CBS_DROPDOWNLIST | CBS_HASSTRINGS
-    LTEXT           "Default Adapter", IDL_PREF_DEFAULT_ADAPTER, 12, 12, 51, 8, SS_LEFT
+    LTEXT           "Default adapter", IDL_PREF_DEFAULT_ADAPTER, 12, 12, 50, 8, SS_LEFT
     AUTOCHECKBOX    "Auto start", IDC_PREF_AUTO_START, 12, 26, 222, 8
     AUTOCHECKBOX    "Auto capture", IDC_PREF_AUTO_CAPTURE, 12, 40, 222, 8
-    GROUPBOX        "Enable Views", IDG_PREF_ENABLE_VIEWS, 12, 54, 222, 72
-    AUTOCHECKBOX    "Realtime view", IDC_PREF_RTVIEW, 24, 70, 198, 8
-    AUTOCHECKBOX    "Month view", IDC_PREF_MTVIEW, 24, 84, 198, 8
-    AUTOCHECKBOX    "Statistics view", IDC_PREF_STVIEW, 24, 98, 198, 8
-    AUTOCHECKBOX    "Detail view", IDC_PREF_DTVIEW, 24, 112, 198, 8
-    PUSHBUTTON      "OK", IDB_PREF_OK, 144, 132, 42, 14
-    PUSHBUTTON      "Cancel", IDB_PREF_CANCEL, 192, 132, 43, 14
+    GROUPBOX        "Detail view", IDG_PREF_DETAIL_VIEW, 12, 54, 222, 66
+    AUTOCHECKBOX    "Enable", IDC_PREF_ENABLE, 24, 70, 36, 8
+    AUTOCHECKBOX    "Max disk space for packet detail (10 - 1024 MB)", IDC_PREF_MAX_DTVIEW, 24, 84, 162, 8
+    EDITTEXT        IDE_PREF_MAX_DTVIEW, 192, 82, 30, 12, ES_AUTOHSCROLL
+    PUSHBUTTON      "Delete All", IDB_PREF_DELETE_ALL, 24, 98, 60, 14
+    PUSHBUTTON      "Compact", IDB_PREF_COMPACT, 90, 98, 54, 14
+    PUSHBUTTON      "OK", IDB_PREF_OK, 144, 126, 42, 14
+    PUSHBUTTON      "Cancel", IDB_PREF_CANCEL, 192, 126, 43, 14
 }
 
 
@@ -218,7 +222,7 @@ FONT 9, "MS Shell Dlg 2", 0, 0, 0
 // Icon resources
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-ICO_MAIN           ICON           ".\\Icon.ico"
+ICO_MAIN           ICON           ".\\res\\Icon.ico"
 
 
 
@@ -227,7 +231,7 @@ ICO_MAIN           ICON           ".\\Icon.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     2,0,0,0
+    FILEVERSION     1,5,0,0
     PRODUCTVERSION  0,0,0,0
     FILEOS          VOS__WINDOWS32
     FILETYPE        VFT_APP
@@ -240,9 +244,9 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
         BLOCK "040904e4"
         {
             VALUE "FileDescription", "Network Monitor for Windows"
-            VALUE "LegalCopyright", "Copyright (C) 2011 - 2015 F32"
+            VALUE "LegalCopyright", "Copyright (C) 2011 - 2014 F32"
             VALUE "ProductName", "Netmon"
-            VALUE "ProductVersion", "2.0.0"
+            VALUE "ProductVersion", "1.5.0"
         }
     }
     BLOCK "VarFileInfo"

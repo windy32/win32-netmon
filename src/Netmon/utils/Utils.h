@@ -28,13 +28,14 @@ private:
 public:
     // Database operations
     static int GetProcessUid(const TCHAR *name);
-    static int InsertProcess(const TCHAR *name, const TCHAR *fullPath);
-    static void UpdateFullPath(int puid, const TCHAR *fullPath);
+    static int InsertProcess(const TCHAR *name);
+    //static int InsertProcessActivity(int puid, int startTime, int endTime);
+    //static void UpdateProcessActivity(int pauid, int endTime);
     static bool GetProcessName(int puid, TCHAR *buf, int len);
     static void InsertPacket(PacketInfoEx *pi);
+    static void DeleteAllPackets();
 
     // Time operations
-/*
     static int GetNumDays(int exMonth);
 
     static int GetExMonth();
@@ -46,7 +47,6 @@ public:
     static int GetDay();
     static int GetDay(time_t tTime);
     static int GetWeekDay(int exMonth, int mday);
-*/
 
     // ListView
     static void ListViewInit(HWND hList, BOOL bCheckBox, int numColumns, ...);
@@ -63,9 +63,7 @@ public:
 
     // Tab
     static void TabInit(HWND hTab, int numTabs, ...);
-    static void TabInit(HWND hTab, int numTabs, const TCHAR *names[]);
     static void TabSetText(HWND hTab, int numTabs, ...);
-    static void TabSetText(HWND hTab, int numTabs, const TCHAR *names[]);
 
     // GDI operations
     static HFONT MyCreateFont(const TCHAR *name, int height, int width, bool bold);
@@ -86,12 +84,10 @@ public:
     static void GetVersionString(TCHAR *buf, int cchLen);
 
     // Menu
-    static void SetMenuString(HMENU hMenu, UINT uItem, BOOL fByPosition, LPCTSTR szText);
+    static void SetMenuString(
+        HMENU hMnu, UINT uPosition, UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem);
 
     // Process
-    static BOOL StartProcess(
-        const TCHAR *szFile, const TCHAR *szParam, BOOL bRunAs);
-
     static BOOL StartProcessAndWait(
         const TCHAR *szFile, const TCHAR *szParam, int *pExitCode, BOOL bRunAs);
 
