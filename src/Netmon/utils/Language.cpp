@@ -25,14 +25,14 @@ int Language::Load()
     HANDLE hFindFile;
     HMODULE hPlugin;
 
-    TCHAR szCurrentExe[MAX_PATH];
-    TCHAR szCurrentDir[MAX_PATH];
-    TCHAR szPluginDir[MAX_PATH];
-    TCHAR szPluginTemplate[MAX_PATH];
-    TCHAR szFullName[MAX_PATH];
+    TCHAR szCurrentExe[MAX_PATH]={ 0 };
+    TCHAR szCurrentDir[MAX_PATH]={ 0 };
+    TCHAR szPluginDir[MAX_PATH]={ 0 };
+    TCHAR szPluginTemplate[MAX_PATH]={ 0 };
+    TCHAR szFullName[MAX_PATH]={ 0 };
     TCHAR *pFilePart;
 
-    TCHAR szResString[MAX_PATH];
+    TCHAR szResString[MAX_PATH]={ 0 };
 
     // Get full path name of Netmon.exe
     GetModuleFileName(0, szCurrentExe, MAX_PATH);
@@ -43,11 +43,11 @@ int Language::Load()
 
     // Get plugin directory
     _tcscpy_s(szPluginDir, MAX_PATH, szCurrentDir);
-    _tcscat_s(szPluginDir, MAX_PATH, TEXT("Lang\\"));
+    _tcscat_s(szPluginDir, MAX_PATH, _T("Lang\\"));
 
     // Get plugin template
     _tcscpy_s(szPluginTemplate, MAX_PATH, szPluginDir);
-    _tcscat_s(szPluginTemplate, MAX_PATH, TEXT("*.dll"));
+    _tcscat_s(szPluginTemplate, MAX_PATH, _T("*.dll"));
 
     // Find files
     hFindFile = FindFirstFile(szPluginTemplate, &stFindFile); // Fix when release
@@ -144,32 +144,32 @@ void Language::GetYearMonthString(TCHAR *buf, int cchLen, int year, int month)
 {
     const TCHAR szEnglishMonths[12][16] = 
     {
-        TEXT("January"),
-        TEXT("February"),
-        TEXT("March"),
-        TEXT("April"),
-        TEXT("May"),
-        TEXT("June"),
-        TEXT("July"),
-        TEXT("August"),
-        TEXT("September"),
-        TEXT("October"),
-        TEXT("November"),
-        TEXT("December")
+        _T("January"),
+        _T("February"),
+        _T("March"),
+        _T("April"),
+        _T("May"),
+        _T("June"),
+        _T("July"),
+        _T("August"),
+        _T("September"),
+        _T("October"),
+        _T("November"),
+        _T("December")
     };
     const TCHAR *szEnglishName = _tables[_curLang].Get(IDS_LANG_NAME_ENG);
 
-    if( _tcscmp(szEnglishName, TEXT("English")) == 0 ) // English
+    if( _tcscmp(szEnglishName, _T("English")) == 0 ) // English
     {
-        _stprintf_s(buf, cchLen, TEXT("%s %d"), szEnglishMonths[month], year);
+        _stprintf_s(buf, cchLen, _T("%s %d"), szEnglishMonths[month], year);
     }
-    else if( _tcscmp(szEnglishName, TEXT("Chinese Simplified")) == 0 ) // Chinese Simplified
+    else if( _tcscmp(szEnglishName, _T("Chinese Simplified")) == 0 ) // Chinese Simplified
     {
-        _stprintf_s(buf, cchLen, TEXT("%d年%d月"), year, month + 1);
+        _stprintf_s(buf, cchLen, _T("%d年%d月"), year, month + 1);
     }
     else // Default: English
     {
-        _stprintf_s(buf, cchLen, TEXT("%s %d"), szEnglishMonths[month], year);
+        _stprintf_s(buf, cchLen, _T("%s %d"), szEnglishMonths[month], year);
     }
 }
 
@@ -177,27 +177,27 @@ void Language::GetDateTimeString(TCHAR *buf, int cchLen, int time, int usec)
 {
     const TCHAR szEnglishMonths[12][16] = 
     {
-        TEXT("January"),
-        TEXT("February"),
-        TEXT("March"),
-        TEXT("April"),
-        TEXT("May"),
-        TEXT("June"),
-        TEXT("July"),
-        TEXT("August"),
-        TEXT("September"),
-        TEXT("October"),
-        TEXT("November"),
-        TEXT("December")
+        _T("January"),
+        _T("February"),
+        _T("March"),
+        _T("April"),
+        _T("May"),
+        _T("June"),
+        _T("July"),
+        _T("August"),
+        _T("September"),
+        _T("October"),
+        _T("November"),
+        _T("December")
     };
     const TCHAR *szEnglishName = _tables[_curLang].Get(IDS_LANG_NAME_ENG);
 
     struct tm tmTime;
     _localtime32_s(&tmTime, (__time32_t *)&time);
 
-    if( _tcscmp(szEnglishName, TEXT("English")) == 0 ) // English
+    if( _tcscmp(szEnglishName, _T("English")) == 0 ) // English
     {
-        _stprintf_s(buf, cchLen, TEXT("%s %d, %d - %02d:%02d:%02d.%04d"), 
+        _stprintf_s(buf, cchLen, _T("%s %d, %d - %02d:%02d:%02d.%04d"), 
             szEnglishMonths[tmTime.tm_mon], 
             (int)tmTime.tm_mday, 
             (int)tmTime.tm_year + 1900,
@@ -206,9 +206,9 @@ void Language::GetDateTimeString(TCHAR *buf, int cchLen, int time, int usec)
             (int)tmTime.tm_sec, 
             usec / 100);
     }
-    else if( _tcscmp(szEnglishName, TEXT("Chinese Simplified")) == 0 ) // Chinese Simplified
+    else if( _tcscmp(szEnglishName, _T("Chinese Simplified")) == 0 ) // Chinese Simplified
     {
-        _stprintf_s(buf, cchLen, TEXT("%d年%d月%d日 - %02d:%02d:%02d.%04d"), 
+        _stprintf_s(buf, cchLen, _T("%d年%d月%d日 - %02d:%02d:%02d.%04d"), 
             (int)tmTime.tm_year + 1900,
             (int)tmTime.tm_mon, 
             (int)tmTime.tm_mday, 
@@ -219,7 +219,7 @@ void Language::GetDateTimeString(TCHAR *buf, int cchLen, int time, int usec)
     }
     else // Default: English
     {
-        _stprintf_s(buf, cchLen, TEXT("%s %d, %d - %02d:%02d:%02d.%04d"), 
+        _stprintf_s(buf, cchLen, _T("%s %d, %d - %02d:%02d:%02d.%04d"), 
             szEnglishMonths[tmTime.tm_mon], 
             tmTime.tm_mday, 
             tmTime.tm_year + 1900,

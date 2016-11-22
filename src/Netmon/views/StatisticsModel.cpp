@@ -29,12 +29,12 @@ StatisticsModel::StatisticsModel()
 
 void StatisticsModel::SaveDatabase()
 {
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     Lock();
 
     // Delete all records - Protocol
-    SQLite::Exec(TEXT("Delete From Protocol;"), true);
+    SQLite::Exec(_T("Delete From Protocol;"), true);
 
     // Insert records - Protocol
     std::map<int, StModelItem>::iterator it;
@@ -49,7 +49,7 @@ void StatisticsModel::SaveDatabase()
 
         // TCP
         _stprintf_s(command, _countof(command), 
-            TEXT("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
+            _T("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
             puid, TRA_TCP, 
             it->second.tx.tcpBytes, 
             it->second.rx.tcpBytes, 
@@ -59,7 +59,7 @@ void StatisticsModel::SaveDatabase()
 
         // UDP
         _stprintf_s(command, _countof(command), 
-            TEXT("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
+            _T("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
             puid, TRA_UDP, 
             it->second.tx.udpBytes, 
             it->second.rx.udpBytes, 
@@ -69,7 +69,7 @@ void StatisticsModel::SaveDatabase()
 
         // ICMP
         _stprintf_s(command, _countof(command), 
-            TEXT("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
+            _T("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
             puid, TRA_ICMP, 
             it->second.tx.icmpBytes, 
             it->second.rx.icmpBytes, 
@@ -79,7 +79,7 @@ void StatisticsModel::SaveDatabase()
 
         // OTHER
         _stprintf_s(command, _countof(command), 
-            TEXT("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
+            _T("Insert Into Protocol Values(%d, %d, %I64d, %I64d, %I64d, %I64d);"), 
             puid, TRA_OTHER, 
             it->second.tx.otherBytes, 
             it->second.rx.otherBytes, 
@@ -103,7 +103,7 @@ void StatisticsModel::SaveDatabase()
             for(int i = 0; i < 1501; i++)
             {
                 _stprintf_s(command, _countof(command), 
-                    TEXT("Insert Into PacketSize Values(%d, %d, 0, 0, %I64d, %I64d);"), 
+                    _T("Insert Into PacketSize Values(%d, %d, 0, 0, %I64d, %I64d);"), 
                     puid, i, it->second.txPacketSize[i], it->second.rxPacketSize[i]);
 
                 SQLite::Exec(command, true);
@@ -117,8 +117,8 @@ void StatisticsModel::SaveDatabase()
                     it->second.rxPacketSize[i] > it->second.rxPrevPacketSize[i] )
                 {
                     _stprintf_s(command, _countof(command), 
-                        TEXT("Update PacketSize Set TxPackets = %I64d, RxPackets = %I64d ")
-                        TEXT("Where ProcessUid = %d And PacketSize = %d;"), 
+                        _T("Update PacketSize Set TxPackets = %I64d, RxPackets = %I64d ")
+                        _T("Where ProcessUid = %d And PacketSize = %d;"), 
                         it->second.txPacketSize[i], it->second.rxPacketSize[i], puid, i);
 
                     SQLite::Exec(command, true);
@@ -142,7 +142,7 @@ void StatisticsModel::SaveDatabase()
             for(int i = 0; i < 1025; i++)
             {
                 _stprintf_s(command, _countof(command), 
-                    TEXT("Insert Into Rate Values(%d, %d, %I64d, %I64d);"), 
+                    _T("Insert Into Rate Values(%d, %d, %I64d, %I64d);"), 
                     puid, i, it->second.txRate[i], it->second.rxRate[i]);
 
                 SQLite::Exec(command, true);
@@ -156,8 +156,8 @@ void StatisticsModel::SaveDatabase()
                     it->second.rxRate[i] > it->second.rxPrevRate[i] )
                 {
                     _stprintf_s(command, _countof(command), 
-                        TEXT("Update Rate Set TxSeconds = %I64d, RxSeconds = %I64d ")
-                        TEXT("Where ProcessUid = %d And Rate = %d;"), 
+                        _T("Update Rate Set TxSeconds = %I64d, RxSeconds = %I64d ")
+                        _T("Where ProcessUid = %d And Rate = %d;"), 
                         it->second.txRate[i], it->second.rxRate[i], puid, i);
 
                     SQLite::Exec(command, true);
@@ -177,10 +177,10 @@ void StatisticsModel::InitDatabase()
     SQLiteRow protocolRow;
     SQLiteRow packetSizeRow;
     SQLiteRow rateRow;
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     // Process Protocol
-    _stprintf_s(command, _countof(command), TEXT("Select * From Protocol;"));
+    _stprintf_s(command, _countof(command), _T("Select * From Protocol;"));
 
     protocolRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
     protocolRow.InsertType(SQLiteRow::TYPE_INT32); // 1 Protocol
@@ -193,7 +193,7 @@ void StatisticsModel::InitDatabase()
 
     // Process Packet Size
     _stprintf_s(command, _countof(command), 
-        TEXT("Select * From PacketSize Where TxPackets > 0 Or RxPackets > 0;"));
+        _T("Select * From PacketSize Where TxPackets > 0 Or RxPackets > 0;"));
 
     packetSizeRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
     packetSizeRow.InsertType(SQLiteRow::TYPE_INT32); // 1 PacketSize
@@ -206,7 +206,7 @@ void StatisticsModel::InitDatabase()
 
     // Process Rate
     _stprintf_s(command, _countof(command), 
-        TEXT("Select * From Rate Where TxSeconds > 0 Or RxSeconds > 0;"));
+        _T("Select * From Rate Where TxSeconds > 0 Or RxSeconds > 0;"));
 
     rateRow.InsertType(SQLiteRow::TYPE_INT32); // 0 ProcessUid
     rateRow.InsertType(SQLiteRow::TYPE_INT32); // 1 Rate

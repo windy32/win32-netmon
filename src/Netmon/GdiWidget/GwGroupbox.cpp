@@ -27,7 +27,7 @@ GwGroupbox::GwGroupbox(
     _color = color;
 
     // Create font
-    _hFont = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, true);
+    _hFont = Utils::MyCreateFont(_T("MS Shell Dlg 2"), 14, 0, true);
 
     // Calculate size
     CalcSize();

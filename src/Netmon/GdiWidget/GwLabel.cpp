@@ -26,7 +26,7 @@ GwLabel::GwLabel(
     _tcscpy_s(_text, 1024, text);
 
     // Create font
-    _hFont = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, false);
+    _hFont = Utils::MyCreateFont(_T("MS Shell Dlg 2"), 14, 0, false);
 
     // Set Color
     SetTextColor(_hdcTarget, RGB(0, 0, 0));

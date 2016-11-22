@@ -83,7 +83,7 @@ bool SQLite::Open(const TCHAR *fileName)
     InitializeCriticalSection(&stCS);
 
     // Convert to UTF-8
-    char szFileName[MAX_PATH];
+    char szFileName[MAX_PATH]={ 0 };
     Utils::Utf16ToUtf8(fileName, szFileName, MAX_PATH);
 
     return sqlite3_open(szFileName, &db) == SQLITE_OK;
@@ -96,7 +96,7 @@ bool SQLite::Close()
 
     if( counter > 0 )
     {
-        Exec(TEXT("Commit Transaction;"));
+        Exec(_T("Commit Transaction;"));
     }
 
     return sqlite3_close(db) != SQLITE_BUSY;
@@ -110,7 +110,7 @@ bool SQLite::Flush()
 
     if( counter > 0 )
     {
-        retVel = Exec(TEXT("Commit Transaction;"));
+        retVel = Exec(_T("Commit Transaction;"));
         counter = 0;
     }
 
@@ -129,7 +129,7 @@ bool SQLite::TableExist(const TCHAR *tableName)
     // Build Command
     TCHAR command[512];
     _stprintf_s(command, _countof(command), 
-        TEXT("Select name From sqlite_master Where type In ('table','view') And name == \'%s\'"), 
+        _T("Select name From sqlite_master Where type In ('table','view') And name == \'%s\'"), 
         tableName);
 
     // Convert to UTF-8
@@ -193,7 +193,7 @@ bool SQLite::Exec(const TCHAR *command, bool cached)
         else
         {
             retValue = Exec(command);
-            retValue = Exec(TEXT("Commit Transaction;"));
+            retValue = Exec(_T("Commit Transaction;"));
             counter = 0;
         }
     }
@@ -201,7 +201,7 @@ bool SQLite::Exec(const TCHAR *command, bool cached)
     {
         if( counter == 0 )
         {
-            retValue = Exec(TEXT("Begin Transaction;"));
+            retValue = Exec(_T("Begin Transaction;"));
             retValue = Exec(command);
             counter += 1;
         }
@@ -212,7 +212,7 @@ bool SQLite::Exec(const TCHAR *command, bool cached)
 
             if( counter == 4000 )
             {
-                retValue = Exec(TEXT("Commit Transaction;"));
+                retValue = Exec(_T("Commit Transaction;"));
                 counter = 0;
             }
         }

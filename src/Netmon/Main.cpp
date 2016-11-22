@@ -218,136 +218,136 @@ static void InitDatabase()
     #pragma endregion
 
     // V1
-    if( !SQLite::TableExist(TEXT("Adapter")))
+    if( !SQLite::TableExist(_T("Adapter")))
     {
-        SQLite::Exec(TEXT("Create Table Adapter(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    Name           Varchar(64),")
-                     TEXT("    Desc           Varchar(64),")
-                     TEXT("    Type           Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table Adapter(")
+                     _T("    UID            Integer,")
+                     _T("    Name           Varchar(64),")
+                     _T("    Desc           Varchar(64),")
+                     _T("    Type           Integer,")
+                     _T("    ")
+                     _T("    Primary Key (UID)")
+                     _T(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Process")))
+    if( !SQLite::TableExist(_T("Process")))
     {
-        SQLite::Exec(TEXT("Create Table Process(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    Name           Varchar(64),")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table Process(")
+                     _T("    UID            Integer,")
+                     _T("    Name           Varchar(64),")
+                     _T("    ")
+                     _T("    Primary Key (UID)")
+                     _T(");"), true);
 
         // Add some init data
-        Utils::InsertProcess(TEXT("Unknown"));
-        Utils::InsertProcess(TEXT("System"));
-        Utils::InsertProcess(TEXT("svchost.exe"));
+        Utils::InsertProcess(_T("Unknown"));
+        Utils::InsertProcess(_T("System"));
+        Utils::InsertProcess(_T("svchost.exe"));
     }
 
-    if( !SQLite::TableExist(TEXT("PActivity")))
+    if( !SQLite::TableExist(_T("PActivity")))
     {
-        SQLite::Exec(TEXT("Create Table PActivity(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    StartTime      Integer,")
-                     TEXT("    EndTime        Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table PActivity(")
+                     _T("    UID            Integer,")
+                     _T("    ProcessUid     Integer,")
+                     _T("    StartTime      Integer,")
+                     _T("    EndTime        Integer,")
+                     _T("    ")
+                     _T("    Primary Key (UID),")
+                     _T("    Foreign Key (ProcessUid) References Process(UID)")
+                     _T(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Packet")))
+    if( !SQLite::TableExist(_T("Packet")))
     {
-        SQLite::Exec(TEXT("Create Table Packet(")
-                     TEXT("    UID            Integer,")
-                     TEXT("    PActivityUid   Integer,")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    AdapterUid     Integer,")
-                     TEXT("    Direction      Integer,")
-                     TEXT("    NetProtocol    Integer,")
-                     TEXT("    TraProtocol    Integer,")
-                     TEXT("    Size           Integer,")
-                     TEXT("    Time           Integer,")
-                     TEXT("    Port           Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (UID),")
-                     TEXT("    Foreign Key (PActivityUid) References PActivity(UID),")
-                     TEXT("    Foreign Key (AdapterUid) References Adapter(UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table Packet(")
+                     _T("    UID            Integer,")
+                     _T("    PActivityUid   Integer,")
+                     _T("    ProcessUid     Integer,")
+                     _T("    AdapterUid     Integer,")
+                     _T("    Direction      Integer,")
+                     _T("    NetProtocol    Integer,")
+                     _T("    TraProtocol    Integer,")
+                     _T("    Size           Integer,")
+                     _T("    Time           Integer,")
+                     _T("    Port           Integer,")
+                     _T("    ")
+                     _T("    Primary Key (UID),")
+                     _T("    Foreign Key (PActivityUid) References PActivity(UID),")
+                     _T("    Foreign Key (AdapterUid) References Adapter(UID)")
+                     _T(");"), true);
 
-        SQLite::Exec(TEXT("Create Index PUID On Packet(ProcessUid);"), true);
+        SQLite::Exec(_T("Create Index PUID On Packet(ProcessUid);"), true);
     }
 
     // V2
-    if( !SQLite::TableExist(TEXT("PacketCount")))
+    if( !SQLite::TableExist(_T("PacketCount")))
     {
-        SQLite::Exec(TEXT("Create Table PacketCount(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Count          Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table PacketCount(")
+                     _T("    ProcessUid     Integer,")
+                     _T("    Count          Integer,")
+                     _T("    ")
+                     _T("    Primary Key (ProcessUid),")
+                     _T("    Foreign Key (ProcessUid) References Process(UID)")
+                     _T(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("PacketSize")))
+    if( !SQLite::TableExist(_T("PacketSize")))
     {
-        SQLite::Exec(TEXT("Create Table PacketSize(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    PacketSize     Integer,")
-                     TEXT("    TxBytes        Integer,")
-                     TEXT("    RxBytes        Integer,")
-                     TEXT("    TxPackets      Integer,")
-                     TEXT("    RxPackets      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, PacketSize),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table PacketSize(")
+                     _T("    ProcessUid     Integer,")
+                     _T("    PacketSize     Integer,")
+                     _T("    TxBytes        Integer,")
+                     _T("    RxBytes        Integer,")
+                     _T("    TxPackets      Integer,")
+                     _T("    RxPackets      Integer,")
+                     _T("    ")
+                     _T("    Primary Key (ProcessUid, PacketSize),")
+                     _T("    Foreign Key (ProcessUid) References Process(UID)")
+                     _T(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Protocol")))
+    if( !SQLite::TableExist(_T("Protocol")))
     {
-        SQLite::Exec(TEXT("Create Table Protocol(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Protocol       Integer,")
-                     TEXT("    TxBytes        Integer,")
-                     TEXT("    RxBytes        Integer,")
-                     TEXT("    TxPackets      Integer,")
-                     TEXT("    RxPackets      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, Protocol),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table Protocol(")
+                     _T("    ProcessUid     Integer,")
+                     _T("    Protocol       Integer,")
+                     _T("    TxBytes        Integer,")
+                     _T("    RxBytes        Integer,")
+                     _T("    TxPackets      Integer,")
+                     _T("    RxPackets      Integer,")
+                     _T("    ")
+                     _T("    Primary Key (ProcessUid, Protocol),")
+                     _T("    Foreign Key (ProcessUid) References Process(UID)")
+                     _T(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Rate")))
+    if( !SQLite::TableExist(_T("Rate")))
     {
-        SQLite::Exec(TEXT("Create Table Rate(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Rate           Integer,")
-                     TEXT("    TxSeconds      Integer,")
-                     TEXT("    RxSeconds      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, Rate),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table Rate(")
+                     _T("    ProcessUid     Integer,")
+                     _T("    Rate           Integer,")
+                     _T("    TxSeconds      Integer,")
+                     _T("    RxSeconds      Integer,")
+                     _T("    ")
+                     _T("    Primary Key (ProcessUid, Rate),")
+                     _T("    Foreign Key (ProcessUid) References Process(UID)")
+                     _T(");"), true);
     }
 
-    if( !SQLite::TableExist(TEXT("Traffic")))
+    if( !SQLite::TableExist(_T("Traffic")))
     {
-        SQLite::Exec(TEXT("Create Table Traffic(")
-                     TEXT("    ProcessUid     Integer,")
-                     TEXT("    Date           Integer,")
-                     TEXT("    TxBytes        Integer,")
-                     TEXT("    RxBytes        Integer,")
-                     TEXT("    TxPackets      Integer,")
-                     TEXT("    RxPackets      Integer,")
-                     TEXT("    ")
-                     TEXT("    Primary Key (ProcessUid, Date),")
-                     TEXT("    Foreign Key (ProcessUid) References Process(UID)")
-                     TEXT(");"), true);
+        SQLite::Exec(_T("Create Table Traffic(")
+                     _T("    ProcessUid     Integer,")
+                     _T("    Date           Integer,")
+                     _T("    TxBytes        Integer,")
+                     _T("    RxBytes        Integer,")
+                     _T("    TxPackets      Integer,")
+                     _T("    RxPackets      Integer,")
+                     _T("    ")
+                     _T("    Primary Key (ProcessUid, Date),")
+                     _T("    Foreign Key (ProcessUid) References Process(UID)")
+                     _T(");"), true);
     }
 
     // Flush
@@ -388,8 +388,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
     {
         int pid = -1;
         int processUID = -1;
-        TCHAR processName[MAX_PATH] = TEXT("Unknown");
-        TCHAR processFullPath[MAX_PATH] = TEXT("-");
+        TCHAR processName[MAX_PATH] = _T("Unknown");
+        TCHAR processFullPath[MAX_PATH] = _T("-");
 
         // - Get a Packet (Process UID or PID is not Provided Here)
         if (!filter.Capture(&pi, &g_bCapture))
@@ -425,8 +425,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
             if (processName[0] == TEXT('\0')) // Cannot get process name from the table
             {
                 pid = -1;
-                _tcscpy_s(processName, MAX_PATH, TEXT("Unknown"));
-                _tcscpy_s(processFullPath, MAX_PATH, TEXT("-"));
+                _tcscpy_s(processName, MAX_PATH, _T("Unknown"));
+                _tcscpy_s(processFullPath, MAX_PATH, _T("-"));
 
                 // Map from Port -> PID is successful, but pid does not exist, rebuild cache
                 if (pi.trasportProtocol == TRA_TCP)
@@ -519,15 +519,15 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
             // DebugPrint
             /*
             TCHAR msg[128];
-            TCHAR *protocol = (pi.networkProtocol == NET_ARP) ? TEXT("ARP") : 
-                              (pi.trasportProtocol == TRA_TCP) ? TEXT("TCP") :
-                              (pi.trasportProtocol == TRA_UDP) ? TEXT("UDP") : 
-                              (pi.trasportProtocol == TRA_ICMP) ? TEXT("ICMP") : 
-                              (pi.trasportProtocol == TRA_IGMP) ? TEXT("IGMP") : TEXT("Other");
-            TCHAR *dir = (pi.dir == DIR_UP) ? TEXT("Up") : 
-                         (pi.dir == DIR_DOWN) ? TEXT("Down") : TEXT("");
+            TCHAR *protocol = (pi.networkProtocol == NET_ARP) ? _T("ARP") : 
+                              (pi.trasportProtocol == TRA_TCP) ? _T("TCP") :
+                              (pi.trasportProtocol == TRA_UDP) ? _T("UDP") : 
+                              (pi.trasportProtocol == TRA_ICMP) ? _T("ICMP") : 
+                              (pi.trasportProtocol == TRA_IGMP) ? _T("IGMP") : _T("Other");
+            TCHAR *dir = (pi.dir == DIR_UP) ? _T("Up") : 
+                         (pi.dir == DIR_DOWN) ? _T("Down") : _T("");
             _stprintf_s(msg, _countof(msg), 
-                TEXT("[Time = %d.%06d] [Size = %4d Bytes] [Port = %d, %d] %s %s\n"), 
+                _T("[Time = %d.%06d] [Size = %4d Bytes] [Port = %d, %d] %s %s\n"), 
                 pi.time_s, pi.time_us, pi.size, pi.remote_port, pi.local_port, dir, protocol);
 
             OutputDebugString(msg);
@@ -666,9 +666,9 @@ static void CreateLanguageMenuItems()
     for(int i = 0; i < g_nLanguage; i++)
     {
         // Build menu item string
-        TCHAR szEnglishName[256];
-        TCHAR szNativeName[256];
-        TCHAR szMenuItem[256];
+        TCHAR szEnglishName[256]={ 0 };
+        TCHAR szNativeName[256]={ 0 };
+        TCHAR szMenuItem[256]={ 0 };
         Language::GetName(i, szEnglishName, 256, szNativeName, 256);
 
         if( _tcscmp(szEnglishName, szNativeName) == 0 )
@@ -677,7 +677,7 @@ static void CreateLanguageMenuItems()
         }
         else
         {
-            _stprintf_s(szMenuItem, 256, TEXT("%s (%s)"), szEnglishName, szNativeName);
+            _stprintf_s(szMenuItem, 256, _T("%s (%s)"), szEnglishName, szNativeName);
         }
 
         // Create menu item
@@ -735,9 +735,9 @@ static void EnumDevices()
     if( !filter.Init())
     {
         MessageBox(g_hDlgMain, 
-            TEXT("Cannot initizlize WinPcap library.\n")
-            TEXT("Please make sure WinPcap version 4.1.2 is correctly installed."), 
-            TEXT("Error"), MB_OK | MB_ICONWARNING);
+            _T("Cannot initizlize WinPcap library.\n")
+            _T("Please make sure WinPcap version 4.1.2 is correctly installed."), 
+            _T("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
         DeleteMenu(hMenuAdapter, 0, MF_BYPOSITION);
@@ -750,8 +750,8 @@ static void EnumDevices()
     if( g_nAdapters <= 0 )
     {
         MessageBox(g_hDlgMain, 
-            TEXT("No network adapters has been found on this machine."), 
-            TEXT("Error"), MB_OK | MB_ICONWARNING);
+            _T("No network adapters has been found on this machine."), 
+            _T("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
         DeleteMenu(hMenuView, 5, MF_BYPOSITION);
@@ -828,7 +828,7 @@ static void ProfileInit(HWND hWnd)
     ProcessView::Update(true);
 
     // Select default adapter
-    TCHAR szAdapter[256];
+    TCHAR szAdapter[256]={ 0 };
     g_profile.GetAdapter(szAdapter, 256);
 
     for(int i =  0; i < g_nAdapters; i++)
@@ -876,17 +876,17 @@ static void ProfileInit(HWND hWnd)
 ///----------------------------------------------------------------------------------------------//
 static void OnHomepage()
 {
-    ShellExecute(0, 0, TEXT("http://www.cnblogs.com/F-32/"), 0, 0, 0);
+    ShellExecute(0, 0, _T("http://www.cnblogs.com/F-32/"), 0, 0, 0);
 }
 
 static void OnHelp()
 {
-    ShellExecute(0, TEXT("open"), TEXT("Netmon.chm"), 0, 0, SW_SHOW);
+    ShellExecute(0, _T("open"), _T("Netmon.chm"), 0, 0, SW_SHOW);
 }
 
 static void OnAbout(HWND hWnd)
 {
-    DialogBoxParam(g_hInstance, TEXT("DLG_ABOUT"), g_hDlgMain, ProcDlgAbout, 0);
+    DialogBoxParam(g_hInstance, _T("DLG_ABOUT"), g_hDlgMain, ProcDlgAbout, 0);
 }
 
 static void OnSelChanged(HWND hWnd, HWND hTab) 
@@ -899,10 +899,10 @@ static void OnSelChanged(HWND hWnd, HWND hTab)
 
     DLGPROC lpProc[C_PAGES] = { ProcDlgRealtime, ProcDlgMonth, ProcDlgStatistics, ProcDlgDetail };
     LPCTSTR lpName[C_PAGES] = { 
-        TEXT("DLG_REALTIME"), 
-        TEXT("DLG_MONTH"), 
-        TEXT("DLG_STATISTICS"), 
-        TEXT("DLG_DETAIL") 
+        _T("DLG_REALTIME"), 
+        _T("DLG_MONTH"), 
+        _T("DLG_STATISTICS"), 
+        _T("DLG_DETAIL") 
     };
 
     // Check MenuItem
@@ -1044,7 +1044,7 @@ static void OnLanguageSelected(HWND hWnd, WPARAM wParam)
 static void OnPreferences(HWND hWnd)
 {
     DialogBoxParam(g_hInstance, 
-        TEXT("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_dtView);
+        _T("DLG_PREFERENCES"), g_hDlgMain, ProcDlgPreferences, (LPARAM)&g_dtView);
 }
 
 static void OnProcessChanged(HWND hWnd, LPARAM lParam)
@@ -1222,7 +1222,7 @@ static void OnExit(HWND hWnd)
     nti.hWnd = hWnd; 
     nti.uID = 0;
     nti.uCallbackMessage = WM_USER_TRAY; 
-    _tcscpy_s(nti.szTip, _countof(nti.szTip), TEXT("Netmon")); 
+    _tcscpy_s(nti.szTip, _countof(nti.szTip), _T("Netmon")); 
 
     Shell_NotifyIcon(NIM_DELETE, &nti);
 
@@ -1288,8 +1288,8 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     HDC hDc;
 
     // Init SQLite
-    TCHAR dbPath[MAX_PATH];
-    Utils::GetFilePathInCurrentDir(dbPath, MAX_PATH, TEXT("Netmon.db"));
+    TCHAR dbPath[MAX_PATH]={ 0 };
+    Utils::GetFilePathInCurrentDir(dbPath, MAX_PATH, _T("Netmon.db"));
     SQLite::Open(dbPath);
     InitDatabase();
 
@@ -1314,7 +1314,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     nti.hWnd = hWnd; 
     nti.uID = 0;
     nti.uCallbackMessage = WM_USER_TRAY; 
-    _tcscpy_s(nti.szTip, _countof(nti.szTip), TEXT("Netmon")); 
+    _tcscpy_s(nti.szTip, _countof(nti.szTip), _T("Netmon")); 
 
     Shell_NotifyIcon(NIM_ADD, &nti); 
 
@@ -1376,7 +1376,7 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     // Init Tab
     Utils::TabInit(GetDlgItem(hWnd, IDT_VIEW), 
-        4, TEXT("Realtime"), TEXT("Month"), TEXT("Statistics"), TEXT("Detail"));
+        4, _T("Realtime"), _T("Month"), _T("Statistics"), _T("Detail"));
 
     // Set Window Size
     MoveWindow(hWnd, 100, 100, 721, 446, FALSE);
@@ -1406,8 +1406,8 @@ static void OnInitDialog(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if( Utils::GetExMonth() < g_mtModel->GetFirstMonth())
     {
         MessageBox(g_hDlgMain, 
-            TEXT("An invalid date is detected.\n")
-            TEXT("Please check system date settings."), TEXT("Error"), MB_OK | MB_ICONWARNING);
+            _T("An invalid date is detected.\n")
+            _T("Please check system date settings."), _T("Error"), MB_OK | MB_ICONWARNING);
 
         EnableMenuItem(GetMenu(g_hDlgMain), IDM_FILE_CAPTURE, MF_GRAYED);
         return;
@@ -1820,12 +1820,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     g_hInstance = hInstance;
 
     // Single Instance (Create a Named-Pipe)
-    HANDLE hPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\netmon"), 
+    HANDLE hPipe = CreateNamedPipe(_T("\\\\.\\pipe\\netmon"), 
         PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE, 0, 4, 1024, 1024, 1000, NULL);
     if( hPipe == INVALID_HANDLE_VALUE )
     {
-        MessageBox(0, TEXT("Netmon is still running.\nOnly one instance is allowed for Netmon!"), 
-            TEXT("Error"), MB_OK | MB_ICONWARNING);
+        MessageBox(0, _T("Netmon is still running.\nOnly one instance is allowed for Netmon!"), 
+            _T("Error"), MB_OK | MB_ICONWARNING);
         return 1;
     }
 
@@ -1833,7 +1833,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     g_nLanguage = Language::Load();
     if( g_nLanguage == 0 )
     {
-        MessageBox(0, TEXT("Failed to load languages."), TEXT("Error"), MB_OK | MB_ICONWARNING);
+        MessageBox(0, _T("Failed to load languages."), _T("Error"), MB_OK | MB_ICONWARNING);
         CloseHandle(hPipe);
         return 1;
     }
@@ -1844,7 +1844,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
         for (int i = 0; i < g_nLanguage; i++)
         {
             Language::GetName(i, szEnglishName, 64, szNativeName, 64);
-            if (_tcscmp(szEnglishName, TEXT("English")) == 0)
+            if (_tcscmp(szEnglishName, _T("English")) == 0)
             {
                 g_iCurLanguage = i;
                 break;
@@ -1860,7 +1860,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     }
 
     // Display the window
-    CreateDialogParam(g_hInstance, TEXT("DLG_MAIN"), NULL, ProcDlgMain, 0);
+    CreateDialogParam(g_hInstance, _T("DLG_MAIN"), NULL, ProcDlgMain, 0);
 
     while( GetMessage(&stMsg, NULL, 0, 0) != 0)
     {

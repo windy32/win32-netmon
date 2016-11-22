@@ -32,7 +32,7 @@ extern NetmonProfile g_profile;
 void ProcessModel::Init()
 {
     // Init Process List
-    TCHAR command[256] = TEXT("Select * From Process;");
+    TCHAR command[256] = _T("Select * From Process;");
 
     SQLiteRow row;
     row.InsertType(SQLiteRow::TYPE_INT32);
@@ -60,7 +60,7 @@ void ProcessModel::InitCallback(SQLiteRow *row)
 
     // - name & fullPath
     _tcscpy_s(item.name, MAX_PATH, row->GetDataStr(1));
-    _tcscpy_s(item.fullPath, MAX_PATH, TEXT("-"));
+    _tcscpy_s(item.fullPath, MAX_PATH, _T("-"));
 
     // Add Process
     _processes.push_back(item);

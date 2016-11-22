@@ -27,9 +27,9 @@ DetailModel::DetailModel()
 void DetailModel::InitDatabase()
 {
     int puid;
-    TCHAR name[256];
+    TCHAR name[256]={ 0 };
     __int64 packetCount;
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     for(int i = 0; i < ProcessModel::GetProcessCount(); i++)
     {
@@ -38,7 +38,7 @@ void DetailModel::InitDatabase()
         ProcessModel::GetProcessName(puid, name, _countof(name));
 
         _stprintf_s(command, _countof(command), 
-            TEXT("Select Count From PacketCount Where ProcessUid = \'%d\';"), puid);
+            _T("Select Count From PacketCount Where ProcessUid = \'%d\';"), puid);
 
         SQLiteRow row;
         row.InsertType(SQLiteRow::TYPE_INT64); // 0 Count(*)
@@ -65,7 +65,7 @@ void DetailModel::SaveDatabase()
     Lock();
 
     // Delete all records
-    SQLite::Exec(TEXT("Delete From PacketCount;"), true);
+    SQLite::Exec(_T("Delete From PacketCount;"), true);
 
     // Insert records
     for(std::map<int, DtModelItem>::iterator it = _items.begin(); it != _items.end(); ++it)
@@ -79,9 +79,9 @@ void DetailModel::SaveDatabase()
         }
 
         // Build Command
-        TCHAR command[256];
+        TCHAR command[256]={ 0 };
         _stprintf_s(command, _countof(command), 
-            TEXT("Insert Into PacketCount Values(%d, %I64d);"), puid, count);
+            _T("Insert Into PacketCount Values(%d, %I64d);"), puid, count);
 
         // Insert
         SQLite::Exec(command, true);

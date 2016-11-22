@@ -20,7 +20,7 @@
 bool PcapNetFilter::Init()
 {
     // Load wpcap.dll
-    _hWinPcap = LoadLibrary(TEXT("wpcap.dll"));
+    _hWinPcap = LoadLibrary(_T("wpcap.dll"));
 
     if( _hWinPcap != NULL )
     {
@@ -84,8 +84,8 @@ int PcapNetFilter::FindDevices()
 
 TCHAR *PcapNetFilter::GetName(int i) // Return ANSI string
 {
-    static char name[256];
-    static TCHAR tName[256];
+    static char name[256]={ 0 };
+    static TCHAR tName[256]={ 0 };
 
     // Get the Name of Npf Device
     pcap_if_t *dev = _devices;

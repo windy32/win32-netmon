@@ -81,7 +81,7 @@ void GwLogHistogram::Paint()
         }
 
         TCHAR szText[32];
-        _stprintf_s(szText, _countof(szText), TEXT("%d"), _scales[i]);
+        _stprintf_s(szText, _countof(szText), _T("%d"), _scales[i]);
         
         GwTextOut((_scales[i] - 1) * (_width - 2) / _cValue, _boxHeight + 3, 
             szText, _tcslen(szText));

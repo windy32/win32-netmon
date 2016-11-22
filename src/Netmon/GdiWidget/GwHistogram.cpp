@@ -44,8 +44,8 @@ GwHistogram::GwHistogram(
     _color = color;
 
     // Create font
-    _hEnglishFont = Utils::MyCreateFont(TEXT("Arial"), 12, 0, false);
-    _hFont = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, false);
+    _hEnglishFont = Utils::MyCreateFont(_T("Arial"), 12, 0, false);
+    _hFont = Utils::MyCreateFont(_T("MS Shell Dlg 2"), 14, 0, false);
 
     // Calculate size
     CalcSize();
@@ -124,7 +124,7 @@ void GwHistogram::Paint()
         }
 
         TCHAR szText[32];
-        _stprintf_s(szText, _countof(szText), TEXT("%d"), _scales[i]);
+        _stprintf_s(szText, _countof(szText), _T("%d"), _scales[i]);
         
         GwTextOut((_scales[i] - 1) * (_width - 2) / _cValue, _boxHeight + 3, 
             szText, _tcslen(szText));

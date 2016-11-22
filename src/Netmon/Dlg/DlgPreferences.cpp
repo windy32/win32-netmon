@@ -40,8 +40,8 @@ static DetailView   *g_pDetailView;
 ///----------------------------------------------------------------------------------------------//
 static void InitProfile(HWND hWnd)
 {
-    TCHAR szAdapter[256];
-    TCHAR szAutoStart[MAX_PATH];
+    TCHAR szAdapter[256]={ 0 };
+    TCHAR szAutoStart[MAX_PATH]={ 0 };
     BOOL bAutoCapture;
     BOOL bDtViewEnable;
     int  iDtViewMaxSpace;
@@ -61,20 +61,20 @@ static void InitProfile(HWND hWnd)
         Button_SetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START), BST_CHECKED);
 
         // Get full path name of Netmon.exe
-        TCHAR szNetmon[MAX_PATH];
+        TCHAR szNetmon[MAX_PATH]={ 0 };
         GetModuleFileName(0, szNetmon, MAX_PATH);
 
         // Sync registry autorun item
         if( _tcscmp(szNetmon, szAutoStart) != 0 )
         {
             int iResult = MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_NOW),
-                TEXT("Netmon"), MB_YESNO | MB_ICONQUESTION);
+                _T("Netmon"), MB_YESNO | MB_ICONQUESTION);
 
             if( iResult == IDYES )
             {
                 // Build command line
-                TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+                TCHAR szRegUpdater[MAX_PATH]={ 0 };
+                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, _T("RegUpdater.exe"));
 
                 // Start process and update registry
                 int iExitCode;
@@ -87,13 +87,13 @@ static void InitProfile(HWND hWnd)
                     else
                     {
                         MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
-                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                            _T("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                 }
                 else
                 {
                     MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
-                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                        _T("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
         }
@@ -152,7 +152,7 @@ static void OnCheckDtViewEnable(HWND hWnd)
     }
     else
     {
-        SetDlgItemText(hWnd, IDE_PREF_MAX_DTVIEW, TEXT(""));
+        SetDlgItemText(hWnd, IDE_PREF_MAX_DTVIEW, _T(""));
         EnableWindow(GetDlgItem(hWnd, IDC_PREF_MAX_DTVIEW), FALSE);
         EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), FALSE);
     }
@@ -166,7 +166,7 @@ static void OnCheckDtViewMaxSpace(HWND hWnd)
     }
     else
     {
-        SetDlgItemText(hWnd, IDE_PREF_MAX_DTVIEW, TEXT(""));
+        SetDlgItemText(hWnd, IDE_PREF_MAX_DTVIEW, _T(""));
         EnableWindow(GetDlgItem(hWnd, IDE_PREF_MAX_DTVIEW), FALSE);
     }
 }
@@ -174,7 +174,7 @@ static void OnCheckDtViewMaxSpace(HWND hWnd)
 static void OnOk(HWND hWnd)
 {
     BOOL bParamOk = TRUE;
-    TCHAR szAdapter[256];
+    TCHAR szAdapter[256]={ 0 };
 
     // Get setting from UI and save profile
     ComboBox_GetText(GetDlgItem(hWnd, IDC_PREF_DEFAULT_ADAPTER), szAdapter, 256);
@@ -191,7 +191,7 @@ static void OnOk(HWND hWnd)
             {
                 bParamOk = FALSE;
                 MessageBox(hWnd, Language::GetString(IDS_PREF_MAX_SPACE_RANGE), 
-                    TEXT("Error"), MB_OK | MB_ICONWARNING);
+                    _T("Error"), MB_OK | MB_ICONWARNING);
             }
 
             if( bParamOk )
@@ -224,19 +224,19 @@ static void OnOk(HWND hWnd)
         if( Button_GetCheck(GetDlgItem(hWnd, IDC_PREF_AUTO_START)) == BST_CHECKED )
         {
             // Get Netmon's auto start item in registry
-            TCHAR szAutoStart[MAX_PATH];
+            TCHAR szAutoStart[MAX_PATH]={ 0 };
             g_profile.GetAutoStart(szAutoStart, MAX_PATH);
 
             // Get Netmon's actual path
-            TCHAR szNetmon[MAX_PATH];
+            TCHAR szNetmon[MAX_PATH]={ 0 };
             GetModuleFileName(0, szNetmon, MAX_PATH);
 
             // Update registry if necessary
             if( _tcscmp(szAutoStart, szNetmon) != 0 )
             {
                 // Build command line
-                TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+                TCHAR szRegUpdater[MAX_PATH]={ 0 };
+                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, _T("RegUpdater.exe"));
 
                 // Start process and update registry
                 int iExitCode;
@@ -245,7 +245,7 @@ static void OnOk(HWND hWnd)
                     if (iExitCode != 0 )
                     {
                         MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
-                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                            _T("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                     else
                     {
@@ -255,39 +255,39 @@ static void OnOk(HWND hWnd)
                 else
                 {
                     MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
-                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                        _T("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
         }
         else // "Auto start" not checked
         {
             // Get Netmon's auto start item in registry
-            TCHAR szAutoStart[MAX_PATH];
+            TCHAR szAutoStart[MAX_PATH]={ 0 };
             g_profile.GetAutoStart(szAutoStart, MAX_PATH);
 
             // Delete the auto start item in registry if necessary
             if( szAutoStart[0] != 0 )
             {
                 int iExitCode;
-                TCHAR szRegUpdater[MAX_PATH];
-                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, TEXT("RegUpdater.exe"));
+                TCHAR szRegUpdater[MAX_PATH]={ 0 };
+                Utils::GetFilePathInCurrentDir(szRegUpdater, MAX_PATH, _T("RegUpdater.exe"));
 
-                if( Utils::StartProcessAndWait(szRegUpdater, TEXT("-c"), &iExitCode, TRUE))
+                if( Utils::StartProcessAndWait(szRegUpdater, _T("-c"), &iExitCode, TRUE))
                 {
                     if (iExitCode != 0 )
                     {
                         MessageBox(hWnd, Language::GetString(IDS_PREF_UPDATE_ERROR), 
-                            TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                            _T("Netmon"), MB_OK | MB_ICONWARNING);
                     }
                     else
                     {
-                        g_profile.SetAutoStart(TEXT("")); // Update profile
+                        g_profile.SetAutoStart(_T("")); // Update profile
                     }
                 }
                 else
                 {
                     MessageBox(hWnd, Language::GetString(IDS_PREF_CANNOT_EXECUTE), 
-                        TEXT("Netmon"), MB_OK | MB_ICONWARNING);
+                        _T("Netmon"), MB_OK | MB_ICONWARNING);
                 }
             }
         }
@@ -314,14 +314,14 @@ static void OnDeleteAll(HWND hWnd)
     if( g_bCapture )
     {
         MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+            _T("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         Utils::DeleteAllPackets();
         g_pDetailView->OnAllPacketsDeleted();
         MessageBox(hWnd, Language::GetString(IDS_PREF_ALL_DELETED), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+            _T("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
 }
 
@@ -330,14 +330,14 @@ static void OnCompact(HWND hWnd)
     if( g_bCapture )
     {
         MessageBox(hWnd, Language::GetString(IDS_PREF_STOP_FIRST), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+            _T("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         SQLite::Flush();
-        SQLite::Exec(TEXT("Vacuum;"), false);
+        SQLite::Exec(_T("Vacuum;"), false);
         MessageBox(hWnd, Language::GetString(IDS_PREF_COMPACT_FINISHED), 
-            TEXT("Netmon"), MB_OK | MB_ICONINFORMATION);
+            _T("Netmon"), MB_OK | MB_ICONINFORMATION);
     }
 }
 

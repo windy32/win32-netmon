@@ -199,7 +199,7 @@ void RealtimeView::DrawGraph()
     {
         for(int i = 0; i < 5; i++)
         {
-            _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d"), scaleRate * (4 - i) / 4);
+            _stprintf_s(yAxisText, _countof(yAxisText), _T("%d"), scaleRate * (4 - i) / 4);
             TextOut(_hdcBuf, x1 - 6, y1 + (y2 - y1 - 4) * i / 4 - 3, yAxisText, _tcslen(yAxisText));
         }
     }
@@ -207,7 +207,7 @@ void RealtimeView::DrawGraph()
     {
         for(int i = 0; i < 6; i++)
         {
-            _stprintf_s(yAxisText, _countof(yAxisText), TEXT("%d"), scaleRate * (5 - i) / 5);
+            _stprintf_s(yAxisText, _countof(yAxisText), _T("%d"), scaleRate * (5 - i) / 5);
             TextOut(_hdcBuf, x1 - 6, y1 + (y2 - y1 - 4) * i / 5 - 3, yAxisText, _tcslen(yAxisText));
         }
     }
@@ -219,9 +219,9 @@ void RealtimeView::DrawGraph()
     //      For ZOOM_60S, is's 2 hours
     TCHAR xAxisTextArray[3][5][16] = 
     {
-        {TEXT("00:00:00"), TEXT("00:01:00"), TEXT("00:02:00"), TEXT("00:03:00"), TEXT("00:04:00")},
-        {TEXT("00:00:00"), TEXT("00:10:00"), TEXT("00:20:00"), TEXT("00:30:00"), TEXT("00:40:00")},
-        {TEXT("00:00:00"), TEXT("01:00:00"), TEXT("02:00:00"), TEXT("03:00:00"), TEXT("04:00:00")},
+        {_T("00:00:00"), _T("00:01:00"), _T("00:02:00"), _T("00:03:00"), _T("00:04:00")},
+        {_T("00:00:00"), _T("00:10:00"), _T("00:20:00"), _T("00:30:00"), _T("00:40:00")},
+        {_T("00:00:00"), _T("01:00:00"), _T("02:00:00"), _T("03:00:00"), _T("04:00:00")},
     };
     int index = 
         (_zoomFactor == ZOOM_1S) ? 0 : 
@@ -420,23 +420,23 @@ void RealtimeView::DrawGraph()
     SelectObject(_hdcBuf, _hEnglishFont);
     SetTextAlign(_hdcBuf, TA_LEFT | TA_TOP);
 
-    TextOut(_hdcBuf, smoothX, smoothY + 0 * smoothD, TEXT("1X"), 2);
-    TextOut(_hdcBuf, smoothX, smoothY + 1 * smoothD, TEXT("2X"), 2);
-    TextOut(_hdcBuf, smoothX, smoothY + 2 * smoothD, TEXT("4X"), 2);
+    TextOut(_hdcBuf, smoothX, smoothY + 0 * smoothD, _T("1X"), 2);
+    TextOut(_hdcBuf, smoothX, smoothY + 1 * smoothD, _T("2X"), 2);
+    TextOut(_hdcBuf, smoothX, smoothY + 2 * smoothD, _T("4X"), 2);
 
     SetBkColor(_hdcBuf, RGB(0xDD, 0xDD, 0xDD));
 
     if( _smoothFactor == SMOOTH_1X )
     {
-        TextOut(_hdcBuf, smoothX, smoothY + 0 * smoothD, TEXT("1X"), 2);
+        TextOut(_hdcBuf, smoothX, smoothY + 0 * smoothD, _T("1X"), 2);
     }
     else if( _smoothFactor == SMOOTH_2X )
     {
-        TextOut(_hdcBuf, smoothX, smoothY + 1 * smoothD, TEXT("2X"), 2);
+        TextOut(_hdcBuf, smoothX, smoothY + 1 * smoothD, _T("2X"), 2);
     }
     else if( _smoothFactor == SMOOTH_4X )
     {
-        TextOut(_hdcBuf, smoothX, smoothY + 2 * smoothD, TEXT("4X"), 2);
+        TextOut(_hdcBuf, smoothX, smoothY + 2 * smoothD, _T("4X"), 2);
     }
 
     SetBkColor(_hdcBuf, RGB(0xFF, 0xFF, 0xFF));
@@ -445,23 +445,23 @@ void RealtimeView::DrawGraph()
     int zoomX = x1 + 1;
     int zoomY = y2 + 0;
 
-    TextOut(_hdcBuf, zoomX + 0,  zoomY, TEXT("1X"), 2);
-    TextOut(_hdcBuf, zoomX + 16, zoomY, TEXT("10X"), 3);
-    TextOut(_hdcBuf, zoomX + 37, zoomY, TEXT("60X"), 3);
+    TextOut(_hdcBuf, zoomX + 0,  zoomY, _T("1X"), 2);
+    TextOut(_hdcBuf, zoomX + 16, zoomY, _T("10X"), 3);
+    TextOut(_hdcBuf, zoomX + 37, zoomY, _T("60X"), 3);
 
     SetBkColor(_hdcBuf, RGB(0xDD, 0xDD, 0xDD));
 
     if( _zoomFactor == ZOOM_1S )
     {
-        TextOut(_hdcBuf, zoomX + 0, zoomY, TEXT("1X"), 2);
+        TextOut(_hdcBuf, zoomX + 0, zoomY, _T("1X"), 2);
     }
     else if( _zoomFactor == ZOOM_10S )
     {
-        TextOut(_hdcBuf, zoomX + 16, zoomY, TEXT("10X"), 3);
+        TextOut(_hdcBuf, zoomX + 16, zoomY, _T("10X"), 3);
     }
     else if( _zoomFactor == ZOOM_60S )
     {
-        TextOut(_hdcBuf, zoomX + 37, zoomY, TEXT("60X"), 3);
+        TextOut(_hdcBuf, zoomX + 37, zoomY, _T("60X"), 3);
     }
 
     SetBkColor(_hdcBuf, RGB(0xFF, 0xFF, 0xFF));
@@ -476,7 +476,7 @@ void RealtimeView::DrawGraph()
     }
     else
     {
-        TCHAR buf[MAX_PATH];
+        TCHAR buf[MAX_PATH]={ 0 };
         ProcessModel::GetProcessName(_process, buf, MAX_PATH);
         TextOut(_hdcBuf, legendX1 + 4, legendY2 + 2, buf, _tcslen(buf));
     }
@@ -514,9 +514,9 @@ LRESULT RealtimeView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
 
         // - Font
-        _hEnglishFont  = Utils::MyCreateFont(TEXT("Arial"), 12, 0, false);
-        _hShellDlgFont = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, false);
-        _hProcessFont  = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, true);
+        _hEnglishFont  = Utils::MyCreateFont(_T("Arial"), 12, 0, false);
+        _hShellDlgFont = Utils::MyCreateFont(_T("MS Shell Dlg 2"), 14, 0, false);
+        _hProcessFont  = Utils::MyCreateFont(_T("MS Shell Dlg 2"), 14, 0, true);
 
         _hOldFont = (HFONT) SelectObject(_hdcBuf, _hEnglishFont); 
 

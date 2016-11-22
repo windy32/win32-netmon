@@ -87,29 +87,29 @@ void DetailView::ListViewInsert(
     int uid, int puid, int dir, int protocol, int size, __int64 time, int port)
 {
     // Prepare Columns
-    TCHAR szDateTime[MAX_PATH];
-    TCHAR szColumn[7][MAX_PATH];
+    TCHAR szDateTime[MAX_PATH]={ 0 };
+    TCHAR szColumn[7][MAX_PATH]={ 0 };
 
     Language::GetDateTimeString(szDateTime, MAX_PATH, (int)(time >> 32), (int)(time & 0xFFFFFFFF));
 
-    _stprintf_s(szColumn[0], MAX_PATH, TEXT("%d"), uid);
-    _stprintf_s(szColumn[1], MAX_PATH, TEXT("%d"), puid);
+    _stprintf_s(szColumn[0], MAX_PATH, _T("%d"), uid);
+    _stprintf_s(szColumn[1], MAX_PATH, _T("%d"), puid);
     _stprintf_s(szColumn[2], MAX_PATH, dir == DIR_UP ? 
         Language::GetString(IDS_DTVIEW_LIST_TX) : 
         Language::GetString(IDS_DTVIEW_LIST_RX));
-    _stprintf_s(szColumn[3], MAX_PATH, (protocol == TRA_TCP) ? TEXT("TCP") : 
-                                       (protocol == TRA_UDP) ? TEXT("UDP") : 
-                                       (protocol == TRA_ICMP) ? TEXT("ICMP") : TEXT("OTHER"));
-    _stprintf_s(szColumn[4], MAX_PATH, TEXT("%d"), size);
+    _stprintf_s(szColumn[3], MAX_PATH, (protocol == TRA_TCP) ? _T("TCP") : 
+                                       (protocol == TRA_UDP) ? _T("UDP") : 
+                                       (protocol == TRA_ICMP) ? _T("ICMP") : _T("OTHER"));
+    _stprintf_s(szColumn[4], MAX_PATH, _T("%d"), size);
     _stprintf_s(szColumn[5], MAX_PATH, szDateTime);
 
     if( protocol == TRA_TCP || protocol == TRA_UDP )
     {
-        _stprintf_s(szColumn[6], MAX_PATH, TEXT("%d"), port);
+        _stprintf_s(szColumn[6], MAX_PATH, _T("%d"), port);
     }
     else
     {
-        _stprintf_s(szColumn[6], MAX_PATH, TEXT("-"));
+        _stprintf_s(szColumn[6], MAX_PATH, _T("-"));
     }
 
     Utils::ListViewAppend(_hList, 7, 
@@ -148,8 +148,8 @@ void DetailView::UpdateContent(bool rebuildList)
     }
 
     // Update Status Label
-    TCHAR status[256];
-    TCHAR buf[MAX_PATH];
+    TCHAR status[256]={ 0 };
+    TCHAR buf[MAX_PATH]={ 0 };
     const TCHAR *szFormat = Language::GetString(IDS_DTVIEW_PAGE); // %s Page %I64d / %I64d - %I64d"
 
     if (_process == -1)
@@ -177,18 +177,18 @@ void DetailView::UpdateContent(bool rebuildList)
         // Select and insert items in current page
         __int64 firstRow = _curPage * 100; // 0-Based
 
-        TCHAR command[256];
+        TCHAR command[256]={ 0 };
         SQLiteRow row;
 
         if( _process == PROCESS_ALL )
         {
             _stprintf_s(command, _countof(command), 
-                TEXT("Select * From Packet Limit 100 Offset %I64d;"), firstRow);
+                _T("Select * From Packet Limit 100 Offset %I64d;"), firstRow);
         }
         else
         {
             _stprintf_s(command, _countof(command), 
-                TEXT("Select * From Packet Where ProcessUid = %d Limit 100 Offset %I64d;"), 
+                _T("Select * From Packet Where ProcessUid = %d Limit 100 Offset %I64d;"), 
                 _process, firstRow);
         }
 
@@ -256,11 +256,11 @@ void DetailView::OnGoto()
 
     if( !translated ) 
     {
-        MessageBox(_hWnd, TEXT("Page number incorrect!"), TEXT("Error"), MB_ICONWARNING | MB_OK);
+        MessageBox(_hWnd, _T("Page number incorrect!"), _T("Error"), MB_ICONWARNING | MB_OK);
     }
     else if( page <= 0 || page > (curPackets - 1) / 100 + 1 )
     {
-        MessageBox(_hWnd, TEXT("Page number out of range!"), TEXT("Error"), MB_ICONWARNING | MB_OK);
+        MessageBox(_hWnd, _T("Page number out of range!"), _T("Error"), MB_ICONWARNING | MB_OK);
     }
     else
     {

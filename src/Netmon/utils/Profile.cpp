@@ -29,14 +29,14 @@ BOOL Profile::GetString(const TCHAR *szOption, TCHAR *buf, int cchLen)
 
 BOOL Profile::GetInt(const TCHAR *szOption, int *pValue)
 {
-    TCHAR buf[256];
+    TCHAR buf[256]={ 0 };
     if( GetPrivateProfileString(_szSectionName, szOption, 0, buf, 256, _szFileName) == 0 )
     {
         return FALSE; // Key empty or not exist
     }
     else // Key not empty
     {
-        if( _stscanf_s(buf, TEXT("%d"), pValue) == 1) // Numeric
+        if( _stscanf_s(buf, _T("%d"), pValue) == 1) // Numeric
         {
             return TRUE;
         }
@@ -51,16 +51,16 @@ BOOL Profile::SetString(const TCHAR *szOption, const TCHAR *szValue)
 
 BOOL Profile::SetInt(const TCHAR *szOption, int iValue)
 {
-    TCHAR buf[256];
-    _stprintf_s(buf, TEXT("%d"), iValue);
+    TCHAR buf[256]={ 0 };
+    _stprintf_s(buf, _T("%d"), iValue);
     return WritePrivateProfileString(_szSectionName, szOption, buf, _szFileName) != 0;
 }
 
 BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 {
-    TCHAR szCurrentExe[MAX_PATH];
-    TCHAR szCurrentDir[MAX_PATH];
-    TCHAR szProfile[MAX_PATH];
+    TCHAR szCurrentExe[MAX_PATH]={ 0 };
+    TCHAR szCurrentDir[MAX_PATH]={ 0 };
+    TCHAR szProfile[MAX_PATH]={ 0 };
     TCHAR *pFilePart;
     TCHAR szHiddenProcesses[1000];
 
@@ -73,39 +73,39 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
 
     // Get full path name of Netmon.ini
     _tcscpy_s(szProfile, MAX_PATH, szCurrentDir);
-    _tcscat_s(szProfile, MAX_PATH, TEXT("Netmon.ini"));
+    _tcscat_s(szProfile, MAX_PATH, _T("Netmon.ini"));
 
     // Init
-    _pf.Init(szProfile, TEXT("Netmon Profile v1"));
+    _pf.Init(szProfile, _T("Netmon Profile v1"));
 
     // Load preferences
     // If the key doesn't exist, a default value is written to the ini file
-    if( _pf.GetString(TEXT("Adapter"), _szAdapter, 256) == FALSE )
+    if( _pf.GetString(_T("Adapter"), _szAdapter, 256) == FALSE )
     {
         SetAdapter(szDefaultAdapter);
     }
 
-    if( _pf.GetString(TEXT("AutoStart"), _szAutoStart, MAX_PATH) == FALSE )
+    if( _pf.GetString(_T("AutoStart"), _szAutoStart, MAX_PATH) == FALSE )
     {
-        SetAutoStart(TEXT(""));
+        SetAutoStart(_T(""));
     }
 
-    if( _pf.GetInt(TEXT("AutoCapture"), &_bAutoCapture) == FALSE )
+    if( _pf.GetInt(_T("AutoCapture"), &_bAutoCapture) == FALSE )
     {
         SetAutoCapture(FALSE);
     }
 
-    if( _pf.GetInt(TEXT("DtViewEnable"), &_bDtViewEnable) == FALSE )
+    if( _pf.GetInt(_T("DtViewEnable"), &_bDtViewEnable) == FALSE )
     {
         SetDtViewEnable(FALSE);
     }
 
-    if( _pf.GetInt(TEXT("DtViewMaxSpace"), &_iDtViewMaxSpace) == FALSE )
+    if( _pf.GetInt(_T("DtViewMaxSpace"), &_iDtViewMaxSpace) == FALSE )
     {
         SetDtViewMaxSpace(0); // No limit
     }
 
-    if( _pf.GetString(TEXT("HiddenProcess"), szHiddenProcesses, 1000) == FALSE)
+    if( _pf.GetString(_T("HiddenProcess"), szHiddenProcesses, 1000) == FALSE)
     {
         SetHiddenProcesses(std::vector<int>());
     }
@@ -113,23 +113,23 @@ BOOL NetmonProfile::Load(const TCHAR *szDefaultAdapter)
     {
         int puid;
         int offset = 0;
-        while (_stscanf_s(szHiddenProcesses + offset, TEXT("%d"), &puid) == 1)
+        while (_stscanf_s(szHiddenProcesses + offset, _T("%d"), &puid) == 1)
         {
             _hiddenProcesses.push_back(puid);
 
             // Offset
             TCHAR buf[16];
-            _stprintf_s(buf, 16, TEXT("%d"), puid);
+            _stprintf_s(buf, 16, _T("%d"), puid);
             offset += _tcslen(buf) + 1;
         }
     }
 
-    if( _pf.GetString(TEXT("Language"), _szLanguage, 64) == FALSE )
+    if( _pf.GetString(_T("Language"), _szLanguage, 64) == FALSE )
     {
-        SetLanguage(TEXT("English"));
+        SetLanguage(_T("English"));
     }
 
-    if( _pf.GetInt(TEXT("ShowHidden"), &_bShowHidden) == FALSE )
+    if( _pf.GetInt(_T("ShowHidden"), &_bShowHidden) == FALSE )
     {
         SetShowHidden(TRUE);
     }
@@ -145,7 +145,7 @@ BOOL NetmonProfile::GetAdapter(TCHAR *szAdapter, int cchLen)
 
 BOOL NetmonProfile::SetAdapter(const TCHAR *szAdapter)
 {
-    if( _pf.SetString(TEXT("Adapter"), szAdapter) == TRUE )
+    if( _pf.SetString(_T("Adapter"), szAdapter) == TRUE )
     {
         _tcscpy_s(_szAdapter, 256, szAdapter);
         return TRUE;
@@ -161,7 +161,7 @@ BOOL NetmonProfile::GetAutoStart(TCHAR *szAutoStart, int cchLen)
 
 BOOL NetmonProfile::SetAutoStart(const TCHAR *szAutoStart)
 {
-    if( _pf.SetString(TEXT("AutoStart"), szAutoStart) == TRUE )
+    if( _pf.SetString(_T("AutoStart"), szAutoStart) == TRUE )
     {
         _tcscpy_s(_szAutoStart, MAX_PATH, szAutoStart);
         return TRUE;
@@ -177,7 +177,7 @@ BOOL NetmonProfile::GetAutoCapture(BOOL *pAutoCapture)
 
 BOOL NetmonProfile::SetAutoCapture(BOOL bAutoCapture)
 {
-    if( _pf.SetInt(TEXT("AutoCapture"), (int)bAutoCapture) == TRUE )
+    if( _pf.SetInt(_T("AutoCapture"), (int)bAutoCapture) == TRUE )
     {
         _bAutoCapture = bAutoCapture;
         return TRUE;
@@ -193,7 +193,7 @@ BOOL NetmonProfile::GetDtViewEnable(BOOL *pEnable)
 
 BOOL NetmonProfile::SetDtViewEnable(BOOL bEnable)
 {
-    if( _pf.SetInt(TEXT("DtViewEnable"), (int)bEnable) == TRUE )
+    if( _pf.SetInt(_T("DtViewEnable"), (int)bEnable) == TRUE )
     {
         _bDtViewEnable = bEnable;
         return TRUE;
@@ -209,7 +209,7 @@ BOOL NetmonProfile::GetDtViewMaxSpace(int *pMaxSpace)
 
 BOOL NetmonProfile::SetDtViewMaxSpace(int iMaxSpace)
 {
-    if( _pf.SetInt(TEXT("DtViewMaxSpace"), (int)iMaxSpace) == TRUE )
+    if( _pf.SetInt(_T("DtViewMaxSpace"), (int)iMaxSpace) == TRUE )
     {
         _iDtViewMaxSpace = iMaxSpace;
         return TRUE;
@@ -234,17 +234,17 @@ BOOL NetmonProfile::SetHiddenProcesses(const std::vector<int> &processes)
     {
         if (i != processes.size() - 1)
         {
-            _stprintf_s(pid, 16, TEXT("%d "), processes[i]);
+            _stprintf_s(pid, 16, _T("%d "), processes[i]);
         }
         else
         {
-            _stprintf_s(pid, 16, TEXT("%d"), processes[i]);
+            _stprintf_s(pid, 16, _T("%d"), processes[i]);
         }
         _tcscat_s(buf, 1000, pid);
     }
 
     // Write to File
-    if( _pf.SetString(TEXT("HiddenProcess"), buf) == TRUE )
+    if( _pf.SetString(_T("HiddenProcess"), buf) == TRUE )
     {
         _hiddenProcesses = processes;
         return TRUE;
@@ -260,7 +260,7 @@ BOOL NetmonProfile::GetLanguage(TCHAR *szLanguage, int cchLen)
 
 BOOL NetmonProfile::SetLanguage(const TCHAR *szLanguage)
 {
-    if (_pf.SetString(TEXT("Language"), szLanguage) == TRUE)
+    if (_pf.SetString(_T("Language"), szLanguage) == TRUE)
     {
         _tcscpy_s(_szLanguage, 64, szLanguage);
         return TRUE;
@@ -276,7 +276,7 @@ BOOL NetmonProfile::GetShowHidden(BOOL *pShowHidden)
 
 BOOL NetmonProfile::SetShowHidden(BOOL bShowHidden)
 {
-    if (_pf.SetInt(TEXT("ShowHidden"), (int)bShowHidden) == TRUE)
+    if (_pf.SetInt(_T("ShowHidden"), (int)bShowHidden) == TRUE)
     {
         _bShowHidden = bShowHidden;
         return TRUE;

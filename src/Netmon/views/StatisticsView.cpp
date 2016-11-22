@@ -174,27 +174,27 @@ void StatisticsView::DrawGraph()
 
     TCHAR buf[64];
 
-    _stprintf_s(buf, 64, TEXT("%s: %I64d"), 
+    _stprintf_s(buf, 64, _T("%s: %I64d"), 
         Language::GetString(IDS_STVIEW_AVG_TX_PKT_SIZE), avgTxPacketSize);
     GwLabel lblAverageTxPacketSize(_hdcBuf, smrct_x, smrct_y + 4, smrct_width, smrct_height, buf);
 
-    _stprintf_s(buf, 64, TEXT("%s: %I64d"), 
+    _stprintf_s(buf, 64, _T("%s: %I64d"), 
         Language::GetString(IDS_STVIEW_AVG_RX_PKT_SIZE), avgRxPacketSize);
     GwLabel lblAverageRxPacketSize(_hdcBuf, smrct_x, smrct_y + 24, smrct_width, smrct_height, buf);
 
-    _stprintf_s(buf, 64, TEXT("%s: %d.%d%%"), 
+    _stprintf_s(buf, 64, _T("%s: %d.%d%%"), 
         Language::GetString(IDS_STVIEW_TX_IDLE_RATIO), txIdleRatio / 10, txIdleRatio % 10);
     GwLabel lblTxIdleRatio(_hdcBuf, smrct_x, smrct_y + 44, smrct_width, smrct_height, buf);
 
-    _stprintf_s(buf, 64, TEXT("%s: %d.%d%%"), 
+    _stprintf_s(buf, 64, _T("%s: %d.%d%%"), 
         Language::GetString(IDS_STVIEW_RX_IDLE_RATIO), rxIdleRatio / 10, rxIdleRatio % 10);
     GwLabel lblRxIdleRatio(_hdcBuf, smrct_x, smrct_y + 64, smrct_width, smrct_height, buf);
 
-    _stprintf_s(buf, 64, TEXT("%s: %I64d KB/s"), 
+    _stprintf_s(buf, 64, _T("%s: %I64d KB/s"), 
         Language::GetString(IDS_STVIEW_AVG_TX_RATE), avgTxRate);
     GwLabel lblAverageTxRate(_hdcBuf, smrct_x, smrct_y + 84, smrct_width, smrct_height, buf);
 
-    _stprintf_s(buf, 64, TEXT("%s: %I64d KB/s"), 
+    _stprintf_s(buf, 64, _T("%s: %I64d KB/s"), 
         Language::GetString(IDS_STVIEW_AVG_RX_RATE), avgRxRate);
     GwLabel lblAverageRxRate(_hdcBuf, smrct_x, smrct_y + 104, smrct_width, smrct_height, buf);
 

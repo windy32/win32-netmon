@@ -217,7 +217,7 @@ void MonthView::DrawGraph()
     for(int i = 0; i < numDays; i++)
     {
         TCHAR szDay[32];
-        _stprintf_s(szDay, _countof(szDay), TEXT("%d"), i + 1);
+        _stprintf_s(szDay, _countof(szDay), _T("%d"), i + 1);
 
         // Set Color, Sundays are Red
         if( Utils::GetWeekDay(_curMonth, i + 1) == 0 )
@@ -241,7 +241,7 @@ void MonthView::DrawGraph()
     for(int i = 0; i < 4; i++)
     {
         _stprintf_s(yAxisTextFormat, _countof(yAxisTextFormat), 
-            TEXT("%%.%dlf MB"), scalePrecision[i]);
+            _T("%%.%dlf MB"), scalePrecision[i]);
         _stprintf_s(yAxisText, _countof(yAxisText), 
             yAxisTextFormat, scaleTraffic / (double)(1 << i));
         TextOut(_hdcBuf, x2 + 3, y1 + (y2 - y1) * i / 4 - 5 , yAxisText, _tcslen(yAxisText));
@@ -286,11 +286,11 @@ void MonthView::DrawGraph()
     SetTextAlign(_hdcBuf, TA_LEFT);
     SetTextColor(_hdcBuf, RGB(0x00, 0x00, 0x00));
 
-    TCHAR szText[256];
-    TCHAR szYearMonth[256];
+    TCHAR szText[256]={ 0 };
+    TCHAR szYearMonth[256]={ 0 };
     Language::GetYearMonthString(szYearMonth, 256, _curMonth / 12 + 1970, _curMonth % 12);
 
-    TCHAR processName[MAX_PATH];
+    TCHAR processName[MAX_PATH]={ 0 };
     if (_process == -1)
     {
         _tcscpy_s(processName, MAX_PATH, Language::GetString(IDS_ALL_PROCESS));
@@ -386,8 +386,8 @@ LRESULT MonthView::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         Rectangle(_hdcBuf, -1, -1, _width + 1, _height + 1);
 
         // - Font
-        _hFontDays = Utils::MyCreateFont(TEXT("Arial"), 12, 5, false);
-        _hFontDesc = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, true);
+        _hFontDays = Utils::MyCreateFont(_T("Arial"), 12, 5, false);
+        _hFontDesc = Utils::MyCreateFont(_T("MS Shell Dlg 2"), 14, 0, true);
 
         // - Pen
         _hPenVertical = CreatePen(PS_DOT, 0, RGB(0xC4, 0xC4, 0xC4));

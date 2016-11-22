@@ -56,11 +56,11 @@ void Utils::InnerListViewInsert(HWND hList, int index, int numColumns, va_list a
 // Database
 int Utils::GetProcessUid(const TCHAR *name)
 {
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     // Build Command
     _stprintf_s(command, _countof(command), 
-        TEXT("Select UID From Process Where Name = \'%s\';"), name);
+        _T("Select UID From Process Where Name = \'%s\';"), name);
 
     // Build SQLiteRow Object
     SQLiteRow row;
@@ -77,11 +77,11 @@ int Utils::GetProcessUid(const TCHAR *name)
 
 int Utils::InsertProcess(const TCHAR *name)
 {
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     // Build Command
     _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into Process(Name) Values(\'%s\');"), name);
+        _T("Insert Into Process(Name) Values(\'%s\');"), name);
 
     // Insert
     SQLite::Exec(command, false);
@@ -93,11 +93,11 @@ int Utils::InsertProcess(const TCHAR *name)
 /*
 int Utils::InsertProcessActivity(int puid, int startTime, int endTime)
 {
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     // Build Comamnd
     _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into PActivity(ProcessUid, StartTime, EndTime) Values(%d, %d, %d);"), 
+        _T("Insert Into PActivity(ProcessUid, StartTime, EndTime) Values(%d, %d, %d);"), 
         puid, startTime, endTime);
 
     SQLite::Exec(command, false);
@@ -108,11 +108,11 @@ int Utils::InsertProcessActivity(int puid, int startTime, int endTime)
 
 void Utils::UpdateProcessActivity(int pauid, int endTime)
 {
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     // Build Comamnd
     _stprintf_s(command, _countof(command), 
-        TEXT("Update PActivity Set EndTime = %d Where UID = %d;"), endTime, pauid);
+        _T("Update PActivity Set EndTime = %d Where UID = %d;"), endTime, pauid);
 
     SQLite::Exec(command, false);
 }
@@ -120,11 +120,11 @@ void Utils::UpdateProcessActivity(int pauid, int endTime)
 
 bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
 {
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     // Build Command
     _stprintf_s(command, _countof(command), 
-        TEXT("Select Name From Process Where UID = %d;"), puid);
+        _T("Select Name From Process Where UID = %d;"), puid);
 
     // Build SQLiteRow Object
     SQLiteRow row;
@@ -142,15 +142,15 @@ bool Utils::GetProcessName(int puid, TCHAR *buf, int len)
 
 void Utils::InsertPacket(PacketInfoEx *pi)
 {
-    TCHAR command[256];
+    TCHAR command[256]={ 0 };
 
     // Build Command
     __int64 i64time = ((__int64)(pi->time_s) << 32) + (__int64)(pi->time_us);
 
     _stprintf_s(command, _countof(command), 
-        TEXT("Insert Into Packet(PActivityUid, ProcessUid, AdapterUid, Direction, ")
-        TEXT("NetProtocol, TraProtocol, Size, Time, Port) ")
-        TEXT("Values(%d, %d, Null, %d, %d, %d, %d, %I64d, %d);"), 
+        _T("Insert Into Packet(PActivityUid, ProcessUid, AdapterUid, Direction, ")
+        _T("NetProtocol, TraProtocol, Size, Time, Port) ")
+        _T("Values(%d, %d, Null, %d, %d, %d, %d, %I64d, %d);"), 
         pi->pauid, pi->puid, pi->dir, pi->networkProtocol, pi->trasportProtocol, 
         pi->size, i64time, pi->remote_port);
 
@@ -160,7 +160,7 @@ void Utils::InsertPacket(PacketInfoEx *pi)
 
 void Utils::DeleteAllPackets()
 {
-    SQLite::Exec(TEXT("Delete From Packet;"), false);
+    SQLite::Exec(_T("Delete From Packet;"), false);
 }
 
 // Time
@@ -515,7 +515,7 @@ void Utils::DbgPrint(const TCHAR *format, ...)
 // Version
 void Utils::GetVersionString(TCHAR *buf, int cchLen)
 {
-    TCHAR szExe[MAX_PATH];
+    TCHAR szExe[MAX_PATH]={ 0 };
     BYTE *pVersionInfo = 0;
     INT iVersionInfoSize;
     VS_FIXEDFILEINFO *pFixedFileInfo = 0;
@@ -532,10 +532,10 @@ void Utils::GetVersionString(TCHAR *buf, int cchLen)
     GetFileVersionInfo(szExe, 0, iVersionInfoSize, pVersionInfo);
 
     // Get fixed file info
-    VerQueryValue(pVersionInfo, TEXT("\\"), (void **)&pFixedFileInfo, &iFixedFileInfoSize);
+    VerQueryValue(pVersionInfo, _T("\\"), (void **)&pFixedFileInfo, &iFixedFileInfoSize);
 
     // Set string
-    _stprintf_s(buf, cchLen, TEXT("%d.%d.%d"), 
+    _stprintf_s(buf, cchLen, _T("%d.%d.%d"), 
         HIWORD(pFixedFileInfo->dwFileVersionMS), 
         LOWORD(pFixedFileInfo->dwFileVersionMS),
         HIWORD(pFixedFileInfo->dwFileVersionLS));
@@ -561,7 +561,7 @@ BOOL Utils::StartProcessAndWait(
     sei.fMask = SEE_MASK_NOCLOSEPROCESS;
     if( bRunAs )
     {
-        sei.lpVerb = TEXT("runas");
+        sei.lpVerb = _T("runas");
     }
     sei.lpFile = szFile;
     sei.lpParameters = szParam;
@@ -587,8 +587,8 @@ BOOL Utils::StartProcessAndWait(
 // File & Directory
 void Utils::GetFilePathInCurrentDir(TCHAR *buf, int cchLen, const TCHAR *szFileName)
 {
-    TCHAR szCurrentExe[MAX_PATH];
-    TCHAR szCurrentDir[MAX_PATH];
+    TCHAR szCurrentExe[MAX_PATH]={ 0 };
+    TCHAR szCurrentDir[MAX_PATH]={ 0 };
     TCHAR *pFilePart;
 
     // Get full path name of Netmon.exe

@@ -50,10 +50,10 @@ void MonthModel::Fill()
 
 void MonthModel::InitDatabase()
 {
-    static TCHAR command[256];
+    static TCHAR command[256]={ 0 };
 
     // Build Command
-    _stprintf_s(command, _countof(command), TEXT("Select * From Traffic;"));
+    _stprintf_s(command, _countof(command), _T("Select * From Traffic;"));
 
     // Build SQLiteRow Object
     SQLiteRow row;
@@ -126,7 +126,7 @@ void MonthModel::SaveDatabase()
     Lock();
 
     // Delete all records
-    SQLite::Exec(TEXT("Delete From Traffic;"), true);
+    SQLite::Exec(_T("Delete From Traffic;"), true);
 
     // Insert records
     std::map<int, MtModelItem>::iterator it;
@@ -149,10 +149,10 @@ void MonthModel::SaveDatabase()
                 int date = (exMonth << 16) + (j + 1); // j + 1: [1, 31]
 
                 // Build Command
-                TCHAR command[256];
+                TCHAR command[256]={ 0 };
 
                 _stprintf_s(command, _countof(command), 
-                    TEXT("Insert Into Traffic Values(%d, %d, %I64d, %I64d, 0, 0);"), 
+                    _T("Insert Into Traffic Values(%d, %d, %I64d, %I64d, 0, 0);"), 
                     puid, date, it->second.months[i].dayTx[j], it->second.months[i].dayRx[j]);
 
                 // Insert

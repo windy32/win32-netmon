@@ -36,7 +36,7 @@ GwPieChart::GwPieChart(
     }
 
     // Select font for painting
-    _hFont = Utils::MyCreateFont(TEXT("MS Shell Dlg 2"), 14, 0, false);
+    _hFont = Utils::MyCreateFont(_T("MS Shell Dlg 2"), 14, 0, false);
     HFONT hOldFont = (HFONT) SelectObject(hdcTarget, _hFont);
 
     // Description text length
@@ -50,7 +50,7 @@ GwPieChart::GwPieChart(
     }
 
     // Value text length
-    GetTextExtentPoint32(hdcTarget, TEXT("100.0%"), 6, &stSize);
+    GetTextExtentPoint32(hdcTarget, _T("100.0%"), 6, &stSize);
     _maxValueWidth = stSize.cx;
 
     // Restore font
@@ -167,7 +167,7 @@ void GwPieChart::Paint()
 
         // Value
         TCHAR szPercentage[32];
-        _stprintf_s(szPercentage, _countof(szPercentage), TEXT("%.1lf%%"), 100 * percentage);
+        _stprintf_s(szPercentage, _countof(szPercentage), _T("%.1lf%%"), 100 * percentage);
         GwTextOut( 
             _pieWidth +_marginLegend + _legendWidth + _marginDesc + _maxDescWidth + _marginValue,
             (int)(_legendHeight * (i * 1.5)) - 2,

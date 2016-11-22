@@ -101,12 +101,12 @@ void ProcessCache::rebuildTable(bool dump)
         {
             ProcessInfo info;
             _tcscpy_s(info.name, MAX_PATH, processName);
-            _tcscpy_s(info.path, MAX_PATH, TEXT("-"));
+            _tcscpy_s(info.path, MAX_PATH, _T("-"));
             _processTable[pid] = info;
             if (dump)
             {
-                Utils::DbgPrint(TEXT("   PID = %d, Name = \"%s\", FullPath = \"%s\"\n"), 
-                    pid, processName, TEXT("-"));
+                Utils::DbgPrint(_T("   PID = %d, Name = \"%s\", FullPath = \"%s\"\n"), 
+                    pid, processName, _T("-"));
             }
         }
         else
@@ -114,14 +114,14 @@ void ProcessCache::rebuildTable(bool dump)
             ProcessInfo info;
             _tcscpy_s(info.name, MAX_PATH, processName);
 
-            TCHAR fullPath[MAX_PATH];
+            TCHAR fullPath[MAX_PATH]={ 0 };
             if (GetModuleFileNameEx(hProcess, 0, fullPath, MAX_PATH) > 0) // Success
             {
                 _tcscpy_s(info.path, MAX_PATH, fullPath);
             }
             else
             {
-                _tcscpy_s(info.path, MAX_PATH, TEXT("-"));
+                _tcscpy_s(info.path, MAX_PATH, _T("-"));
             }
             _processTable[pid] = info;
         }
