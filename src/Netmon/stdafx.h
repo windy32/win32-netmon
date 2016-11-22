@@ -45,3 +45,7 @@
 
 //#define DEBUG
 //#define DEBUG_PID 4088
+
+//引入第三方日志库
+#include "log4z/log4z.h"
+using namespace zsummer::log4z;

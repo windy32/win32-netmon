@@ -37,14 +37,28 @@ protected:
     //     GetTcpPortPid / GetPortPortPid returns the pid for the corresponding port.
     //     If the pid cannot be found, return value is 0.
 
-    int _tcpPortTable[65536];
-    int _udpPortTable[65536];
+    //int _tcpPortTable[65536];
+    //int _udpPortTable[65536];
+	std::map<int, MIB_TCPROW_OWNER_PID> _mapTcpPortTableEx;
+	std::map<int, MIB_UDPROW_OWNER_PID> _mapUdpPortTableEx;
 
 public:
     PortCache();
 
-    int GetTcpPortPid(int port);
-    int GetUdpPortPid(int port);
+    //int GetTcpPortPid(int port);
+    //int GetUdpPortPid(int port);
+	MIB_TCPROW_OWNER_PID GetTcpPortPidEx(int port);
+	MIB_UDPROW_OWNER_PID GetUdpPortPidEx(int port);
+
+	/** @brief: 根据端口状态的数值，找到对应的文本解析
+	* @param[in] DWORD  dwPortState  端口状态标记
+	* @param[in] int  nLanguageID  想要获取的明文数据，0：中文，1：英文
+	* @param[out] TCHAR*  szPortState  获取到的文本解析
+	* @return  无
+	* @mark
+	*/
+	static void GetPortStateText(DWORD dwPortState, int nLanguageID, TCHAR szPortState[]);
+
     void RebuildTcpTable();
     void RebuildUdpTable();
 };

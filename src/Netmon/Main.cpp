@@ -36,10 +36,6 @@
 #include "views/StatisticsView.h"
 #include "views/DetailView.h"
 
-//引入第三方日志库
-#include "log4z/log4z.h"
-using namespace zsummer::log4z;
-
 #define WM_USER_TRAY (WM_USER + 1)
 #define WM_RECONNECT (WM_USER + 2)
 
@@ -392,7 +388,8 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
     {
         int pid = -1;
         int processUID = -1;
-        TCHAR processName[MAX_PATH] = _T("Unknown");
+		TCHAR szPortStateForTCP[MAX_PATH] = { 0 };
+		TCHAR processName[MAX_PATH] = _T("Unknown");
         TCHAR processFullPath[MAX_PATH] = _T("-");
 
         // - Get a Packet (Process UID or PID is not Provided Here)
@@ -411,12 +408,18 @@ static DWORD WINAPI CaptureThread(LPVOID lpParam)
         // - Get PID
         if( pi.trasportProtocol == TRA_TCP )
         {
-            pid = pc.GetTcpPortPid(pi.local_port);
-            pid = ( pid == 0 ) ? -1 : pid;
-        }
+			//pid = pc.GetTcpPortPid(pi.local_port);
+			MIB_TCPROW_OWNER_PID &TcpInfo = pc.GetTcpPortPidEx(pi.local_port);
+			pid = TcpInfo.dwOwningPid;
+			PortCache::GetPortStateText(TcpInfo.dwState,0,szPortStateForTCP);
+
+			pid = (pid == 0) ? -1 : pid;
+		}
         else if( pi.trasportProtocol == TRA_UDP )
         {
-            pid = pc.GetUdpPortPid(pi.local_port);
+			//pid = pc.GetUdpPortPid(pi.local_port);
+			MIB_UDPROW_OWNER_PID &UdpInfo = pc.GetUdpPortPidEx(pi.local_port);
+			pid = UdpInfo.dwOwningPid;
             pid = ( pid == 0 ) ? -1 : pid;
         }
 
@@ -1457,22 +1460,26 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     }
     else if( wParam == IDM_FILE_CAPTURE )
     {
+		LOGT(_T("开始监控"));
         OnCapture(hWnd);
     }
     else if( wParam == IDM_FILE_STOP )
     {
-        OnStop(hWnd);
+		LOGT(_T("停止监控"));
+		OnStop(hWnd);
     }
     else if( wParam == IDM_VIEW_REALTIME   ||
              wParam == IDM_VIEW_MONTH      ||
              wParam == IDM_VIEW_STATISTICS ||
              wParam == IDM_VIEW_DETAIL )
     {
-        OnViewSwitch(hWnd, wParam);
+		LOGT(_T("页面控件切换"));
+		OnViewSwitch(hWnd, wParam);
     }
     else if( wParam >= IDM_VIEW_ADAPTER_FIRST && wParam < IDM_OPTIONS_LANGUAGE_FIRST )
     {
-        OnAdapterSelected(hWnd, wParam);
+		LOGT(_T("更改网络适配器"));
+		OnAdapterSelected(hWnd, wParam);
     }
     else if( wParam == IDM_VIEW_SHOW_HIDDEN )
     {
@@ -1480,23 +1487,28 @@ static void OnCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     }
     else if( wParam >= IDM_OPTIONS_LANGUAGE_FIRST )
     {
-        OnLanguageSelected(hWnd, wParam);
+		LOGT(_T("更改界面语言"));
+		OnLanguageSelected(hWnd, wParam);
     }
     else if( wParam == IDM_OPTIONS_PREFERENCES )
     {
-        OnPreferences(hWnd);
+		LOGT(_T("打开“首选项”对话框"));
+		OnPreferences(hWnd);
     }
     else if( wParam == IDM_HELP_HOMEPAGE )
     {
-        OnHomepage();
+		LOGT(_T("打开开发者主页"));
+		OnHomepage();
     }
     else if( wParam == IDM_HELP_TOPIC )
     {
-        OnHelp();
+		LOGT(_T("调用帮助文件"));
+		OnHelp();
     }
     else if( wParam == IDM_HELP_ABOUT || wParam == IDM_TRAY_ABOUT )
     {
-        OnAbout(hWnd);
+		LOGT(_T("打开“关于”对话框"));
+		OnAbout(hWnd);
     }
     else if( wParam == IDM_PROCESS_SHOW)
     {
@@ -1512,12 +1524,13 @@ static void OnUserTray(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     if( lParam == WM_LBUTTONDBLCLK ) 
     {
-        OnShowWindow(hWnd);
+		OnShowWindow(hWnd);
     }
     else if( lParam == WM_RBUTTONDOWN ) 
     {
         // Show Tray Icon Popup Menu
-        POINT point;
+		LOGT(_T("弹出托盘菜单"));
+		POINT point;
         GetCursorPos(&point); 
 
         // Hide the menu when the user clicks outside of the menu
@@ -1529,7 +1542,7 @@ static void OnUserTray(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 static void OnReconnect(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    OnStop(hWnd);
+	OnStop(hWnd);
 
     // Display a balloon on the tray icon
     NOTIFYICONDATA nid = { sizeof(nid) };
@@ -1823,6 +1836,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 	ILog4zManager::getRef().start();
 	ILog4zManager::getRef().setLoggerLevel(LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_TRACE);
 
+	LOGT(_T("开始运行主程序"));
     MSG stMsg;
 
     g_hInstance = hInstance;
@@ -1838,6 +1852,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     }
 
     // Load languages
+	LOGT(_T("加载语言模块"));
     g_nLanguage = Language::Load();
     if( g_nLanguage == 0 )
     {
@@ -1870,6 +1885,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
     // Display the window
     CreateDialogParam(g_hInstance, _T("DLG_MAIN"), NULL, ProcDlgMain, 0);
 
+	LOGT(_T("进入窗口消息循环"));
+
     while( GetMessage(&stMsg, NULL, 0, 0) != 0)
     {
         TranslateMessage(&stMsg);
@@ -1878,7 +1895,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 
     // Close the Named-Pipe
     CloseHandle(hPipe);
-
+	LOGT(_T("退出主程序"));
 	ILog4zManager::getRef().stop();
     // Exit
     return 0;
