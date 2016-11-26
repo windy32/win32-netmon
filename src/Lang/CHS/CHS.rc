@@ -42,7 +42,7 @@ STRINGTABLE
     IDS_LANG_NAME_ENG             "Chinese Simplified"
     IDS_LANG_NAME_NATIVE          "简体中文"
     IDS_TAB_REALTIME              "实时流量"
-    IDS_TAB_MONTH                 "每日流量"
+    IDS_TAB_MONTH                 "每月流量"
     IDS_TAB_STATISTICS            "统计数据"
     IDS_TAB_DETAIL                "报文记录"
     IDS_PLIST_UID                 "编号"
