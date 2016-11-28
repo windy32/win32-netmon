@@ -127,7 +127,8 @@ TCHAR *PcapNetFilter::GetName(int i) // Return ANSI string
         }
     }
 
-    return tName;
+	free(pAdapterInfo);
+	return tName;
 }
 
 bool PcapNetFilter::Select(int i)
@@ -177,7 +178,8 @@ bool PcapNetFilter::Select(int i)
         }
     }
 
-    return true;
+	free(pAdapterInfo);
+	return true;
 }
 
 bool PcapNetFilter::ReConnect(int i)
