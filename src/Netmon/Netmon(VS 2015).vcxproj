@@ -98,6 +98,7 @@
     <ClCompile Include="GdiWidget\GwLabel.cpp" />
     <ClCompile Include="GdiWidget\GwLogHistogram.cpp" />
     <ClCompile Include="GdiWidget\GwPieChart.cpp" />
+    <ClCompile Include="LeakDetector.cpp" />
     <ClCompile Include="log4z\log4z.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -145,6 +146,7 @@
     <ClInclude Include="GdiWidget\GwLabel.h" />
     <ClInclude Include="GdiWidget\GwLogHistogram.h" />
     <ClInclude Include="GdiWidget\GwPieChart.h" />
+    <ClInclude Include="LeakDetector.h" />
     <ClInclude Include="log4z\log4z.h" />
     <ClInclude Include="MainWnd.h" />
     <ClInclude Include="res\resource.h" />

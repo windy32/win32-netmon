@@ -15,10 +15,12 @@
 
 #include "stdafx.h"
 #include "MainWnd.h"
+#include "LeakDetector.h"
 
 // Language
 #include "../Lang/resource.h"
 #include "utils/Language.h"
+
 int            g_nLanguage;
 int            g_iCurLanguage;
 HINSTANCE g_hInstance;
@@ -30,9 +32,11 @@ bool    g_bHideWindow = false;
 ///----------------------------------------------------------------------------------------------//
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdShow)
 {
-	ILog4zManager::getRef().setLoggerPath(LOG4Z_MAIN_LOGGER_ID, "NetMonLog");
-	ILog4zManager::getRef().start();
-	ILog4zManager::getRef().setLoggerLevel(LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_TRACE);
+	//_CrtSetBreakAlloc(265);
+	EnableMemLeakCheck();
+	//ILog4zManager::getRef().setLoggerPath(LOG4Z_MAIN_LOGGER_ID, "NetMonLog");
+	//ILog4zManager::getRef().start();
+	//ILog4zManager::getRef().setLoggerLevel(LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_TRACE);
 
 	LOGT(_T("开始运行主程序"));
 
@@ -88,7 +92,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nCmdS
 	CloseHandle(hPipe);
 
 	LOGT(_T("退出主程序"));
-	ILog4zManager::getRef().stop();
+	//ILog4zManager::getRef().stop();
     // Exit
     return lReslut;
 }

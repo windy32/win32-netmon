@@ -120,6 +120,9 @@
     <ClCompile Include="MainWnd.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="LeakDetector.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sqlite\sqlite3.h">
@@ -219,6 +222,9 @@
       <Filter>Log4z</Filter>
     </ClInclude>
     <ClInclude Include="MainWnd.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="LeakDetector.h">
       <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
