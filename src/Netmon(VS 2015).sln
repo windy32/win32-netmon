@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Netmon", "Netmon\Netmon(VS 2015).vcxproj", "{AF84916B-6157-44BC-A49C-D4A96F91A788}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lang_ENU", "Lang\ENU\Lang_ENU(VS 2015).vcxproj", "{0EEE4ABD-07C2-4D1A-BA02-D78501E813E7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lang_CHS", "Lang\CHS\Lang_CHS(VS 2015).vcxproj", "{DADC0F7E-EFEA-4629-A8A0-9B3033BBB090}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegUpdater", "RegUpdater\RegUpdater(VS 2015).vcxproj", "{7A68641E-DD2A-48E1-AB7A-B3007830D21B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF84916B-6157-44BC-A49C-D4A96F91A788}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AF84916B-6157-44BC-A49C-D4A96F91A788}.Debug|Win32.Build.0 = Debug|Win32
+		{AF84916B-6157-44BC-A49C-D4A96F91A788}.Release|Win32.ActiveCfg = Release|Win32
+		{AF84916B-6157-44BC-A49C-D4A96F91A788}.Release|Win32.Build.0 = Release|Win32
+		{0EEE4ABD-07C2-4D1A-BA02-D78501E813E7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0EEE4ABD-07C2-4D1A-BA02-D78501E813E7}.Debug|Win32.Build.0 = Debug|Win32
+		{0EEE4ABD-07C2-4D1A-BA02-D78501E813E7}.Release|Win32.ActiveCfg = Release|Win32
+		{0EEE4ABD-07C2-4D1A-BA02-D78501E813E7}.Release|Win32.Build.0 = Release|Win32
+		{DADC0F7E-EFEA-4629-A8A0-9B3033BBB090}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DADC0F7E-EFEA-4629-A8A0-9B3033BBB090}.Debug|Win32.Build.0 = Debug|Win32
+		{DADC0F7E-EFEA-4629-A8A0-9B3033BBB090}.Release|Win32.ActiveCfg = Release|Win32
+		{DADC0F7E-EFEA-4629-A8A0-9B3033BBB090}.Release|Win32.Build.0 = Release|Win32
+		{7A68641E-DD2A-48E1-AB7A-B3007830D21B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7A68641E-DD2A-48E1-AB7A-B3007830D21B}.Debug|Win32.Build.0 = Debug|Win32
+		{7A68641E-DD2A-48E1-AB7A-B3007830D21B}.Release|Win32.ActiveCfg = Release|Win32
+		{7A68641E-DD2A-48E1-AB7A-B3007830D21B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

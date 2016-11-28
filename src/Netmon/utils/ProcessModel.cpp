@@ -27,16 +27,15 @@ CRITICAL_SECTION ProcessModel::_cs;
 
 #pragma endregion
 
-extern Profile g_profile;
+extern NetmonProfile g_profile;
 
 void ProcessModel::Init()
 {
     // Init Process List
-    TCHAR command[256] = TEXT("Select * From Process;");
+    TCHAR command[256] = _T("Select * From Process;");
 
     SQLiteRow row;
     row.InsertType(SQLiteRow::TYPE_INT32);
-    row.InsertType(SQLiteRow::TYPE_STRING);
     row.InsertType(SQLiteRow::TYPE_STRING);
 
     SQLite::Select(command, &row, InitCallback);
@@ -61,7 +60,7 @@ void ProcessModel::InitCallback(SQLiteRow *row)
 
     // - name & fullPath
     _tcscpy_s(item.name, MAX_PATH, row->GetDataStr(1));
-    _tcscpy_s(item.fullPath, MAX_PATH, row->GetDataStr(2));
+    _tcscpy_s(item.fullPath, MAX_PATH, _T("-"));
 
     // Add Process
     _processes.push_back(item);
@@ -82,7 +81,7 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
 {
     int index = GetProcessIndex(pi->puid);
 
-    if (index == -1) // A new process
+    if( index == -1 ) // A new process
     {
         // Insert a ProcessItem
         ProcessItem item;
@@ -116,7 +115,7 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
         // Update the ProcessItem that already Exists
         ProcessItem &item = _processes[index];
 
-        if (!item.active)
+        if( !item.active )
         {
             item.active = true;
             item.pid = pi->pid; // The first pid is logged
@@ -127,19 +126,13 @@ void ProcessModel::OnPacket(PacketInfoEx *pi)
             item.rxRate = 0;
             item.prevTxRate = 0;
             item.prevRxRate = 0;
-
-            // Update full path when necessary, but avoid comparing to frequently
-            if (_tcscmp(item.fullPath, pi->fullPath) != 0)
-            {
-                Utils::UpdateFullPath(item.puid, item.fullPath);
-            }
         }
 
-        if (pi->dir == DIR_UP)
+        if( pi->dir == DIR_UP )
         {
             item.txRate += pi->size;
         }
-        else if (pi->dir == DIR_DOWN)
+        else if( pi->dir == DIR_DOWN )
         {
             item.rxRate += pi->size;
         }
@@ -158,9 +151,9 @@ void ProcessModel::OnTimer()
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
         ProcessItem &item = _processes[i];
-        if (item.active && item.pid != -1 ) // Skip the "Unknown" process
+        if( item.active && item.pid != -1 ) // Skip the "Unknown" process
         {
-            if (!ProcessCache::instance()->IsProcessAlive(item.pid, item.name, !rebuilt))
+            if( !ProcessCache::instance()->IsProcessAlive(item.pid, item.name, !rebuilt))
             {
                 item.active = false;
             }
@@ -212,7 +205,7 @@ void ProcessModel::ShowProcess(int puid)
         // Update Profile
         std::vector<int> hiddenProcesses;
         ExportHiddenProcesses(hiddenProcesses);
-        g_profile.SetValue(TEXT("HiddenProcess"), new ProfileIntListItem(hiddenProcesses));
+        g_profile.SetHiddenProcesses(hiddenProcesses);
     }
 }
 
@@ -242,7 +235,7 @@ void ProcessModel::HideProcess(int puid)
         // Update Profile
         std::vector<int> hiddenProcesses;
         ExportHiddenProcesses(hiddenProcesses);
-        g_profile.SetValue(TEXT("HiddenProcess"), new ProfileIntListItem(hiddenProcesses));
+        g_profile.SetHiddenProcesses(hiddenProcesses);
     }
 }
 
@@ -255,8 +248,8 @@ void ProcessModel::Export(std::vector<ProcessModel::ProcessItem> &items)
 
 void ProcessModel::ExportHiddenState(std::vector<bool> &states)
 {
-    Lock();
     states.clear();
+    Lock();
     for (unsigned int i = 0; i < _processes.size(); i++)
     {
         states.push_back(_processes[i].hidden);
@@ -266,8 +259,8 @@ void ProcessModel::ExportHiddenState(std::vector<bool> &states)
 
 void ProcessModel::ExportHiddenProcesses(std::vector<int> &processes)
 {
-    Lock();
     processes.clear();
+    Lock();
     for (unsigned int i = 0; i < _processes.size(); i++)
     {
         if (_processes[i].hidden)
@@ -301,7 +294,7 @@ int ProcessModel::GetProcessUid(const TCHAR *name)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if (_tcscmp(_processes[i].name, name) == 0 )
+        if( _tcscmp(_processes[i].name, name) == 0 )
         {
             puid = _processes[i].puid;
             break;
@@ -317,7 +310,7 @@ bool ProcessModel::GetProcessName(int puid, TCHAR *buf, int len)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if (_processes[i].puid == puid )
+        if( _processes[i].puid == puid )
         {
             _tcscpy_s(buf, len, _processes[i].name);
             result = true;
@@ -334,7 +327,7 @@ int ProcessModel::GetProcessIndex(int puid)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if (_processes[i].puid == puid )
+        if( _processes[i].puid == puid )
         {
             index = i;
             break;
@@ -348,7 +341,7 @@ bool ProcessModel::GetProcessRate(int puid, int *txRate, int *rxRate)
 {
     int index = GetProcessIndex(puid);
 
-    if (index == -1 )
+    if( index == -1 )
     {
         return false;
     }
@@ -368,7 +361,7 @@ bool ProcessModel::IsProcessActive(int puid)
     Lock();
     for(unsigned int i = 0; i < _processes.size(); i++)
     {
-        if (_processes[i].puid == puid)
+        if( _processes[i].puid == puid )
         {
             active = _processes[i].active;
             break;

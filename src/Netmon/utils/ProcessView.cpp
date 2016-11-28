@@ -30,7 +30,7 @@ void ProcessView::Init(HWND hList)
     _prevHideProcess = false;
 
     Utils::ListViewInit(_hList, FALSE, 5, 
-        TEXT("UID"), TEXT("Process"), TEXT("Tx Rate"), TEXT("Rx Rate"), TEXT("Full Path"), 
+        _T("UID"), _T("Process"), _T("Tx Rate"), _T("Rx Rate"), _T("Full Path"), 
         50, 150, 70, 70, 400);
 
     // Init Model
@@ -41,23 +41,23 @@ void ProcessView::Init(HWND hList)
 void ProcessView::ListViewInsert(const ProcessModel::ProcessItem &item)
 {
     // Prepare Columns
-    TCHAR szColumn[5][MAX_PATH];
+    TCHAR szColumn[5][MAX_PATH]={ 0 };
 
-    _stprintf_s(szColumn[0], MAX_PATH, TEXT("%d"), item.puid);
-    _stprintf_s(szColumn[1], MAX_PATH, TEXT("%s"), item.name);
+    _stprintf_s(szColumn[0], MAX_PATH, _T("%d"), item.puid);
+    _stprintf_s(szColumn[1], MAX_PATH, _T("%s"), item.name);
 
-    if (item.active)
+    if( item.active )
     {
-        _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), 
+        _stprintf_s(szColumn[2], MAX_PATH, _T("%d.%d"), 
             item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
-        _stprintf_s(szColumn[3], MAX_PATH, TEXT("%d.%d"), 
+        _stprintf_s(szColumn[3], MAX_PATH, _T("%d.%d"), 
             item.prevRxRate / 1024, (item.prevRxRate % 1024 + 51) / 108);
         _tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
     }
     else
     {
-        _tcscpy_s(szColumn[2], MAX_PATH, TEXT("-"));
-        _tcscpy_s(szColumn[3], MAX_PATH, TEXT("-"));
+        _tcscpy_s(szColumn[2], MAX_PATH, _T("-"));
+        _tcscpy_s(szColumn[3], MAX_PATH, _T("-"));
         _tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
     }
 
@@ -70,18 +70,18 @@ void ProcessView::ListViewUpdate(int index, const ProcessModel::ProcessItem &ite
     // Prepare Columns
     TCHAR szColumn[5][MAX_PATH];
 
-    if (item.active )
+    if( item.active )
     {
-        _stprintf_s(szColumn[2], MAX_PATH, TEXT("%d.%d"), 
+        _stprintf_s(szColumn[2], MAX_PATH, _T("%d.%d"), 
             item.prevTxRate / 1024, (item.prevTxRate % 1024 + 51) / 108);
-        _stprintf_s(szColumn[3], MAX_PATH, TEXT("%d.%d"), 
+        _stprintf_s(szColumn[3], MAX_PATH, _T("%d.%d"), 
             item.prevRxRate / 1024, (item.prevRxRate % 1024 + 51) / 108);
         _tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
     }
     else
     {
-        _tcscpy_s(szColumn[2], MAX_PATH, TEXT("-"));
-        _tcscpy_s(szColumn[3], MAX_PATH, TEXT("-"));
+        _tcscpy_s(szColumn[2], MAX_PATH, _T("-"));
+        _tcscpy_s(szColumn[3], MAX_PATH, _T("-"));
         _tcscpy_s(szColumn[4], MAX_PATH, item.fullPath);
     }
 

@@ -198,208 +198,144 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Plugin"
+			Name="Model &amp; View"
 			>
 			<File
-				RelativePath=".\plugins\Plugin.h"
+				RelativePath=".\views\DetailModel.cpp"
 				>
 			</File>
-			<Filter
-				Name="Abstract"
+			<File
+				RelativePath=".\views\DetailModel.h"
 				>
-				<File
-					RelativePath=".\plugins\abstract\Model.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\abstract\Model.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\abstract\View.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\abstract\View.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Month"
+			</File>
+			<File
+				RelativePath=".\views\DetailView.cpp"
 				>
-				<File
-					RelativePath=".\plugins\month\Month.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\month\Month.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\month\MonthModel.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\month\MonthModel.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\month\MonthView.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\month\MonthView.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Statistics"
+			</File>
+			<File
+				RelativePath=".\views\DetailView.h"
 				>
-				<File
-					RelativePath=".\plugins\statistics\Statistics.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\statistics\Statistics.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\statistics\StatisticsModel.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\statistics\StatisticsModel.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\statistics\StatisticsView.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\statistics\StatisticsView.h"
-					>
-				</File>
-				<Filter
-					Name="GDI Widget"
-					>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GdiWidget.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GdiWidget.h"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwGroupbox.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwGroupbox.h"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwHistogram.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwHistogram.h"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwLabel.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwLabel.h"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwLogHistogram.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwLogHistogram.h"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwPieChart.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\plugins\statistics\GdiWidget\GwPieChart.h"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="Realtime"
+			</File>
+			<File
+				RelativePath=".\views\MonthModel.cpp"
 				>
-				<File
-					RelativePath=".\plugins\realtime\Realtime.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\realtime\Realtime.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\realtime\RealtimeModel.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\realtime\RealtimeModel.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\realtime\RealtimeView.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\realtime\RealtimeView.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Detail"
+			</File>
+			<File
+				RelativePath=".\views\MonthModel.h"
 				>
-				<File
-					RelativePath=".\plugins\detail\Detail.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\detail\Detail.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\detail\DetailModel.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\detail\DetailModel.h"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\detail\DetailView.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\plugins\detail\DetailView.h"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\views\MonthView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\MonthView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\views\NetModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\NetModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\views\NetView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\NetView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\views\RealtimeModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\RealtimeModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\views\RealtimeView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\RealtimeView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\views\StatisticsModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\StatisticsModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\views\StatisticsView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\views\StatisticsView.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="GdiWidget"
+			>
+			<File
+				RelativePath=".\GdiWidget\GdiWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GdiWidget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwGroupbox.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwGroupbox.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwHistogram.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwHistogram.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwLabel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwLabel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwLogHistogram.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwLogHistogram.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwPieChart.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GdiWidget\GwPieChart.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Utils"
 			>
-			<File
-				RelativePath=".\utils\Date.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils\Date.h"
-				>
-			</File>
 			<File
 				RelativePath=".\utils\Language.cpp"
 				>
@@ -413,6 +349,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\utils\PcapNetFilter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\PcapNetFilter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utils\PortCache.cpp"
 				>
 			</File>
@@ -421,11 +365,35 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils\SingleLock.cpp"
+				RelativePath=".\utils\ProcessCache.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\utils\SingleLock.h"
+				RelativePath=".\utils\ProcessCache.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\ProcessView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\Profile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils\Profile.h"
 				>
 			</File>
 			<File
@@ -444,78 +412,6 @@
 				RelativePath=".\utils\Utils.h"
 				>
 			</File>
-			<Filter
-				Name="Profile"
-				>
-				<File
-					RelativePath=".\utils\Profile.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\Profile.h"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\ProfileItem.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\ProfileItem.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Process"
-				>
-				<File
-					RelativePath=".\utils\ProcessCache.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\ProcessCache.h"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\ProcessModel.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\ProcessModel.h"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\ProcessView.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\utils\ProcessView.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Traffic Source"
-				>
-				<File
-					RelativePath=".\traffic-src\PcapSource.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\traffic-src\PcapSource.h"
-					>
-				</File>
-				<File
-					RelativePath=".\traffic-src\TrafficSource.h"
-					>
-				</File>
-				<File
-					RelativePath=".\traffic-src\VirtualSource.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\traffic-src\VirtualSource.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Main"
@@ -566,22 +462,22 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Dialog"
+			Name="Dlg"
 			>
 			<File
-				RelativePath=".\DlgAbout.cpp"
+				RelativePath=".\Dlg\DlgAbout.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\DlgAbout.h"
+				RelativePath=".\Dlg\DlgAbout.h"
 				>
 			</File>
 			<File
-				RelativePath=".\DlgPreferences.cpp"
+				RelativePath=".\Dlg\DlgPreferences.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\DlgPreferences.h"
+				RelativePath=".\Dlg\DlgPreferences.h"
 				>
 			</File>
 		</Filter>

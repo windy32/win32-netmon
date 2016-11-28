@@ -83,7 +83,7 @@ bool SQLite::Open(const TCHAR *fileName)
     InitializeCriticalSection(&stCS);
 
     // Convert to UTF-8
-    char szFileName[MAX_PATH];
+    char szFileName[MAX_PATH]={ 0 };
     Utils::Utf16ToUtf8(fileName, szFileName, MAX_PATH);
 
     return sqlite3_open(szFileName, &db) == SQLITE_OK;
@@ -94,9 +94,9 @@ bool SQLite::Close()
 {
     //DeleteCriticalSection(&stCS);
 
-    if (counter > 0 )
+    if( counter > 0 )
     {
-        Exec(TEXT("Commit Transaction;"));
+        Exec(_T("Commit Transaction;"));
     }
 
     return sqlite3_close(db) != SQLITE_BUSY;
@@ -108,9 +108,9 @@ bool SQLite::Flush()
 
     bool retVel = true;
 
-    if (counter > 0 )
+    if( counter > 0 )
     {
-        retVel = Exec(TEXT("Commit Transaction;"));
+        retVel = Exec(_T("Commit Transaction;"));
         counter = 0;
     }
 
@@ -129,7 +129,7 @@ bool SQLite::TableExist(const TCHAR *tableName)
     // Build Command
     TCHAR command[512];
     _stprintf_s(command, _countof(command), 
-        TEXT("Select name From sqlite_master Where type In ('table','view') And name == \'%s\'"), 
+        _T("Select name From sqlite_master Where type In ('table','view') And name == \'%s\'"), 
         tableName);
 
     // Convert to UTF-8
@@ -137,7 +137,7 @@ bool SQLite::TableExist(const TCHAR *tableName)
     Utils::Utf16ToUtf8(command, szCommand, 512);
 
     // Prepare
-    if (sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
+    if( sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
     {
         if ( sqlite3_step(stmt) == SQLITE_ROW ) // Table exist
         {
@@ -163,10 +163,10 @@ bool SQLite::Exec(const TCHAR *command)
     Utils::Utf16ToUtf8(command, szCommand, 512);
 
     // Prepare
-    if (sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
+    if( sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
     {
         // Execute
-        if (sqlite3_step(stmt) == SQLITE_DONE )
+        if( sqlite3_step(stmt) == SQLITE_DONE )
         {
             retValue = true;
         }
@@ -184,24 +184,24 @@ bool SQLite::Exec(const TCHAR *command, bool cached)
     EnterCriticalSection(&stCS);
     bool retValue;
 
-    if (!cached )
+    if( !cached )
     {
-        if (counter == 0 )
+        if( counter == 0 )
         {
             retValue = Exec(command);
         }
         else
         {
             retValue = Exec(command);
-            retValue = Exec(TEXT("Commit Transaction;"));
+            retValue = Exec(_T("Commit Transaction;"));
             counter = 0;
         }
     }
     else
     {
-        if (counter == 0 )
+        if( counter == 0 )
         {
-            retValue = Exec(TEXT("Begin Transaction;"));
+            retValue = Exec(_T("Begin Transaction;"));
             retValue = Exec(command);
             counter += 1;
         }
@@ -210,9 +210,9 @@ bool SQLite::Exec(const TCHAR *command, bool cached)
             retValue = Exec(command);
             counter += 1;
 
-            if (counter == 4000 )
+            if( counter == 4000 )
             {
-                retValue = Exec(TEXT("Commit Transaction;"));
+                retValue = Exec(_T("Commit Transaction;"));
                 counter = 0;
             }
         }
@@ -234,7 +234,7 @@ bool SQLite::Select(const TCHAR *command, SQLiteRow *row, SQLiteCallback callbac
     char szCommand[512];
     Utils::Utf16ToUtf8(command, szCommand, 512);
 
-    if (sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
+    if( sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
     {
         int result;
 
@@ -287,85 +287,7 @@ bool SQLite::Select(const TCHAR *command, SQLiteRow *row, SQLiteCallback callbac
                 // Call back
                 callback(row);
             }
-            else if (result == SQLITE_DONE ) // No more data
-            {
-                retValue = true;
-            }
-        } while( result == SQLITE_ROW );
-    }
-
-    // Finalize
-    sqlite3_finalize(stmt);
-
-    LeaveCriticalSection(&stCS);
-    return retValue;
-}
-
-bool SQLite::Select(const TCHAR *command, SQLiteRow *row, SQLiteCallback2 callback, void *context)
-{
-    EnterCriticalSection(&stCS);
-
-    bool retValue = false;
-    sqlite3_stmt *stmt = 0;
-
-    // Convert to UTF-8
-    char szCommand[512];
-    Utils::Utf16ToUtf8(command, szCommand, 512);
-
-    if (sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
-    {
-        int result;
-
-        do
-        {
-            result = sqlite3_step(stmt);
-
-            if ( result == SQLITE_ROW ) // There's data returned
-            {
-                for(int i = 0; i < sqlite3_column_count(stmt); i++)
-                {
-                    int16_t vInt16;
-                    int32_t vInt32;
-                    int64_t vInt64;
-                    char   *vStrUtf8;
-                    TCHAR   vStrUtf16[1024];
-
-                    // Save data for current column
-                    switch (row->GetType(i))
-                    {
-                    case SQLiteRow::TYPE_INT16:
-                        vInt16 = (int16_t)sqlite3_column_int(stmt, i);
-                        row->SetData(i, (void *)&vInt16);
-                        break;
-
-                    case SQLiteRow::TYPE_INT32:
-                        vInt32 = (int32_t)sqlite3_column_int(stmt, i);
-                        row->SetData(i, (void *)&vInt32);
-                        break;
-
-                    case SQLiteRow::TYPE_INT64:
-                        vInt64 = (int64_t)sqlite3_column_int64(stmt, i);
-                        row->SetData(i, (void *)&vInt64);
-                        break;
-
-                    case SQLiteRow::TYPE_STRING:
-                        vStrUtf8 = (char *)sqlite3_column_text(stmt, i);
-                        
-                        // Convert to UTF-16
-                        Utils::Utf8ToUtf16(vStrUtf8, vStrUtf16, _countof(vStrUtf16));
-
-                        row->SetData(i, (void *)vStrUtf16);
-                        break;
-
-                    default:
-                        break;
-                    }
-                }
-
-                // Call back
-                callback(row, context);
-            }
-            else if (result == SQLITE_DONE ) // No more data
+            else if( result == SQLITE_DONE ) // No more data
             {
                 retValue = true;
             }
@@ -390,7 +312,7 @@ bool SQLite::Select(const TCHAR *command, SQLiteRow *row)
     char szCommand[512];
     Utils::Utf16ToUtf8(command, szCommand, 512);
 
-    if (sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
+    if( sqlite3_prepare_v2(db, szCommand, -1, &stmt, 0) == SQLITE_OK)
     {
         int result = sqlite3_step(stmt);
 
