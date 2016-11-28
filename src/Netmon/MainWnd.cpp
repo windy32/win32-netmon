@@ -1240,6 +1240,14 @@ static void OnExit(HWND hWnd)
 	// End SQLite
 	SQLite::Close();
 
+	//release buffer
+#define RELEASEMEM(_point) if(NULL!=_point){delete _point;_point=NULL;}
+	RELEASEMEM(g_rtModel);
+	RELEASEMEM(g_mtModel);
+	RELEASEMEM(g_stModel);
+	RELEASEMEM(g_dtModel);
+#undef RELEASEMEM
+
 	// Exit
 	DestroyWindow(hWnd);
 	PostQuitMessage(0);
