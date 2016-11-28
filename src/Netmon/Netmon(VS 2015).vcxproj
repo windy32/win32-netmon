@@ -105,6 +105,7 @@
     <ClCompile Include="Main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="sqlite\sqlite3.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -145,6 +146,7 @@
     <ClInclude Include="GdiWidget\GwLogHistogram.h" />
     <ClInclude Include="GdiWidget\GwPieChart.h" />
     <ClInclude Include="log4z\log4z.h" />
+    <ClInclude Include="MainWnd.h" />
     <ClInclude Include="res\resource.h" />
     <ClInclude Include="sqlite\sqlite3.h" />
     <ClInclude Include="stdafx.h" />

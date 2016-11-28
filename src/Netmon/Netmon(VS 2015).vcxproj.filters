@@ -117,6 +117,9 @@
     <ClCompile Include="log4z\log4z.cpp">
       <Filter>Log4z</Filter>
     </ClCompile>
+    <ClCompile Include="MainWnd.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sqlite\sqlite3.h">
@@ -214,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="log4z\log4z.h">
       <Filter>Log4z</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWnd.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
